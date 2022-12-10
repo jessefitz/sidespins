@@ -1,12 +1,34 @@
-<!-- bootstrap-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
--->
 <div class="container-fluid bg-2 text-center">
   <markdown 
   [src]="'articles/better-now-than-never.md'"></markdown>
+</div>
+
+<div class="container">
+  <div class="row">
+    
+    <div class="col-lg-3 text-center  offset-md-1">
+      <div class="card bg-light mb-3 land landingPageTiles" style="max-width: 18rem;">    
+        <h5 class="card-header text-primary">Learn</h5>
+        <p class="card-body">Do some hands-on learning exercises relevant to my interests and the needs of our business.</p>   
+      </div>
+    </div>
+
+    <div class="col-lg-3 text-center offset-md-1">
+      <div class="card bg-light mb-3 land landingPageTiles" style="max-width: 18rem;">    
+        <h5 class="card-header text-primary">Experiment</h5>
+        <p class="card-body">Validated learning.  I'll lay out theories and experiment with ways to prove them.</p>   
+      </div>
+    </div>
+
+    <div class="col-lg-3 text-center offset-md-1">
+      <div class="card bg-light mb-3 land landingPageTiles" style="max-width: 18rem;">    
+        <h5 class="card-header text-primary">Share</h5>
+        <p class="card-body">No rules or constraints.  Just create and share things.</p>   
+      </div>
+    </div>
+  </div>
+</div>
+<app-article-list-component></app-article-list-component>
 <router-outlet></router-outlet>
 
 <!--font color #-->

@@ -1,0 +1,18 @@
+{
+    "Articles" : [{
+            "title": "Article1",
+            "src": "./articles/article1.md",
+            "tagline": "it's a real winner",
+            "date": "December 2022"
+        },{
+            "title": "Article2",
+            "src": "./articles/article2.md",
+            "tagline": "but this one is better",
+            "date": "December 2022"
+        },{
+            "title": "Article3",
+            "src": "./articles/better-now-than-never.md",
+            "tagline": "something else",
+            "date": "December 2022"
+        }]
+}

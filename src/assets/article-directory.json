@@ -1,21 +1,24 @@
 {
     "Articles" : [{
             "id": "1",
-            "title": "Article1",
-            "src": "/assets/articles/article1.md",
-            "tagline": "it's a real winner",
+            "urlpath": "a-little-more-detail",
+            "title": "A Explanation",
+            "src": "/assets/articles/moredetail.md",
+            "tagline": "The first article I've written",
             "date": "December 2022"
         },{
             "id": "2",
-            "title": "Article2",
-            "src": "/assets/articles/article2.md",
-            "tagline": "but this one is better",
+            "urlpath": "website-infrastructure",
+            "title": "What Lays Below",
+            "src": "/assets/articles/website-infrastructure.md",
+            "tagline": "Coming Soon",
             "date": "December 2022"
         },{
             "id": "3",
-            "title": "Article3",
-            "src": "/assets/articles/better-now-than-never.md",
-            "tagline": "something else",
+            "urlpath": "how-it-works",
+            "title": "Stuff You Should Know",
+            "src": "/assets/articles/how-it-works.md",
+            "tagline": "Coming Soon",
             "date": "December 2022"
         }]
 }

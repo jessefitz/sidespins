@@ -11,9 +11,9 @@ import { JsonPipe } from '@angular/common';
   providers: [ArticlesService]
 })
 export class ArticleComponent implements OnInit {
-   articleTitle : any;
+   articleUrlPath : any;
    articleContent: any;
-   articlesServce: any;
+  //  articlesServce: any;
    AllArticles : ArticleInfo[] = [];
    data = [];
    articleSrc: string = "";
@@ -34,10 +34,10 @@ export class ArticleComponent implements OnInit {
 
   constructor(private http: HttpClient, private service: ArticlesService, private route: ActivatedRoute) { }  
     ngOnInit() {
-      this.articlesServce = this.service;
-      this.articleTitle = this.route.snapshot.paramMap.get('articleTitle');
+      // this.articlesServce = this.service;
+      this.articleUrlPath = this.route.snapshot.paramMap.get('articleUrlPath');
       // this.articleContentAsync = this.getMyArticleContentPromise(this.articleTitle);
-      this.getArticleInfo(this.articleTitle);
+      this.getArticleInfo(this.articleUrlPath);
 
     }
   
@@ -54,11 +54,8 @@ export class ArticleComponent implements OnInit {
               var results = (JSON.parse(JSON.stringify(data)));
 
               for(let i=0; i< results.Articles.length; i++){
-                // this.AllArticles.push(
-                //   new ArticleInfo( results.Articles[i].id, results.Articles[i].title, results.Articles[i].tagline, results.Articles[i].src)
-                // );
-
-                if (results.Articles[i].title === articleTitleToFind){
+                
+                if (results.Articles[i].urlpath === articleTitleToFind){
                   this.articleTagline = results.Articles[i].tagline; 
                   this.articleSrc = results.Articles[i].src;
                   break;

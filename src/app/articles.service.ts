@@ -31,7 +31,7 @@ export class ArticlesService {
       this.getFileContent(this._jsonURL).subscribe(data => {    
         for(let i=0; i< data.Articles.length; i++){
           this.AllArticles.push(
-          new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src)
+          new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src, data.Articles[i].urlpath)
           );
         }     
       });
@@ -58,7 +58,7 @@ export class ArticlesService {
           success = true; //TODO:  figure out how to catch error event from subscribe
           for(let i=0; i< data.Articles.length; i++){
             this.AllArticles.push(
-            new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src)
+            new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src, data.Articles[i].urlpath)
             );
           }
           
@@ -99,31 +99,7 @@ export class ArticlesService {
         
         return "";
     }
-        // var content: any;
-  //   if(this.AllArticles.length === 0){
-  //     this.getArticlesHelper()
-  //       .then((res) => {
-  //         success = true;
-  //         var result = this.AllArticles.find(item => item.ArticleTitle === aticleTitleToFind); //still matching title with id instead of using an anctual id
-  //         content = result?.ArticleSourceFile;
-  //         console.log(result?.ArticleSourceFile);
-  //         return content;
-  //         //return result?.ArticleTagline;
-  //       }) //response should be a count of articles listed in the directory
-  //       .catch((err) => {
-  //         console.log(err);
-  //         return "Error in Get Article Content"; //err should just say there was a failure.
-  //       });  
-  //   }   
-  //   else {
-  //     var result = this.AllArticles.find(item => item.ArticleTitle === aticleTitleToFind); //still matching title with id instead of using an anctual id
-  //     content = result?.ArticleSourceFile;
-  //     console.log(result?.ArticleSourceFile);
-  //     return content;
-  //   }
-  //   return "i have no idea how i would get here";
-  // }
-   
+     
 }
 
 export class ArticleInfo {
@@ -131,12 +107,14 @@ export class ArticleInfo {
   ArticleTagline: any;
   ArticleSourceFile: any;
   ArticleId: any;
+  ArticleUrlPath: any;
 
-   constructor(id: string, title: string, tagline: string, src: string){
+   constructor(id: string, title: string, tagline: string, src: string, url: string){
     this.ArticleId = id;
     this.ArticleTitle = title;
     this.ArticleTagline = tagline;
     this.ArticleSourceFile = src;
+    this.ArticleUrlPath = url;
    }
 
 }

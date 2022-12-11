@@ -1,0 +1,3 @@
+# Coming Soon...
+
+More information about how I built the app and the instructions for adding content into the Frankenstein CMS.

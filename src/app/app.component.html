@@ -1,31 +1,15 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-<!--  
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button> -->
   <div class="navbar-expand-lg navbar-light bg-light" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <!-- <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a> -->
       <a class="navbar-brand" routerLink="/home" routerLinkactive="active" ariaCurrentWhenActive="page">Home</a>
       <a class="navbar-brand" routerLink="/article-list" routerLinkActive="active" ariaCurrentWhenActive="page">Articles</a>
     </div>
   </div>
   </nav>
 
-<!-- This nav gives you links to click, which tells the router which route to use (defined in the routes constant in  AppRoutingModule) -->
-<!-- <nav>
-  <ul>
-    <li>
-      <a routerLink="/home" routerLinkactive="active" ariaCurrentWhenActive="page">Home</a>
-    </li>
-    <li>
-      <a routerLink="/article-list" routerLinkActive="active" ariaCurrentWhenActive="page">article list route</a>
-    </li>
-  </ul>
-</nav> -->
-
-<!-- <app-article-list></app-article-list> -->
-<router-outlet></router-outlet>
+  <div class="container-lg min-vh-100">
+    <router-outlet></router-outlet>
+  </div>
 
 <div class="container-fluid bg-2 text-center ">
   <!-- <span>Contact Me</span>  -->

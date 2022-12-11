@@ -9,7 +9,7 @@ const routes: Routes = [
   {path: 'article-list', component: ArticleListComponent},
   {path: 'home', component:HomeComponent},
   {path: 'article', component:ArticleComponent},
-  {path: 'article/*', component:ArticleComponent}
+  {path: 'article/:articleTitle', component:ArticleComponent}
 ];
 
 @NgModule({

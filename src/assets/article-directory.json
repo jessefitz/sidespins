@@ -2,7 +2,7 @@
     "Articles" : [{
             "id": "1",
             "urlpath": "a-little-more-detail",
-            "title": "A Explanation",
+            "title": "An Explanation",
             "src": "/assets/articles/moredetail.md",
             "tagline": "The first article I've written",
             "date": "December 2022"

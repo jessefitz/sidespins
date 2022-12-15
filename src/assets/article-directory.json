@@ -20,5 +20,12 @@
             "src": "/assets/articles/how-it-works.md",
             "tagline": "Coming Soon",
             "date": "December 2022"
+        },{
+            "id": "4",
+            "urlpath": "chatgpt",
+            "title": "Brief Thought on ChatGPT",
+            "src": "/assets/articles/chatgpt.md",
+            "tagline": "Not-so-deep thoughts by Jesse",
+            "date": "December 2022"
         }]
 }

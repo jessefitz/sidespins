@@ -4,7 +4,7 @@ I recently listened to an episode of (one of) my new, more favorite podcasts, [H
 
 In terms of benefit to society, look, it's definitely there... But I can also see the flip side and how, not necessarily through intentionally malicious action, technology like this could have a negative impact our future as a society of independently thinking people.  I think my immediate concerns are most focused on what it means for the creating thinking process itself.
 
-Here's this big "easy button" that can do your thinking for you.  Why go through all that energy consuming effot of putting your brain through the process of creating something new when that beautiful button right in front of your face?
+Here's this big "easy button" that can do your thinking for you.  Why go through all that energy consuming effort of putting your brain through the process of creating something new when that beautiful button right in front of your face?
 
 The optimist in me hopes that technology like this can be used to inspire a higher level of creativity or to perhaps spark creativity where it may not have existed otherwise.
 

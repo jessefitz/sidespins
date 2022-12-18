@@ -26,17 +26,13 @@ export class ArticleComponent implements OnInit {
 
    getMyArticleContentPromise(articleTitleToFind: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      //setTimeout(() => resolve(articleTitleToFind), 3000);  //this would be where i call my function to pull article content ansync?
-      //resolve(this.service.getArticleContent(articleTitleToFind));  //this needs to be in resolve?
-      resolve(this.service.getArticleContent(articleTitleToFind)); 
+            resolve(this.service.getArticleContent(articleTitleToFind)); 
     });
   }
 
   constructor(private http: HttpClient, private service: ArticlesService, private route: ActivatedRoute) { }  
     ngOnInit() {
-      // this.articlesServce = this.service;
       this.articleUrlPath = this.route.snapshot.paramMap.get('articleUrlPath');
-      // this.articleContentAsync = this.getMyArticleContentPromise(this.articleTitle);
       this.getArticleInfo(this.articleUrlPath);
 
     }
@@ -45,7 +41,7 @@ export class ArticleComponent implements OnInit {
   getArticleInfo(articleTitleToFind : string){
     var success: boolean = false;
     //using a promise here appears to mitigate the issues I was experiencing with async property values.
-    //i've eliminted usage of the ArticlesService until I can prioritize time to clean things up.
+    //i've eliminated usage of the ArticlesService until I can prioritize time to clean things up.
     const promise = new Promise<void>((resolve, reject) => {
       // const apiURL = this.api;
       this.http.get('assets/article-directory.json').subscribe(data => {    

@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/jessefitz_app",
+            "outputPath": "dist/jessefitz_app/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -104,6 +104,59 @@
             ],
             "scripts": []
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/jessefitz_app/server",
+            "main": "server.ts",
+            "tsConfig": "tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media"
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "vendorChunk": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "jessefitz_app:build:development",
+              "serverTarget": "jessefitz_app:server:development"
+            },
+            "production": {
+              "browserTarget": "jessefitz_app:build:production",
+              "serverTarget": "jessefitz_app:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "jessefitz_app:build:production",
+              "serverTarget": "jessefitz_app:server:production"
+            },
+            "development": {
+              "browserTarget": "jessefitz_app:build:development",
+              "serverTarget": "jessefitz_app:server:development"
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     }

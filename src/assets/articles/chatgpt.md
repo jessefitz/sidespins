@@ -8,4 +8,8 @@ Here's this big "easy button" that can do your thinking for you.  Why go through
 
 The optimist in me hopes that technology like this can be used to inspire a higher level of creativity or to perhaps spark creativity where it may not have existed otherwise.
 
-The realist expects there to be some good to come of it, but that the good will eventually be overshadowed by more shady use cases, primarily driven by personal gain through the deceptive coercion of the masses.
+The realist expects there to be some good to come of it, but that the good will eventually be overshadowed by more shady use cases, primarily driven by personal gain through the deceptive coercion of the masses. 
+
+That all said, I've used ChatGPT on-and-off over the course of the past few days as I've tried to address issues with my Frankenstein CMS.  I've also used it to help push some ideas through for my one of my Loyola finals.
+
+I'll have to agree with the guys from Hard Fork on this one... ChatGPT is going to cause a major disruption in the education space.

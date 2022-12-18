@@ -6,7 +6,7 @@
   <li *ngFor="let article of articles">
       <a
       [title]="article.ArticleTitle"
-      [routerLink]="['/article', article.ArticleUrlPath]">
+      [routerLink]="['/articles', article.ArticleUrlPath]">
       {{ article.ArticleTitle  }}
     </a>
   </li>

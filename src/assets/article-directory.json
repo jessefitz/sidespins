@@ -1,8 +1,15 @@
 {
     "Articles" : [{
+            "id": "0",
+            "urlpath": "venus",
+            "title": "An Explanation of Venus",
+            "src": "/assets/articles/chatgpt.md",
+            "tagline": "yee haw",
+            "date": "December 2022"
+        },{
             "id": "1",
             "urlpath": "a-little-more-detail",
-            "title": "An Explanation",
+            "title": "An Explanation for more",
             "src": "/assets/articles/moredetail.md",
             "tagline": "The first article I've written",
             "date": "December 2022"

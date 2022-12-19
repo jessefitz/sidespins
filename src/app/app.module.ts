@@ -16,6 +16,7 @@ import { IntroducingFrankensteinComponent } from './articles/introducing-franken
 import { WebsiteInfrastructureComponent } from './articles/website-infrastructure/website-infrastructure.component';
 import { HowItWorksComponent } from './articles/how-it-works/how-it-works.component';
 import { ChatGptComponent } from './articles/chat-gpt/chat-gpt.component';
+import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on-motivation.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { ChatGptComponent } from './articles/chat-gpt/chat-gpt.component';
     IntroducingFrankensteinComponent,
     WebsiteInfrastructureComponent,
     HowItWorksComponent,
-    ChatGptComponent
+    ChatGptComponent,
+    MoreOnMotivationComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

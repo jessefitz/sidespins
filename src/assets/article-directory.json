@@ -27,5 +27,12 @@
             "src": "/assets/article-content/chatgpt.md",
             "tagline": "Not-so-deep thoughts by Jesse",
             "date": "December 2022"
+        },{
+            "id": "5",
+            "urlpath": "more-on-motivation",
+            "title": "Some More Thoughts on My Motivations for this Site",
+            "src": "/assets/article-content/more-on-motivation.md",
+            "tagline": "Not-so-deep thoughts by Jesse",
+            "date": "December 2022"
         }]
 }

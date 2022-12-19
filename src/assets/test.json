@@ -1,0 +1,36 @@
+{
+    "Articles":  [
+                     {
+                         "id":  "1",
+                         "urlpath":  "introducing-frankenstein",
+                         "title":  "Introducing Frankenstein",
+                         "src":  "/assets/article-content/moredetail.md",
+                         "tagline":  "The first article I\u0027ve written",
+                         "date":  "December 2022"
+                     },
+                     {
+                         "id":  "2",
+                         "urlpath":  "website-infrastructure",
+                         "title":  "What Lays Below",
+                         "src":  "/assets/article-content/website-infrastructure.md",
+                         "tagline":  "Coming Soon",
+                         "date":  "December 2022"
+                     },
+                     {
+                         "id":  "3",
+                         "urlpath":  "how-it-works",
+                         "title":  "Stuff You Should Know",
+                         "src":  "/assets/article-content/how-it-works.md",
+                         "tagline":  "Coming Soon",
+                         "date":  "December 2022"
+                     },
+                     {
+                         "id":  "4",
+                         "urlpath":  "chatgpt",
+                         "title":  "Brief Thought on ChatGPT",
+                         "src":  "/assets/article-content/chatgpt.md",
+                         "tagline":  "Not-so-deep thoughts by Jesse",
+                         "date":  "December 2022"
+                     }
+                 ]
+}

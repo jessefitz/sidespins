@@ -13,4 +13,13 @@ This much has been tested locally and is functioning in "production".
 
 ## To Do's:
 - I'd like to automate this entire process.  Could take the form of a script that I run manually, or a file system watcher that does all this when a new article is added into the article-content directory.
-- Client browsers will cache most/all of this static content.  There's got to be a version paramter or something I can put in the index.html that, if changed, will force the client to replace files that have been previously cached.  Maybe I should ask ChatGPT.
+- Client browsers will cache most/all of this static content.  There's got to be a version parameter or something I can put in the index.html that, if changed, will force the client to replace files that have been previously cached.  Maybe I should ask ChatGPT.
+  
+  # Load the JSON file into a variable
+$data = Get-Content -Raw -Path data.json | ConvertFrom-Json
+
+# Add a new object to the array
+$data += @{ name = 'John'; age = 30; city = 'New York' }
+
+# Write the modified array back to the JSON file
+$data | ConvertTo-Json | Set-Content -Path data.json

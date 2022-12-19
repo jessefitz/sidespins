@@ -3,7 +3,9 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { ArticleInfo, ArticlesService } from '../articles.service';
 import { HttpClient } from '@angular/common/http';
 import { JsonPipe } from '@angular/common';
+import { useAnimation } from '@angular/animations';
 
+// ****** this component is no longer in use ****
 @Component({
   selector: 'app-article',
   templateUrl: './article.component.html',

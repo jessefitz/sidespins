@@ -8,6 +8,7 @@ This process is what I've come up with so that my full set of articles can be hy
 4.  in app-routing.module.ts, 
     1.  add import { HelloVenusComponent } from './articles/hello-venus/hello-venus.component';
     2.  add a route {path: 'articles/venus', component:HelloVenusComponent}
+5.  Add the entry into articles.json file.
 
 This much has been tested locally and is functioning in "production".
 

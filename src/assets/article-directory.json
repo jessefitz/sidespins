@@ -40,6 +40,13 @@
             "title": "Schooled by ChatGPT",
             "src": "/assets/article-content/using-chatgpt.md",
             "tagline": "Not-so-deep thoughts by Jesse",
-            "date": "December 2022"
+            "date": "Feb 2022"
+        },{
+            "id": "7",
+            "urlpath": "bridge",
+            "title": "A Bridge",
+            "src": "/assets/article-content/bridge.md",
+            "tagline": "Not-so-deep thoughts by Jesse",
+            "date": "Feb 2022"
         }]
 }

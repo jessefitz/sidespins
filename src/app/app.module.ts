@@ -18,6 +18,7 @@ import { HowItWorksComponent } from './articles/how-it-works/how-it-works.compon
 import { ChatGptComponent } from './articles/chat-gpt/chat-gpt.component';
 import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on-motivation.component';
 import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
+import { BridgeComponent } from './articles/bridge/bridge.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schoo
     HowItWorksComponent,
     ChatGptComponent,
     MoreOnMotivationComponent,
-    SchooledByChatgptComponent
+    SchooledByChatgptComponent,
+    BridgeComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

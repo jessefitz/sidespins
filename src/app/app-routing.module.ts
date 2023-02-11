@@ -10,6 +10,7 @@ import { HowItWorksComponent } from './articles/how-it-works/how-it-works.compon
 import { WebsiteInfrastructureComponent } from './articles/website-infrastructure/website-infrastructure.component';
 import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on-motivation.component';
 import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
+import { BridgeComponent } from './articles/bridge/bridge.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -24,7 +25,8 @@ const routes: Routes = [
   {path: 'articles/website-infrastructure', component:WebsiteInfrastructureComponent},  
   {path: 'articles/introducing-frankenstein', component:IntroducingFrankensteinComponent},   
   {path: 'articles/more-on-motivation', component:MoreOnMotivationComponent},
-  {path: 'articles/schooled-by-chatgpt', component:SchooledByChatgptComponent}  
+  {path: 'articles/schooled-by-chatgpt', component:SchooledByChatgptComponent},
+  {path: 'articles/bridge', component:BridgeComponent}  
 ];
 
 @NgModule({

@@ -22,7 +22,7 @@ Here's how it went.
 
  ...And then magic happened.
 
- ![Diagram](/img/ChatGTP_Rick.jpg)
+ ![Diagram](/img/rick.jpg)
 
  There you have it, folks.  Some AI generated constructive criticism and tom-foolery all rolled up into a single package.  
  

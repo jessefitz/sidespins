@@ -22,7 +22,7 @@ Here's how it went.
 
  ...And then magic happened.
 
- TODO: Insert screenshot of rick roll
+ ![Diagram](/img/ChatGTP_Rick.jpg)
 
  There you have it, folks.  Some AI generated constructive criticism and tom-foolery all rolled up into a single package.  
  

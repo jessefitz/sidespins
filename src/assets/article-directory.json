@@ -34,5 +34,12 @@
             "src": "/assets/article-content/more-on-motivation.md",
             "tagline": "Not-so-deep thoughts by Jesse",
             "date": "December 2022"
+        },{
+            "id": "6",
+            "urlpath": "schooled-by-chatgpt",
+            "title": "Schooled by ChatGPT",
+            "src": "/assets/article-content/using-chatgpt.md",
+            "tagline": "Not-so-deep thoughts by Jesse",
+            "date": "December 2022"
         }]
 }

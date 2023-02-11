@@ -9,6 +9,8 @@ import { ChatGptComponent } from './articles/chat-gpt/chat-gpt.component';
 import { HowItWorksComponent } from './articles/how-it-works/how-it-works.component';
 import { WebsiteInfrastructureComponent } from './articles/website-infrastructure/website-infrastructure.component';
 import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on-motivation.component';
+import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
+
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full' },
   {path: 'article-list', component: ArticleListComponent},
@@ -21,7 +23,8 @@ const routes: Routes = [
   {path: 'articles/how-it-works', component:HowItWorksComponent},  
   {path: 'articles/website-infrastructure', component:WebsiteInfrastructureComponent},  
   {path: 'articles/introducing-frankenstein', component:IntroducingFrankensteinComponent},   
-  {path: 'articles/more-on-motivation', component:MoreOnMotivationComponent}  
+  {path: 'articles/more-on-motivation', component:MoreOnMotivationComponent},
+  {path: 'articles/schooled-by-chatgpt', component:SchooledByChatgptComponent}  
 ];
 
 @NgModule({

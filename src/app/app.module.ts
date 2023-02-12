@@ -20,6 +20,7 @@ import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on
 import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
 import { BridgeComponent } from './articles/bridge/bridge.component';
 import { AutomationComponent } from './articles/automation/automation.component';
+import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-process/updated-authoring-process.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { AutomationComponent } from './articles/automation/automation.component'
     MoreOnMotivationComponent,
     SchooledByChatgptComponent,
     BridgeComponent,
-    AutomationComponent
+    AutomationComponent,
+    UpdatedAuthoringProcessComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

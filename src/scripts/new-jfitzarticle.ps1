@@ -1,22 +1,43 @@
+
 param (
-    [string]$markdownFile,  #the filename for the newly authored article, ex: my-new-article.md
+  [string]$markdownFile,  #the filename for the newly authored article, ex: my-new-article.md
   [string]$componentName,  #the name to use for the new component
   [string]$articlePath, #the path to use for the new route
   [string]$displayTitle #the title for the article on the articles listing page
 )
 
+function AddDashBeforeUppercase($inputString) {
+    $outputString = ''
+    for ($i = 0; $i -lt $inputString.Length; $i++) {
+      $currentChar = $inputString[$i]
+      if ($currentChar -cmatch '[A-Z]') {   ##TODO:  This is matching all characters.
+        $outputString += '-' + $currentChar.ToString().toLower()
+      } else {
+        $outputString += $currentChar
+      }
+    }
+    return $outputString
+  }
 
+  
+##ng generate is splitting the component name by uppercase letters, inserting a - between each item, then combining into a single, toLower string
+##this gets used instead of the component name in the routing modules import statement as well as the folder/filename for the component that gets generated
 ##generate the new angular component
 Write-Output "Generating new component"
+$splitComponentNameString = AddDashBeforeUppercase($componentName)
+#$pathToNewComponentClass = "src\app\articles\" + $splitComponentNameString + "\" + $splitComponentNameString + ".component.ts"
+Write-Output $pathToNewComponentClass
+
 $ngCommand = "ng generate component articles/" + $componentName + " --module=app.module --inline-template --inline-style --skip-tests"
 Invoke-Expression $ngCommand
 Write-Output "Component generated."
 
 ##BEGIN update component rendering template
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 2
 Write-Output "Updating component rendering template"
-$pathToNewComponentClass = "src\app\articles\" + $componentName + "\" + $componentName + ".component.ts"
+$pathToNewComponentClass = "src\app\articles\" + $splitComponentNameString + "\" + $splitComponentNameString + ".component.ts"
 $renderingTemplate = "  template: ``<markdown src=`"assets/article-content/"+ $markdownFile + "`"></markdown>``,"
+Write-Output "Getting component class at " + $pathToNewComponentClass
 $componentClassLines = Get-Content $pathToNewComponentClass
 $newComponentClassLInes = @()
 $indexOfRenderingTemplateLine = 4
@@ -49,8 +70,8 @@ $appRoutingModuleFilePath = "src\app\app-routing.module.ts"
 $componentClassName = ($componentName[0]).ToString().ToUpper() + $componentName.Substring(1) + "Component"
 $importHomeComponentLine = "import { HomeComponent } from './home/home.component';"
 $startOfRoutesLine = "const routes: Routes = ["
-$newRouteLine = "  {path: 'articles/" + $articlePath + "', component:" + $componentClassName + "},"
-$newComponentLine = "import { " + $componentClassName + " } from './articles/" + $componentName + "/" + $componentName + ".component';"
+$newRouteLine = "  {path: 'articles/" + $articlePath  + "', component:" + $componentClassName + "},"
+$newComponentLine = "import { " + $componentClassName + " } from './articles/" + $splitComponentNameString  + "/" + $splitComponentNameString  + ".component';"
 
 $appRoutingLines = Get-Content $appRoutingModuleFilePath
 $newAppRoutingLines = @()
@@ -99,3 +120,4 @@ $json += (ConvertFrom-Json -InputObject $valueToAdd)
 # Write the new contents of the JSON file back to disk
 $json | ConvertTo-Json | Set-Content -Path $articleDirectoryFilePath
 Write-Output "Updated article directory"
+#>

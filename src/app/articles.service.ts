@@ -29,9 +29,10 @@ export class ArticlesService {
   public getArticles (){
     if(this.AllArticles.length === 0){
       this.getFileContent(this._jsonURL).subscribe(data => {    
-        for(let i=0; i< data.Articles.length; i++){
+        for(let i=0; i< data.length; i++){
           this.AllArticles.push(
-          new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src, data.Articles[i].urlpath)
+          // new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src, data.Articles[i].urlpath)
+          new ArticleInfo( data[i].id, data[i].title, data[i].tagline, data[i].src, data[i].urlpath)
           );
         }     
       });
@@ -56,9 +57,10 @@ export class ArticlesService {
 
         this.getFileContent(this._jsonURL).subscribe(data => {    
           success = true; //TODO:  figure out how to catch error event from subscribe
-          for(let i=0; i< data.Articles.length; i++){
+          for(let i=0; i< data.length; i++){
             this.AllArticles.push(
-            new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src, data.Articles[i].urlpath)
+            //new ArticleInfo( data.Articles[i].id, data.Articles[i].title, data.Articles[i].tagline, data.Articles[i].src, data.Articles[i].urlpath)
+            new ArticleInfo( data[i].id, data[i].title, data[i].tagline, data[i].src, data[i].urlpath)
             );
           }
           

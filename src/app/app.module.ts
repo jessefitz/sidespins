@@ -19,16 +19,13 @@ import { ChatGptComponent } from './articles/chat-gpt/chat-gpt.component';
 import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on-motivation.component';
 import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
 import { BridgeComponent } from './articles/bridge/bridge.component';
+import { AutomationComponent } from './articles/automation/automation.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ArticleListComponent,
     HomeComponent,
-    // ArticleComponent,
-    // HelloWorldComponent,
-    // HelloMarsComponent,
-    // HelloSaturnComponent,
     HelloVenusComponent,
     IntroducingFrankensteinComponent,
     WebsiteInfrastructureComponent,
@@ -36,7 +33,8 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
     ChatGptComponent,
     MoreOnMotivationComponent,
     SchooledByChatgptComponent,
-    BridgeComponent
+    BridgeComponent,
+    AutomationComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

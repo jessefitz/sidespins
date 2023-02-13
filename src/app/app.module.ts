@@ -22,6 +22,7 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
 import { AutomationComponent } from './articles/automation/automation.component';
 import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-process/updated-authoring-process.component';
 import { MondaysComponent } from './articles/mondays/mondays.component';
+import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { MondaysComponent } from './articles/mondays/mondays.component';
     BridgeComponent,
     AutomationComponent,
     UpdatedAuthoringProcessComponent,
-    MondaysComponent
+    MondaysComponent,
+    AiUsageComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

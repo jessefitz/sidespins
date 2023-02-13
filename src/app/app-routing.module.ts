@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
+import { MondaysComponent } from './articles/mondays/mondays.component';
 import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-process/updated-authoring-process.component';
 import { AutomationComponent } from './articles/automation/automation.component';
 import { IntroducingFrankensteinComponent } from './articles/introducing-frankenstein/introducing-frankenstein.component';
@@ -15,6 +16,7 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/mondays', component:MondaysComponent},
   {path: 'articles/revised-authoring-process', component:UpdatedAuthoringProcessComponent},
   {path: 'articles/automation', component:AutomationComponent},
   {path: '', redirectTo: '/home', pathMatch: 'full' },

@@ -21,6 +21,7 @@ import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schoo
 import { BridgeComponent } from './articles/bridge/bridge.component';
 import { AutomationComponent } from './articles/automation/automation.component';
 import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-process/updated-authoring-process.component';
+import { MondaysComponent } from './articles/mondays/mondays.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-p
     SchooledByChatgptComponent,
     BridgeComponent,
     AutomationComponent,
-    UpdatedAuthoringProcessComponent
+    UpdatedAuthoringProcessComponent,
+    MondaysComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

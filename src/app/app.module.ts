@@ -23,6 +23,7 @@ import { AutomationComponent } from './articles/automation/automation.component'
 import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-process/updated-authoring-process.component';
 import { MondaysComponent } from './articles/mondays/mondays.component';
 import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
+import { ReworkComponent } from './articles/rework/rework.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
     AutomationComponent,
     UpdatedAuthoringProcessComponent,
     MondaysComponent,
-    AiUsageComponent
+    AiUsageComponent,
+    ReworkComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

@@ -24,6 +24,7 @@ import { UpdatedAuthoringProcessComponent } from './articles/updated-authoring-p
 import { MondaysComponent } from './articles/mondays/mondays.component';
 import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
 import { ReworkComponent } from './articles/rework/rework.component';
+import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { ReworkComponent } from './articles/rework/rework.component';
     UpdatedAuthoringProcessComponent,
     MondaysComponent,
     AiUsageComponent,
-    ReworkComponent
+    ReworkComponent,
+    ArmsRaceComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

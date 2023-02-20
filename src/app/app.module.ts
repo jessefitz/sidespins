@@ -25,6 +25,7 @@ import { MondaysComponent } from './articles/mondays/mondays.component';
 import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
 import { ReworkComponent } from './articles/rework/rework.component';
 import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
+import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-love.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
     MondaysComponent,
     AiUsageComponent,
     ReworkComponent,
-    ArmsRaceComponent
+    ArmsRaceComponent,
+    FallingInLoveComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

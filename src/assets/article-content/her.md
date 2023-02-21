@@ -4,7 +4,7 @@
     <img src="/img/wedding.jpg">
 </p>
 
-The 2013 film ["Her"](https://en.wikipedia.org/wiki/Her_(film)) portrays Joaquin Phoenix as a young-ish, single man who passes his days writing heart-felt letters on behalf of paying customers.  We learn early in the movie that he's recently divorced and has a tendency to self-isolate.  He desires and seeks new relationships but fails to make meaningful connections... until he meets Samantha, an AI who exists only has a voice in his ear.
+The 2013 film ["Her"](https://en.wikipedia.org/wiki/Her_(film)) portrays Joaquin Phoenix as a young-ish, single man who passes his days writing heart-felt letters on behalf of paying customers.  We learn early in the movie that he's recently divorced and has a tendency to self-isolate.  He desires and seeks new relationships but fails to make meaningful connections... until he meets Samantha, an AI who exists only as a voice in his ear.
 
 It takes no feat of creative inspiration to imagine the story and drama that follows as a commentary on the power of the AI emerging in our current reality.  
 

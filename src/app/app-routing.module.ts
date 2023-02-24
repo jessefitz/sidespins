@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
+import { VanityComponent } from './articles/vanity/vanity.component';
 import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-love.component';
 import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
 import { ReworkComponent } from './articles/rework/rework.component';
@@ -20,6 +21,7 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/vanity', component:VanityComponent},
   {path: 'articles/falling-in-love', component:FallingInLoveComponent},
   {path: 'articles/a-dangerous-race', component:ArmsRaceComponent},
   {path: 'articles/rework', component:ReworkComponent},

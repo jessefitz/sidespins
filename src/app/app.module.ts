@@ -26,6 +26,7 @@ import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
 import { ReworkComponent } from './articles/rework/rework.component';
 import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
 import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-love.component';
+import { VanityComponent } from './articles/vanity/vanity.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-lo
     AiUsageComponent,
     ReworkComponent,
     ArmsRaceComponent,
-    FallingInLoveComponent
+    FallingInLoveComponent,
+    VanityComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

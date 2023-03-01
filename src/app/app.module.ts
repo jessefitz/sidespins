@@ -27,6 +27,7 @@ import { ReworkComponent } from './articles/rework/rework.component';
 import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
 import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-love.component';
 import { VanityComponent } from './articles/vanity/vanity.component';
+import { AloneTogetherComponent } from './articles/alone-together/alone-together.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { VanityComponent } from './articles/vanity/vanity.component';
     ReworkComponent,
     ArmsRaceComponent,
     FallingInLoveComponent,
-    VanityComponent
+    VanityComponent,
+    AloneTogetherComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

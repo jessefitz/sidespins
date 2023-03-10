@@ -28,6 +28,8 @@ import { ArmsRaceComponent } from './articles/arms-race/arms-race.component';
 import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-love.component';
 import { VanityComponent } from './articles/vanity/vanity.component';
 import { AloneTogetherComponent } from './articles/alone-together/alone-together.component';
+import { NoncompeteAgreementsComponent } from './articles/noncompete-agreements/noncompete-agreements.component';
+import { AloofComponent } from './articles/aloof/aloof.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,9 @@ import { AloneTogetherComponent } from './articles/alone-together/alone-together
     ArmsRaceComponent,
     FallingInLoveComponent,
     VanityComponent,
-    AloneTogetherComponent
+    AloneTogetherComponent,
+    NoncompeteAgreementsComponent,
+    AloofComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

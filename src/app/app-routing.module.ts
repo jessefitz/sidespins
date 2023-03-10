@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
+import { AloofComponent } from './articles/aloof/aloof.component';
+import { NoncompeteAgreementsComponent } from './articles/noncompete-agreements/noncompete-agreements.component';
 import { AloneTogetherComponent } from './articles/alone-together/alone-together.component';
 import { VanityComponent } from './articles/vanity/vanity.component';
 import { FallingInLoveComponent } from './articles/falling-in-love/falling-in-love.component';
@@ -22,6 +24,8 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/aloof', component:AloofComponent},
+  {path: 'articles/noncompete-agreements', component:NoncompeteAgreementsComponent},
   {path: 'articles/alone-together', component:AloneTogetherComponent},
   {path: 'articles/vanity', component:VanityComponent},
   {path: 'articles/falling-in-love', component:FallingInLoveComponent},

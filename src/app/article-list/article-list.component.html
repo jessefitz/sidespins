@@ -1,13 +1,15 @@
-<h2>Article List</h2>
+<h1>Articles</h1>
+<br/>
 
-<p><em>Select an article from the list to see details.  There's not much here yet.</em></p>
-
-<ul>
-  <li *ngFor="let article of articles">
+<div *ngFor="let category of getCategories()">
+  <h2>{{ category }}</h2>
+  <ul>
+    <li *ngFor="let article of filteredItems(category)">
       <a
       [title]="article.ArticleTitle"
       [routerLink]="['/articles', article.ArticleUrlPath]">
       {{ article.ArticleTitle  }}
     </a>
-  </li>
-</ul>
+    </li>
+  </ul>
+</div>

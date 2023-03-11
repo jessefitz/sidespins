@@ -5,7 +5,9 @@
     "title": "Introducing Frankenstein",
     "src": "/assets/article-content/moredetail.md",
     "tagline": "The first article I've written",
-    "date": "December 2022"
+    "date": "December 2022",
+    "rank": "1",
+    "category": "Frankenstein"
   },
   {
     "id": "2",
@@ -13,7 +15,9 @@
     "title": "What Lays Below",
     "src": "/assets/article-content/website-infrastructure.md",
     "tagline": "Coming Soon",
-    "date": "December 2022"
+    "date": "December 2022",
+    "rank": "1",
+    "category": "Frankenstein"
   },
   {
     "id": "3",
@@ -21,7 +25,9 @@
     "title": "Stuff You Should Know",
     "src": "/assets/article-content/how-it-works.md",
     "tagline": "Coming Soon",
-    "date": "December 2022"
+    "date": "December 2022",
+    "rank": "2",
+    "category": "Frankenstein"
   },
   {
     "id": "4",
@@ -29,7 +35,9 @@
     "title": "Brief Thought on ChatGPT",
     "src": "/assets/article-content/chatgpt.md",
     "tagline": "Not-so-deep thoughts by Jesse",
-    "date": "December 2022"
+    "date": "December 2022",
+    "rank": "1",
+    "category": "Tech and Biz"
   },
   {
     "id": "5",
@@ -37,7 +45,9 @@
     "title": "Some More Thoughts on My Motivations for this Site",
     "src": "/assets/article-content/more-on-motivation.md",
     "tagline": "Not-so-deep thoughts by Jesse",
-    "date": "December 2022"
+    "date": "December 2022",
+    "rank": "3",
+    "category": "Frankenstein"
   },
   {
     "id": "6",
@@ -45,7 +55,9 @@
     "title": "Schooled by ChatGPT",
     "src": "/assets/article-content/using-chatgpt.md",
     "tagline": "Not-so-deep thoughts by Jesse",
-    "date": "Feb 2022"
+    "date": "Feb 2022",
+    "rank": "1",
+    "category": "Tech and Biz"
   },
   {
     "id": "7",
@@ -53,7 +65,9 @@
     "title": "A Bridge",
     "src": "/assets/article-content/bridge.md",
     "tagline": "Not-so-deep thoughts by Jesse",
-    "date": "Feb 2022"
+    "date": "Feb 2022",
+    "rank": "1",
+    "category": "Prose"
   },
   {
     "urlpath": "automation",
@@ -61,7 +75,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "2",
+    "category": "Frankenstein"
   },
   {
     "urlpath": "revised-authoring-process",
@@ -69,7 +85,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "3",
+    "category": "Frankenstein"
   },
   {
     "urlpath": "mondays",
@@ -77,15 +95,19 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Prose"
   },
   {
     "urlpath": "rework",
-    "title": "Insiration is Perishable",
+    "title": "Inspiration is Perishable",
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "3",
+    "category": "Tech and Biz"
   },
   {
     "urlpath": "a-dangerous-race",
@@ -93,7 +115,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Tech and Biz"
   },
   {
     "urlpath": "falling-in-love",
@@ -101,7 +125,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Tech and Biz"
   },
   {
     "urlpath": "vanity",
@@ -109,7 +135,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Prose"
   },
   {
     "urlpath": "alone-together",
@@ -117,7 +145,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Prose"
   },
   {
     "urlpath": "noncompete-agreements",
@@ -125,7 +155,9 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Tech and Biz"
   },
   {
     "urlpath": "aloof",
@@ -133,6 +165,8 @@
     "id": "",
     "tagline": "",
     "date": "",
-    "src": ""
+    "src": "",
+    "rank": "1",
+    "category": "Prose"
   }
 ]

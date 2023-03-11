@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
+import { NoShameComponent } from './articles/no-shame/no-shame.component';
 import { AloofComponent } from './articles/aloof/aloof.component';
 import { NoncompeteAgreementsComponent } from './articles/noncompete-agreements/noncompete-agreements.component';
 import { AloneTogetherComponent } from './articles/alone-together/alone-together.component';
@@ -24,6 +25,7 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/no-shame', component:NoShameComponent},
   {path: 'articles/aloof', component:AloofComponent},
   {path: 'articles/noncompete-agreements', component:NoncompeteAgreementsComponent},
   {path: 'articles/alone-together', component:AloneTogetherComponent},

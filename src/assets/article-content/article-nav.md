@@ -20,5 +20,5 @@ I've been passively using the site for a couple of months now, primarily for aut
 
 ### Crawl
 - Add new attributes into existing entries in article json directory ☑️
-- Update the article-list.component.html file to understand and render according to those attributes
+- Update the article-list.component.html file to understand and render according to those attributes☑️
 - Update article registration script to accept and use parameters for tags and sorting.

@@ -25,6 +25,7 @@ export class ArticleListComponent implements OnInit {
     filteredItems(category: string): any[] {
       return this.articles
         .filter(item => item.ArticleCategory === category)
+        .sort((a:ArticleInfo, b:ArticleInfo) => new Date(b.ArticleDate).getTime() - new Date(a.ArticleDate).getTime())
         .sort((a:ArticleInfo, b:ArticleInfo) => a.ArticleRank - b.ArticleRank);
     };
 
@@ -35,6 +36,10 @@ export class ArticleListComponent implements OnInit {
        * which automatically removes any duplicates. Finally, we use the spread syntax ... 
        * to convert the Set back into an array and assign it to the uniqueCategories variable.**/
       this.categories  = [...new Set(this.articles.map(obj => obj.ArticleCategory))];
+
+      //hack to sort by my preferred category rendering order.
+      //TODO: eventually create a new object responsible for categories that also gives the ability to define sort order
+      this.categories = ["Tech and Biz", "Prose", "Frankenstein"];
 
       return this.categories;
     };

@@ -29,7 +29,7 @@ export class ArticlesService {
         for(let i=0; i< data.length; i++){
           this.AllArticles.push(
             new ArticleInfo( data[i].id, data[i].title, data[i].tagline, data[i].src, 
-              data[i].urlpath, data[i].category, data[i].rank)
+              data[i].urlpath, data[i].category, data[i].rank, data[i].date)
           );
         }     
       });
@@ -53,8 +53,9 @@ export class ArticleInfo {
   ArticleUrlPath: any;
   ArticleCategory: any;
   ArticleRank: any;
+  ArticleDate: any;
 
-   constructor(id: string, title: string, tagline: string, src: string, url: string, category: string, rank: string){
+   constructor(id: string, title: string, tagline: string, src: string, url: string, category: string, rank: string, date: string){
     this.ArticleId = id;
     this.ArticleTitle = title;
     this.ArticleTagline = tagline;
@@ -62,6 +63,7 @@ export class ArticleInfo {
     this.ArticleUrlPath = url;
     this.ArticleCategory = category;
     this.ArticleRank = rank;
+    this.ArticleDate = date;
    }
 
 }

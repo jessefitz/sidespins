@@ -10,7 +10,7 @@ They recently did an episode on [Noncompete Agreements](https://www.iheart.com/p
 
 In 2008 I took what we'll refer to as an "involuntary employment break" that began with a very unexpected and poorly executed meeting with my then manager.  Within a few short moments of being told the company was "trimming some fat" I was reminded of my Noncompete Agreement and that the company would graciously consider some leniency its clauses given the circumstances.  What a load of horse shit.
 
-Fast-forward to present day.  We're building a new company from the ground up.  Optimism abounds.
+Fast-forward to present day.  We're building a new company from the ground up.  Optimism and uncertainty abound.
 
 I hope we can be bold enough to resist the temptation that so many others have succumbed to.  Our team should be compelled to work with us because they want to, not because they feel legally prevented from considering alternatives.  People might leave for competitors.  Maybe they'll even poach some of our teammates.
 

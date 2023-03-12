@@ -5,10 +5,7 @@
     font-size: medium;
 }
 
-.container-fluid {
-    padding-top: 35px;
-    padding-bottom: 35px;
-  }
+
 
   .btn-default {
     background-color: darkgray;
@@ -17,4 +14,9 @@
 .landingPageTiles
 {
     min-height: 160px;
+}
+
+.container-fluid {
+  max-width: 800px; /* Set the maximum width of the container */
+  margin: 0 auto; /* Center the container horizontally */
 }

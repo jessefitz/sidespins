@@ -1,12 +1,8 @@
-<!-- <h1>Articles</h1> -->
-
 <div *ngFor="let category of getCategories()">
   <div class="container mt-3 mb-3">
     <h1 class="p-3 mb-2 bg-dark text-light text-center" style="margin-top: 24px; ">{{ category }}</h1>
-  </div>
-  
+  </div>  
   <div class="row gx-5 gy-5">
-
     <div class="col-sm-6" *ngFor="let article of filteredItems(category)">
       <div class="card">
         <h5 class="card-header display-6">
@@ -21,6 +17,5 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>

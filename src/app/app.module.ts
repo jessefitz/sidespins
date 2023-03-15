@@ -32,6 +32,8 @@ import { AloneTogetherComponent } from './articles/alone-together/alone-together
 import { NoncompeteAgreementsComponent } from './articles/noncompete-agreements/noncompete-agreements.component';
 import { AloofComponent } from './articles/aloof/aloof.component';
 import { NoShameComponent } from './articles/no-shame/no-shame.component';
+import { ManageComponent } from './manage/manage.component';
+import { FriendsComponent } from './articles/friends/friends.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { NoShameComponent } from './articles/no-shame/no-shame.component';
     AloneTogetherComponent,
     NoncompeteAgreementsComponent,
     AloofComponent,
-    NoShameComponent
+    NoShameComponent,
+    ManageComponent,
+    FriendsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

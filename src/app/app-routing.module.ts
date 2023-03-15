@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
+import { FriendsComponent } from './articles/friends/friends.component';
+import { ManageComponent } from './manage/manage.component';
 import { NoShameComponent } from './articles/no-shame/no-shame.component';
 import { AloofComponent } from './articles/aloof/aloof.component';
 import { NoncompeteAgreementsComponent } from './articles/noncompete-agreements/noncompete-agreements.component';
@@ -25,6 +27,7 @@ import { BridgeComponent } from './articles/bridge/bridge.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/friends-and-enemies', component:FriendsComponent},
   {path: 'articles/no-shame', component:NoShameComponent},
   {path: 'articles/aloof', component:AloofComponent},
   {path: 'articles/noncompete-agreements', component:NoncompeteAgreementsComponent},
@@ -40,6 +43,7 @@ const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full' },
   {path: 'article-list', component: ArticleListComponent},
   {path: 'home', component:HomeComponent},
+  {path: 'manage', component: ManageComponent},
   //Frankenstein needs a route defined per article.  //register the same path as urlpath in the articlesdirectory.json file.
   {path: 'articles/chatgpt', component:ChatGptComponent},  
   {path: 'articles/how-it-works', component:HowItWorksComponent},  

@@ -29,7 +29,8 @@
               "src/styles.css",
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/prismjs/themes/prism-okaidia.css",
-              "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css"
+              "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css",
+              "node_modules/jsoneditor/dist/jsoneditor.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.js",

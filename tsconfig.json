@@ -24,6 +24,13 @@
       "dom"
     ]
   },
+  "include": [
+    "src/**/*.ts",
+    "node_modules/jsoneditor/dist/jsoneditor.min.js"
+  ],
+  "types": [
+    "jsoneditor"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

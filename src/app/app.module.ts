@@ -34,6 +34,7 @@ import { AloofComponent } from './articles/aloof/aloof.component';
 import { NoShameComponent } from './articles/no-shame/no-shame.component';
 import { ManageComponent } from './manage/manage.component';
 import { FriendsComponent } from './articles/friends/friends.component';
+import { MillTownComponent } from './articles/mill-town/mill-town.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import { FriendsComponent } from './articles/friends/friends.component';
     AloofComponent,
     NoShameComponent,
     ManageComponent,
-    FriendsComponent
+    FriendsComponent,
+    MillTownComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

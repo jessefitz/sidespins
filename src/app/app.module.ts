@@ -35,6 +35,7 @@ import { NoShameComponent } from './articles/no-shame/no-shame.component';
 import { ManageComponent } from './manage/manage.component';
 import { FriendsComponent } from './articles/friends/friends.component';
 import { MillTownComponent } from './articles/mill-town/mill-town.component';
+import { SandboxComponent } from './sandbox/sandbox.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +64,8 @@ import { MillTownComponent } from './articles/mill-town/mill-town.component';
     NoShameComponent,
     ManageComponent,
     FriendsComponent,
-    MillTownComponent
+    MillTownComponent,
+    SandboxComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

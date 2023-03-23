@@ -4,5 +4,11 @@
         "chatgpt",
         "jessefitz",
         "urlpath"
-    ]
+    ],
+    "azureFunctions.deploySubpath": "api",
+    "azureFunctions.projectLanguage": "JavaScript",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "npm prune (functions)",
+    "azureFunctions.postDeployTask": "npm install (functions)"
 }

@@ -24,6 +24,7 @@ import { WebsiteInfrastructureComponent } from './articles/website-infrastructur
 import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on-motivation.component';
 import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
 import { BridgeComponent } from './articles/bridge/bridge.component';
+import { SandboxComponent } from './sandbox/sandbox.component';
 
 
 /*--BEGIN ROUTES--*/
@@ -53,7 +54,9 @@ const routes: Routes = [
   {path: 'articles/introducing-frankenstein', component:IntroducingFrankensteinComponent},   
   {path: 'articles/more-on-motivation', component:MoreOnMotivationComponent},
   {path: 'articles/schooled-by-chatgpt', component:SchooledByChatgptComponent},
-  {path: 'articles/bridge', component:BridgeComponent}  
+  {path: 'articles/bridge', component:BridgeComponent},
+  {path: 'sandbox', component: SandboxComponent}
+
 ];
 /*--END ROUTES--*/
 

@@ -9,26 +9,26 @@ module.exports = async function (context, req) {
 
     const requestOptions = {
         method: 'POST',
+        url: 'https://api.openai.com/v1/chat/completions',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${openAiApiKey}`
         },
-        body: JSON.stringify({
+        data: {
             model: 'gpt-3.5-turbo',
             messages: [
                 {role: "system", content: "You are a noob programmer that's super excited about your new AI creation."},
                 {role: "user", content: "Give me a snarky one-liner to display on my website landing page."}
             ],
             temperature: 1
-        })
+        }
     };
 
     try {
-        const fetch = await import('node-fetch').then(module => module.default);
-        const response = await fetch('https://api.openai.com/v1/chat/completions', requestOptions);
-        const responseJson = await response.json();
-        if ((responseJson.choices != null) && (responseJson.choices.length > 0)) {
-            responseMessage.message = responseJson.choices[0].message.content;
+        const axios = require('axios');
+        const response = await axios(requestOptions);
+        if ((response.data.choices != null) && (response.data.choices.length > 0)) {
+            responseMessage.message = response.data.choices[0].message.content
         }
     } catch (error) {
         responseMessage.message = "Error: " + error.message;

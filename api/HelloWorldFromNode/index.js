@@ -1,19 +1,40 @@
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-    // const name = (req.query.name || (req.body && req.body.name));
-    // const responseMessage = name
-    //     ? "Hello, " + name + ". This HTTP triggered function executed successfully."
-    //     : "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.";
-
-    const responseMessage = {
+    let responseMessage = {
         "message": "Hello from Node."
     }
 
-    // debugger; force a break here
-    
+    const openAiApiKey = process.env.OPENAI_API_KEY;
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openAiApiKey}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: "system", content: "You are a noob programmer that's super excited about your new AI creation."},
+                {role: "user", content: "Give me a snarky one-liner to display on my website landing page."}
+            ],
+            temperature: 1
+        })
+    };
+
+    try {
+        const fetch = await import('node-fetch').then(module => module.default);
+        const response = await fetch('https://api.openai.com/v1/chat/completions', requestOptions);
+        const responseJson = await response.json();
+        if ((responseJson.choices != null) && (responseJson.choices.length > 0)) {
+            responseMessage.message = responseJson.choices[0].message.content;
+        }
+    } catch (error) {
+        responseMessage.message = "Error: " + error.message;
+    }
+
     context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: JSON.stringify(responseMessage) //to do:  this needs to be a json object in order to be correctly interprted by caller (at least as it's currently implemented in angular)
+        body: JSON.stringify(responseMessage)
     };
 }

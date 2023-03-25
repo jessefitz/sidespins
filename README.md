@@ -9,10 +9,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 ## CMS vNext Notes
 
 ### Plan
-- Create a new component that reads ID from HTTP Request and gets content from new service, templated <markdown>{{content}}</markdown>
-- Update ArticlesService to call the new API to get content
+- [DONE] Create a new component that reads ID from HTTP Request and gets content from new service, templated <markdown>{{content}}</markdown>
+- [DONE] Update ArticlesService to call the new API to get content
   - Update the ArticleInfo object to include the content variable, then return the full set of shit
-- Create a new API method that calls cosmos to get content
+- [DONE] Create a new API method that calls cosmos to get content
   - Use local.settings.json to config connections
 
 If all that works...

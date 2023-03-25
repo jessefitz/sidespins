@@ -36,6 +36,7 @@ import { ManageComponent } from './manage/manage.component';
 import { FriendsComponent } from './articles/friends/friends.component';
 import { MillTownComponent } from './articles/mill-town/mill-town.component';
 import { SandboxComponent } from './sandbox/sandbox.component';
+import { ArticlePresenterComponent } from './article-presenter/article-presenter.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +66,8 @@ import { SandboxComponent } from './sandbox/sandbox.component';
     ManageComponent,
     FriendsComponent,
     MillTownComponent,
-    SandboxComponent
+    SandboxComponent,
+    ArticlePresenterComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

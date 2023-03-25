@@ -4,7 +4,6 @@ import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
 import { MillTownComponent } from './articles/mill-town/mill-town.component';
 import { FriendsComponent } from './articles/friends/friends.component';
-import { ManageComponent } from './manage/manage.component';
 import { NoShameComponent } from './articles/no-shame/no-shame.component';
 import { AloofComponent } from './articles/aloof/aloof.component';
 import { NoncompeteAgreementsComponent } from './articles/noncompete-agreements/noncompete-agreements.component';
@@ -25,6 +24,7 @@ import { MoreOnMotivationComponent } from './articles/more-on-motivation/more-on
 import { SchooledByChatgptComponent } from './articles/schooled-by-chatgpt/schooled-by-chatgpt.component';
 import { BridgeComponent } from './articles/bridge/bridge.component';
 import { SandboxComponent } from './sandbox/sandbox.component';
+import { ArticlePresenterComponent } from './article-presenter/article-presenter.component';
 
 
 /*--BEGIN ROUTES--*/
@@ -46,8 +46,6 @@ const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full' },
   {path: 'article-list', component: ArticleListComponent},
   {path: 'home', component:HomeComponent},
-  {path: 'manage', component: ManageComponent},
-  //Frankenstein needs a route defined per article.  //register the same path as urlpath in the articlesdirectory.json file.
   {path: 'articles/chatgpt', component:ChatGptComponent},  
   {path: 'articles/how-it-works', component:HowItWorksComponent},  
   {path: 'articles/website-infrastructure', component:WebsiteInfrastructureComponent},  
@@ -55,7 +53,8 @@ const routes: Routes = [
   {path: 'articles/more-on-motivation', component:MoreOnMotivationComponent},
   {path: 'articles/schooled-by-chatgpt', component:SchooledByChatgptComponent},
   {path: 'articles/bridge', component:BridgeComponent},
-  {path: 'sandbox', component: SandboxComponent}
+  {path: 'sandbox', component: SandboxComponent},
+  {path: 'presenter', component: ArticlePresenterComponent}
 
 ];
 /*--END ROUTES--*/

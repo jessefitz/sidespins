@@ -6,6 +6,24 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## CMS vNext Notes
+
+### Plan
+- Create a new component that reads ID from HTTP Request and gets content from new service, templated <markdown>{{content}}</markdown>
+- Update ArticlesService to call the new API to get content
+  - Update the ArticleInfo object to include the content variable, then return the full set of shit
+- Create a new API method that calls cosmos to get content
+  - Use local.settings.json to config connections
+
+If all that works...
+- Create new routes for articles by ID
+- Update ArticleList service to render required links in desired format
+- Create new build event that moves article MD file contents into cosmos
+
+If all that works...
+- Create new GitHub action(s) that copy contents of repo article files into cosmos
+  
+
 ### 3/22/23 Update
 Added node API.  To run/debug locally, use SWA CLI. Was able to get this working according to most widely [available documentation on web](https://learn.microsoft.com/en-gb/azure/static-web-apps/add-api?tabs=vanilla-javascript), with the exception of the following items:
 - SWA doesn't work with latest version of Node, so I installed [Windows Node Version Manager](https://github.com/coreybutler/nvm-windows) and switched to Node 16.16.0.

@@ -16,9 +16,9 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
   - Use local.settings.json to config connections
 
 If all that works...
-- Create new routes for articles by ID
+- [Next2] Create new routes for articles by ID
 - Update ArticleList service to render required links in desired format
-- Create new build event that moves article MD file contents into cosmos
+- [Next1] Create new build event that moves article MD file contents into cosmos
 
 If all that works...
 - Create new GitHub action(s) that copy contents of repo article files into cosmos

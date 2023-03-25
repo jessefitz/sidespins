@@ -11,7 +11,7 @@ export class ArticlePresenterComponent {
   articleContent = '';
   
   constructor(private service: ArticlesService) {
-    const articleId = '1'; // set the article ID here
+    const articleId = 'b11bf40a-e8f3-4382-9476-bcc947a4ed0e'; // set the article ID here
     // this.content = service.getArticleContent(articleId);
     this.service.getArticleContent(articleId).subscribe({
       next: (content: string) => {

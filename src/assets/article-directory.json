@@ -3,7 +3,7 @@
     "id": "1",
     "urlpath": "introducing-frankenstein",
     "title": "Introducing Frankenstein",
-    "src": "/assets/article-content/moredetail.md",
+    "src": "moredetail.md",
     "tagline": "Why I went about creating this abomination.",
     "date": "12/1/2022",
     "rank": "1",
@@ -13,27 +13,17 @@
     "id": "2",
     "urlpath": "website-infrastructure",
     "title": "What Lays Below",
-    "src": "/assets/article-content/website-infrastructure.md",
+    "src": "website-infrastructure.md",
     "tagline": "Some of the technology that powers Frankenstein.",
     "date": "12/1/2022",
     "rank": "1",
     "category": "Frankenstein"
   },
   {
-    "id": "3",
-    "urlpath": "how-it-works",
-    "title": "Stuff You Should Know",
-    "src": "/assets/article-content/how-it-works.md",
-    "tagline": "This is some rather outdated information about the Frankenstein CMS works.",
-    "date": "12/1/2022",
-    "rank": "2",
-    "category": "Frankenstein"
-  },
-  {
     "id": "4",
     "urlpath": "chatgpt",
     "title": "Brief Thought on ChatGPT",
-    "src": "/assets/article-content/chatgpt.md",
+    "src": "chatgpt.md",
     "tagline": "I had some thoughts to share when ChatGPT first started hitting the headlines.",
     "date": "12/5/2022",
     "rank": "1",
@@ -43,7 +33,7 @@
     "id": "5",
     "urlpath": "more-on-motivation",
     "title": "Some More Thoughts on My Motivations for this Site",
-    "src": "/assets/article-content/more-on-motivation.md",
+    "src": "more-on-motivation.md",
     "tagline": "Not-so-deep thoughts by Jesse",
     "date": "12/20/2022",
     "rank": "3",
@@ -53,7 +43,7 @@
     "id": "6",
     "urlpath": "schooled-by-chatgpt",
     "title": "Schooled by ChatGPT",
-    "src": "/assets/article-content/using-chatgpt.md",
+    "src": "using-chatgpt.md",
     "tagline": "AI has a better sense of humor than I do.",
     "date": "2/1/2023",
     "rank": "1",
@@ -63,31 +53,11 @@
     "id": "7",
     "urlpath": "bridge",
     "title": "A Bridge",
-    "src": "/assets/article-content/bridge.md",
+    "src": "bridge.md",
     "tagline": "A metaphor",
     "date": "2/1/2023",
     "rank": "1",
     "category": "Prose"
-  },
-  {
-    "urlpath": "automation",
-    "title": "Frankenstein Automation",
-    "id": 8,
-    "tagline": "Hey Franky, I think he likes it.",
-    "date": "1/20/2023",
-    "src": "",
-    "rank": "2",
-    "category": "Frankenstein"
-  },
-  {
-    "urlpath": "revised-authoring-process",
-    "title": "Revised Article Authoring Process",
-    "id": 9,
-    "tagline": "How to use Frankenstein's new management script to register new articles.",
-    "date": "1/30/2023",
-    "src": "",
-    "rank": "2",
-    "category": "Frankenstein"
   },
   {
     "urlpath": "mondays",
@@ -95,7 +65,7 @@
     "id": 10,
     "tagline": "Some are better than others... right?",
     "date": "2/1/2023",
-    "src": "",
+    "src": "mondays.md",
     "rank": "1",
     "category": "Prose"
   },
@@ -105,7 +75,7 @@
     "id": 11,
     "tagline": "Quick reaction to the closing thoughts in 'Rework'.",
     "date": "2/1/2023",
-    "src": "",
+    "src": "rework.md",
     "rank": "3",
     "category": "Tech and Biz"
   },
@@ -115,7 +85,7 @@
     "id": 12,
     "tagline": "FOMO + AI = Bad Things to Come",
     "date": "2/5/2023",
-    "src": "",
+    "src": "arms-race.md",
     "rank": "1",
     "category": "Tech and Biz"
   },
@@ -125,7 +95,7 @@
     "id": 13,
     "tagline": "It's kinda surprising to me that I haven't heard more people talking about 'Her' lately...",
     "date": "2/15/2023",
-    "src": "",
+    "src": "her.md",
     "rank": "1",
     "category": "Tech and Biz"
   },
@@ -135,7 +105,7 @@
     "id": 14,
     "tagline": "We all feel it.",
     "date": "2/20/2023",
-    "src": "",
+    "src": "vanity.md",
     "rank": "1",
     "category": "Prose"
   },
@@ -145,7 +115,7 @@
     "id": 15,
     "tagline": "Inspired by a recent trip on the Boston subway",
     "date": "2/27/2023",
-    "src": "",
+    "src": "alone-together.md",
     "rank": "1",
     "category": "Prose"
   },
@@ -155,7 +125,7 @@
     "id": 16,
     "tagline": "One day I hope to be on SYSK Listener Mail, but for now I'll settle with private musings.",
     "date": "3/9/2023",
-    "src": "",
+    "src": "nca.md",
     "rank": "1",
     "category": "Tech and Biz"
   },
@@ -165,19 +135,9 @@
     "id": 17,
     "tagline": "Communicating is hard and uncomfortable... things aren't always as they seem.",
     "date": "3/9/2023",
-    "src": "",
+    "src": "aloof.md",
     "rank": "1",
     "category": "Prose"
-  },
-  {
-    "urlpath": "no-shame",
-    "title": "No Shame",
-    "id": 18,
-    "tagline": "Shut up and take my money.",
-    "date": "3/11/2023",
-    "src": "",
-    "rank": "1",
-    "category": "Tech and Biz"
   },
   {
     "urlpath": "friends-and-enemies",
@@ -185,7 +145,7 @@
     "id": 19,
     "tagline": "Consequences of the decisions we make.",
     "date": "3/15/2023",
-    "src": "",
+    "src": "friends.md",
     "rank": 1,
     "category": "Prose"
   },
@@ -195,8 +155,18 @@
     "id": "20",
     "tagline": "I lost the newspaper clipping of the town burning.",
     "date": "3/16/2023",
-    "src": "",
+    "src": "mill-town.md",
     "rank": 1,
     "category": "Prose"
+  },
+  {
+    "urlpath": "not-me",
+    "title": "Not Me",
+    "id": "21",
+    "tagline": "Somebody should probably add a tagline to this article...",
+    "date": "3/26/2023",
+    "src": "not-me.md",
+    "rank": 1,
+    "category": "Tech and Biz"
   }
 ]

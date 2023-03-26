@@ -19,10 +19,23 @@ If all that works...
 - [Next2] Create new routes for articles by ID
 - Update ArticleList service to render required links in desired format
 - [Next1] Create new build event that moves article MD file contents into cosmos
+  - [TODO]  
+    - The build event needs to call the console app
+    - [Done] The console app needs to drop the items in the cosmos container, then repopulate by iterating through the articles directory json file, to include the urlpath attribute
+    - [Done] The article directory json file needs to be updated to include the article filepath.
+      - [Done] Use the SRC attribute that's already there, and just make a hard-coded constant in the migration utility for the full path.
+    - [Done] Ipdate ArticleService to lookup cosmos using the urlpath attribute can be used as a lookup in the cosmos from the article presenter
+    - Add paths in the angular routes that match the URL path but that all go to the presenter
+    - Need to add all the new config variables to app settings
+    - The new "register new article" process is now going to consist of:
+      - Adding the new entry to article directory
+      - No longer generating new ang component
 
 If all that works...
 - Create new GitHub action(s) that copy contents of repo article files into cosmos
   
+### Migrate Content
+dotnet build --configuration Debug --debug --output bin/Debug/net6.0/
 
 ### 3/22/23 Update
 Added node API.  To run/debug locally, use SWA CLI. Was able to get this working according to most widely [available documentation on web](https://learn.microsoft.com/en-gb/azure/static-web-apps/add-api?tabs=vanilla-javascript), with the exception of the following items:

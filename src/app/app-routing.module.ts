@@ -54,7 +54,8 @@ const routes: Routes = [
   {path: 'articles/schooled-by-chatgpt', component:SchooledByChatgptComponent},
   {path: 'articles/bridge', component:BridgeComponent},
   {path: 'sandbox', component: SandboxComponent},
-  {path: 'presenter', component: ArticlePresenterComponent}
+  {path: 'another-bridge', component: ArticlePresenterComponent},
+  {path: 'the-old-mill-town', component: ArticlePresenterComponent}
 
 ];
 /*--END ROUTES--*/

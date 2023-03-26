@@ -111,7 +111,7 @@ $valueToAdd =@"
     "id":"",
     "tagline":"",
     "date":"",
-    "src":""
+    "src":"$markdownFile"
 }
 "@
 

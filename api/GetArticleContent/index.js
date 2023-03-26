@@ -13,10 +13,10 @@ module.exports = async function (context, req) {
         
       const { database } = await client.databases.createIfNotExists({ id: databaseId });
       const { container } = await database.containers.createIfNotExists({ id: containerId });
-      const articleId = req.query.ArticleId || req.body.ArticleId;
+      const articlePath = req.query.urlPath || req.body.urlPath;
       
       const querySpec = {
-        query: `SELECT * FROM c WHERE c.id = "${articleId}"`
+        query: `SELECT * FROM c WHERE c.urlpath = "${articlePath}"`
       };
       
       const { resources } = await container.items.query(querySpec).fetchAll();

@@ -52,8 +52,8 @@ export class ArticlesService {
   // }  
 
   //in its current implementation, this function returns a json string representation of the article item in cosmos.
-  public getArticleContent(id: any): Observable<string> {
-    return this.http.get(`/api/GetArticleContent?ArticleId=${id}`)
+  public getArticleContent(urlPath: any): Observable<string> {
+    return this.http.get(`/api/GetArticleContent?urlPath=${urlPath}`)
       .pipe(
         map((response: any) => {
           const valToReturn = response && response.length ? response[0] : 'No matching article found';

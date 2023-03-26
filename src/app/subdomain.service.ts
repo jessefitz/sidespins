@@ -7,7 +7,10 @@ export class SubdomainService {
   private subdomain: string;
 
   constructor() {
-    this.subdomain = this.extractSubdomain(window.location.hostname);
+    this.subdomain = "";
+    if(window != null){
+      this.subdomain = this.extractSubdomain(window.location.hostname);
+    }
   }
 
   private extractSubdomain(hostname: string): string {

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ArticlesService } from '../articles.service';
+import { SubdomainService } from '../subdomain.service';
 import { ActivatedRoute } from '@angular/router';
 import { OnInit } from '@angular/core';
 
@@ -11,35 +12,61 @@ import { OnInit } from '@angular/core';
 })
 export class ArticlePresenterComponent implements OnInit {
 
-  articleContent = '';
+  markdownContentToPresent = '';
+  impersonating = false;
+
   
-  constructor(private service: ArticlesService, private route: ActivatedRoute) {
+  constructor(
+    private service: ArticlesService, 
+    private route: ActivatedRoute, 
+    private subdomainService: SubdomainService) {
    
   }
 
   ngOnInit() {
+    //CHECK THE SUBDOMAIN... IT DRIVES BEHAVIOR.  subdomain is configured at the app service level using cname record in the jessefitz.me DNS zone.
+    this.impersonating = this.subdomainService.getSubdomain() == 'not';
+    
+    //GET CONTENT FROM THE ARTICLE API
     this.route.url.subscribe(segments => {
       // We are defining a unique route for each article.  use the path to query the API for the corresponding article content
       const urlPath = segments[0].path;
-      // Now you can use the 'hardcodedId' value in your component
-
-      //const articleId = 'b11bf40a-e8f3-4382-9476-bcc947a4ed0e'; // set the article ID here
       // this.content = service.getArticleContent(articleId);
-      this.service.getArticleContent(urlPath).subscribe({
-        next: (content: string) => {
-          // do something with content
-          console.log(content);
-          let article = JSON.parse(JSON.stringify(content));
-          // this.articleContent = ;//
-          this.articleContent = article.content; 
-        },
-        error: (error: any) => {
-          console.error(error);
-        },
-        complete: () => {
-          // do something when the observable completes (optional)
-        }
-      });
+      if(!this.impersonating){
+        this.service.getArticleContent(urlPath).subscribe({
+          next: (content: string) => {
+            // do something with content
+            console.log(content);
+            let article = JSON.parse(JSON.stringify(content));
+            // this.articleContent = ;//
+            this.markdownContentToPresent = article.content; 
+          },
+          error: (error: any) => {
+            console.error(error);
+          },
+          complete: () => {
+            // do something when the observable completes (optional)
+          }
+        });
+      }
+      else  //impersonating
+      {
+        this.service.getImpersonatedArticleContent(urlPath, "ernest hemingway").subscribe({
+          next: (content: string) => {
+            // do something with content
+            console.log(content);
+            // let article = JSON.parse(JSON.stringify(content));
+            // this.articleContent = ;//
+            this.markdownContentToPresent = content; 
+          },
+          error: (error: any) => {
+            console.error(error);
+          },
+          complete: () => {
+            // do something when the observable completes (optional)
+          }
+        });
+      }
   
     });
     

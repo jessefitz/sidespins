@@ -29,7 +29,6 @@ import { ArticlePresenterComponent } from './article-presenter/article-presenter
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
-  {path: 'articles/the-old-mill-town', component:MillTownComponent},
   {path: 'articles/friends-and-enemies', component:FriendsComponent},
   {path: 'articles/no-shame', component:NoShameComponent},
   {path: 'articles/aloof', component:AloofComponent},

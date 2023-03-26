@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
+// import axios from 'axios';
 
 
 @Injectable({
@@ -37,19 +38,6 @@ export class ArticlesService {
 
      return this.AllArticles;
     };
-     
-  // public getArticleContent(id: any){
-
-  //   let content = '';
-
-  //   this.http.get(`/api/GetArticleContent?ArticleId=${id}`)
-  //   .subscribe((resp: any) => {
-  //     console.log(resp); // log the resp object to the console
-  //     content = resp.message;
-  //   });
-
-  //   return content;
-  // }  
 
   //in its current implementation, this function returns a json string representation of the article item in cosmos.
   public getArticleContent(urlPath: any): Observable<string> {
@@ -77,6 +65,63 @@ export class ArticlesService {
       The observable returned by pipe() (and getArticleContent()) is of type Observable<string>, indicating that it emits strings.
       */
   }
+  
+  // public async getImpersonatedArticleContent(urlPath: any, persona: string): Promise<string> {
+  //   const encodedPersona = encodeURIComponent(persona);
+  //   try {
+  //     const response = await axios.get(`/api/GetImpersonatedContent?articlePath=${urlPath}&persona=${encodedPersona}`);
+  //     const valToReturn = response && response.data.length ? response.data : 'No matching article found';
+  //     return valToReturn;
+  //   } catch (error) {
+  //     console.error(error);
+  //     return 'Error retrieving article';
+  //   }
+  // }
+
+  public getImpersonatedArticleContent(urlPath: any, persona: string): Observable<string> {
+    const encodedPersona = encodeURIComponent(persona);
+    return this.http.get(`/api/GetImpersonatedContent?articlePath=${urlPath}&persona=${encodedPersona}`)
+      .pipe(
+        map((response: any) => {
+          const valToReturn = (response != null) ? response.content : "Couldn't impersonate content.";
+          return valToReturn;
+        })
+      );
+    
+  }
+
+  // public async getImpersonatedArticleContent(urlPath: any, persona: string) {
+  //   ///api/GetArticleContent?urlPath=${urlPath}
+  //   let impersonatedArticleContent = '';
+  //   let actualArticleContent = '';
+    
+  //   //first get the article content
+  //   const requestOptions = {
+  //     method: 'GET',
+  //     url: 'api/GetArticleContent?urlPath='+urlPath,
+  //   }
+
+  //   try {
+  //     const axios = require('axios');
+  //     let response = await axios(requestOptions);
+  //     actualArticleContent = response;
+
+
+  //     const requestOptionsForOpenAI = {
+  //       method: 'GET',
+  //       url: 'api/GetImpersonatedContent?persona='+persona,
+  //     }
+  //     //got the original content... now need to make another API call to get the altered content.
+  //       let responseFromOpenAI = aw
+
+  //   } catch (error) {
+  //     impersonatedArticleContent = "Error: " + error.message;
+  //   }
+
+  // };
+
+    
+  
 
   private getFileContent(url: string): Observable<any> {
     return this.http.get(url);

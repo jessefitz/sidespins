@@ -1,6 +1,7 @@
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger GetArticleContent function processed a request.');
   
+    //TODO:  replace these calls with CosmosArticleHelper method.
     const { CosmosClient } = require('@azure/cosmos');
     const endpoint = process.env.CosmosEndPoint;
     const key = process.env.CosmosKey;

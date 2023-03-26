@@ -30,6 +30,16 @@ If all that works...
     - The new "register new article" process is now going to consist of:
       - Adding the new entry to article directory
       - No longer generating new ang component
+    - Update article list page to render appropriate links (maybe)
+
+### not.jessefitz.me
+- [DONE] Create and test the not.jessefitz.me domain in prod
+  - to do this locally, you have to create a  not.localhost entry in hosts file.
+- [Done] Create the subdomain service and check for presence of the 'not' identifier
+- Inject it into the ArticlePresenter and implement conditional logic
+  - Get MD content
+  - Make secondary API call to OpenAI to "translate" for persona
+- Create new API endpoint to ChatGPT that accepts MD content and persona parameter
 
 If all that works...
 - Create new GitHub action(s) that copy contents of repo article files into cosmos

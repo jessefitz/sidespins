@@ -7,10 +7,9 @@ class CosmosArticleHelper {
         const { CosmosClient } = require('@azure/cosmos');
         const endpoint = process.env.CosmosEndPoint;
         const key = process.env.CosmosKey;
-        const client = 
-            new CosmosClient({ endpoint, key });
-        const databaseId = 'JesseFitzAppDB-Dev'; //TODO:  pull from settings
-        const containerId = 'JesseFitzAppContainer-Dev'; //TODO:  pull from settings
+        const client = new CosmosClient({ endpoint, key });
+        const databaseId = process.env.CosmosDBName;//'JesseFitzAppDB-Dev'; //TODO:  pull from settings
+        const containerId = process.env.CosmosContainerName;//'JesseFitzAppContainer-Dev'; //TODO:  pull from settings
         
         try {
             

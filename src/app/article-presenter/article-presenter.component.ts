@@ -14,6 +14,7 @@ export class ArticlePresenterComponent implements OnInit {
 
   markdownContentToPresent = '';
   impersonating = false;
+  isLoading = true;
 
   
   constructor(
@@ -30,7 +31,7 @@ export class ArticlePresenterComponent implements OnInit {
     //GET CONTENT FROM THE ARTICLE API
     this.route.url.subscribe(segments => {
       // We are defining a unique route for each article.  use the path to query the API for the corresponding article content
-      const urlPath = segments[0].path;
+      const urlPath = segments[segments.length-1].path;
       // this.content = service.getArticleContent(articleId);
       if(!this.impersonating){
         this.service.getArticleContent(urlPath).subscribe({
@@ -40,6 +41,7 @@ export class ArticlePresenterComponent implements OnInit {
             let article = JSON.parse(JSON.stringify(content));
             // this.articleContent = ;//
             this.markdownContentToPresent = article.content; 
+            this.isLoading = false;
           },
           error: (error: any) => {
             console.error(error);
@@ -51,13 +53,14 @@ export class ArticlePresenterComponent implements OnInit {
       }
       else  //impersonating
       {
-        this.service.getImpersonatedArticleContent(urlPath, "ernest hemingway").subscribe({
+        this.service.getImpersonatedArticleContent(urlPath, "a sentient black hole bent on consuming the universe").subscribe({
           next: (content: string) => {
             // do something with content
             console.log(content);
             // let article = JSON.parse(JSON.stringify(content));
             // this.articleContent = ;//
             this.markdownContentToPresent = content; 
+            this.isLoading = false;
           },
           error: (error: any) => {
             console.error(error);
@@ -71,6 +74,8 @@ export class ArticlePresenterComponent implements OnInit {
     });
     
   }
+
+  
 }
 
 

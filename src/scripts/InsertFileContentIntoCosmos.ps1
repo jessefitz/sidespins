@@ -13,7 +13,7 @@ $localSettings = Get-Content $localSettingsPath | ConvertFrom-Json
 $cosmosDbAccountName = $localSettings.Values.CosmosAccountName
 $resourceGroupName = $localSettings.Values.ResourceGroupName
 $databaseName = $localSettings.Values.CosmosDBName
-$containerName = $localSettings.Values.ComsosContainerName
+$containerName = $localSettings.Values.CosmosContainerName
 $keyString = $localSettings.Values.CosmosKey 
 $endPoint = $localSettings.Values.CosmosEndPoint
 

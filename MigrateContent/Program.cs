@@ -22,7 +22,7 @@ namespace MigrateContent
             string cosmosDbAccountName = (string)localSettings["Values"]["CosmosAccountName"];
             string resourceGroupName = (string)localSettings["Values"]["ResourceGroupName"];
             string databaseName = (string)localSettings["Values"]["CosmosDBName"];
-            string containerName = (string)localSettings["Values"]["ComsosContainerName"];
+            string containerName = (string)localSettings["Values"]["CosmosContainerName"];
             string keyString = (string)localSettings["Values"]["CosmosKey"];
             string endPoint = (string)localSettings["Values"]["CosmosEndPoint"];
 

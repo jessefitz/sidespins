@@ -7,8 +7,8 @@ module.exports = async function (context, req) {
     const key = process.env.CosmosKey;
     const client = 
         new CosmosClient({ endpoint, key });
-    const databaseId = 'JesseFitzAppDB-Dev';
-    const containerId = 'JesseFitzAppContainer-Dev';
+    const databaseId = process.env.CosmosDBName; //'JesseFitzAppDB-Dev';
+    const containerId = process.env.CosmosContainerName;// 'JesseFitzAppContainer-Dev';
     
     try {
         

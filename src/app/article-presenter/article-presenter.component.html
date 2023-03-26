@@ -1,9 +1,3 @@
-<ng-container *ngIf="impersonating">
-  <div class="alert alert-warning">
-    This content is an AI generated impersonation of the original content by the site's author.
-  </div>
-</ng-container>
-
 <ng-container *ngIf="isLoading; else doneLoading">
   <div class="d-flex justify-content-center align-items-top" style="height: 100vh">
     <div class="spinner-border text-info" role="status">
@@ -17,6 +11,11 @@
     [data]="markdownContentToPresent">
   </div>
 </ng-template>
+<ng-container *ngIf="impersonating">
+  <div class="alert alert-warning">
+    This content is an AI generated impersonation of the original content by the site's author.
+  </div>
+</ng-container>
 
 
 

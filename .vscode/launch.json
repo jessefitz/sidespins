@@ -6,12 +6,11 @@
     "type": "coreclr",
     "request": "launch",
     "program": "${workspaceFolder}/migratecontent/bin/Debug/net6.0/MigrateContent.dll", 
-    "args": [],
+    "args": ["true"],
     "cwd": "${workspaceFolder}",
     "stopAtEntry": false,
     "console": "internalConsole"
-  },
-    
+  },    
   {
     "name": "PowerShell Launch Current File",
     "type": "PowerShell",

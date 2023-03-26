@@ -7,10 +7,19 @@ using Microsoft.Azure.Cosmos;
 
 namespace MigrateContent
 {
+    //call with first parameter = true to initiate a content migration to prod in addition to the migration to dev.
     class Program
     {
          static async Task Main(string[] args)
         {
+            bool migrateToProd = false; // default value
+
+            // Check if the "migrateToProd" parameter was passed as an argument
+            if (args.Length > 0 && bool.TryParse(args[0], out bool argValue))
+            {
+                migrateToProd = argValue;
+            }
+
             //
             string articleDirectoryPath = @"C:\projects\jessfitz.me\jessefitz_app\src\assets\article-directory.json";
             string articleDirectoryContent = File.ReadAllText(articleDirectoryPath);       
@@ -25,21 +34,34 @@ namespace MigrateContent
             string containerName = (string)localSettings["Values"]["CosmosContainerName"];
             string keyString = (string)localSettings["Values"]["CosmosKey"];
             string endPoint = (string)localSettings["Values"]["CosmosEndPoint"];
+            string prodDBName = databaseName.Split('-')[0];
+            string prodContainerName = containerName.Split('-')[0];
 
             
             // Create a Cosmos DB client instance
             CosmosClient client = new CosmosClient(endPoint, keyString);
 
             // Get a reference to the database and container
-            Database database = await client.GetDatabase(databaseName).ReadAsync();
-            Container container = await database.GetContainer(containerName).ReadContainerAsync();
-
+            Database devDatabase = await client.GetDatabase(databaseName).ReadAsync();
+            Container devContainer = await devDatabase.GetContainer(containerName).ReadContainerAsync();
             // Delete the container
-            await container.DeleteContainerAsync();
-
+            await devContainer.DeleteContainerAsync();
             // Recreate the container
-            await database.CreateContainerIfNotExistsAsync(containerName, "/id");
-            container = await database.GetContainer(containerName).ReadContainerAsync();
+            await devDatabase.CreateContainerIfNotExistsAsync(containerName, "/id");
+            devContainer = await devDatabase.GetContainer(containerName).ReadContainerAsync();
+
+            Database prodDB  = await client.GetDatabase(prodDBName).ReadAsync();
+            Container prodContainer = await prodDB.GetContainer(prodContainerName).ReadContainerAsync();
+
+            if(migrateToProd){
+                // Delete the prod container
+                await prodContainer.DeleteContainerAsync();
+                // Recreate the prod container
+                await prodDB.CreateContainerIfNotExistsAsync(prodContainerName, "/id");
+                prodContainer = await prodDB.GetContainer(prodContainerName).ReadContainerAsync();
+            }
+
+
             int countInserted = 0;
             int countFailed = 0;
 
@@ -62,7 +84,10 @@ namespace MigrateContent
                     string content = File.ReadAllText(filePath);
 
                     // Insert the document into Cosmos DB
-                    dynamic response = await container.CreateItemAsync(new { id = id, content = content, urlpath = urlPath });
+                    dynamic response = await devContainer.CreateItemAsync(new { id = id, content = content, urlpath = urlPath });
+                    if(migrateToProd){
+                        dynamic responseFromProd = await prodContainer.CreateItemAsync(new { id = id, content = content, urlpath = urlPath });
+                    }
 
                     // Output the response
                     Console.WriteLine($"Inserted document with ID: {response.Resource.id}");

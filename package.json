@@ -31,6 +31,7 @@
     "jsoneditor": "^9.10.0",
     "marked": "^4.2.3",
     "ngx-bootstrap": "^10.2.0",
+    "ngx-cookie-service": "^15.0.0",
     "ngx-markdown": "^15.0.0",
     "node-fetch": "^3.3.1",
     "prismjs": "^1.29.0",

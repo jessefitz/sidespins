@@ -3,6 +3,7 @@ import { ArticlesService } from '../articles.service';
 import { SubdomainService } from '../subdomain.service';
 import { ActivatedRoute } from '@angular/router';
 import { OnInit } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 
 
 @Component({
@@ -20,7 +21,8 @@ export class ArticlePresenterComponent implements OnInit {
   constructor(
     private service: ArticlesService, 
     private route: ActivatedRoute, 
-    private subdomainService: SubdomainService) {
+    private subdomainService: SubdomainService,
+    private cookieService: CookieService) {
    
   }
 
@@ -53,7 +55,12 @@ export class ArticlePresenterComponent implements OnInit {
       }
       else  //impersonating
       {
-        this.service.getImpersonatedArticleContent(urlPath, "a sentient black hole bent on consuming the universe").subscribe({
+        let personaToUse = "a bot that constantly reminds everyone that it has no persona";
+        const savedValue = this.cookieService.get('personaValue');
+        if (savedValue) {
+          personaToUse = savedValue;
+        }
+        this.service.getImpersonatedArticleContent(urlPath, personaToUse).subscribe({
           next: (content: string) => {
             // do something with content
             console.log(content);

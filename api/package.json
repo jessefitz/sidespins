@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node app.js func start",
+    "start": "func start",
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {

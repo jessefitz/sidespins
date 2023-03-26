@@ -8,6 +8,7 @@ import { ArticlePresenterComponent } from './article-presenter/article-presenter
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/not-me', component:ArticlePresenterComponent},
   {path: 'articles/friends-and-enemies', component:ArticlePresenterComponent},
   {path: 'articles/no-shame', component:ArticlePresenterComponent},
   {path: 'articles/aloof', component:ArticlePresenterComponent},

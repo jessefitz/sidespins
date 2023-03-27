@@ -6,7 +6,7 @@
     "type": "coreclr",
     "request": "launch",
     "program": "${workspaceFolder}/migratecontent/bin/Debug/net6.0/MigrateContent.dll", 
-    "args": ["true"],
+    "args": ["false"],
     "cwd": "${workspaceFolder}",
     "stopAtEntry": false,
     "console": "internalConsole"

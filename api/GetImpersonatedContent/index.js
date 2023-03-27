@@ -1,5 +1,3 @@
-const { empty, isEmpty } = require('rxjs');
-
 module.exports = async function (context, req) {
     // Import the helper class, which abstracts calls to the OpenAI API
     

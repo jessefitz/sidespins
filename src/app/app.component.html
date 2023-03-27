@@ -1,11 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="navbar-expand-lg navbar-light bg-light" id="navbarNavAltMarkup">
-    <div class="navbar-nav">
-      <a class="navbar-brand btn-lg" routerLink="/home" routerLinkActive="active" ariaCurrentWhenActive="page">Home</a>
-      <a class="navbar-brand" routerLink="/article-list" routerLinkActive="active" ariaCurrentWhenActive="page">Articles</a>
+    <div class="navbar-nav" style="margin-left: 50px;">
+      <a class="nav-link navbar-brand btn-lg" routerLink="/home" routerLinkActive="active" ariaCurrentWhenActive="page">Home</a>
+      <a class="nav-link navbar-brand" routerLink="/article-list" routerLinkActive="active" ariaCurrentWhenActive="page">Articles</a>
     </div>
   </div>
 </nav>
+
 
 <ng-container *ngIf="isImpersonating">
   <div class="container">
@@ -16,7 +17,7 @@
           <small class="text-muted">The site will use this persona definition to influence the content it renders. Refresh the page to see changes.</small>
         </h4>
           <div class="input-group">
-            <input class="form-control" [(ngModel)]="personaValue" (blur)="saveInputValueToCookie()" />
+            <input class="form-control" [(ngModel)]="personaValue"  (ngModelChange)="saveInputValueToCookie()" />
             <div class="input-group-append">
               <button class="btn btn-primary" onclick="window.location.reload()">Refresh</button>
             </div>

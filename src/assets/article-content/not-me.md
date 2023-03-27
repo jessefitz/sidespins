@@ -1,8 +1,14 @@
 # Not Me
 
-<p align="center">
-    <img src="/img/notme.jpg" style="max-width: 25%; height: auto;">
-</p>
+<div class="container-fluid bg-light">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6 text-center">
+      <div class="p-3">
+        <img src="/img/notme.jpg" class="img-fluid  mx-auto" style="max-height: calc(100% + 20px);">
+      </div>
+    </div>
+  </div>
+</div>
 
 We've all seen the movies, maybe read the books.  *New ground-breaking technology enables humans to live beyond death.  Our consciousness may finally transcend the limits of our physical being.  Reserve your spot now... the digital space is filling up fast!*
 
@@ -16,9 +22,15 @@ AI has obviously been top of mind for me lately, especially this idea of AI bein
 
 The thought inspired me to create something... and given the temporal nature of inspiration... I blew the good part of a weekend creating [not.jessefitz.com](https://not.jessefitz.me).
 
-<p align="center">
-    <img src="/img/notmeimage.jpg" style="max-width: 25%; height: auto;">
-</p>
+<div class="container-fluid bg-light">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+      <div class="p-3 text-center">
+        <img src="/img/notmeimage.jpg" class="img-fluid shadow" >
+      </div>
+    </div>
+  </div>
+</div>
 
 [not.jessefitz.com](https://not.jessefitz.me) is a small scratch at the surface of generative self-augmentation.  Define a persona at the top of the page, then browse any of the content in /articles to see it rendered as that persona might have authored it.  Behind the scenes it's the same site, content and codebase, but instead of rendering the content as I've authored it, it's being routed through OpenAI.
 

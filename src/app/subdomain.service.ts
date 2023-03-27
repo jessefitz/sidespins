@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Inject, PLATFORM_ID } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
@@ -6,9 +8,9 @@ import { Injectable } from '@angular/core';
 export class SubdomainService {
   private subdomain: string;
 
-  constructor() {
+  constructor( @Inject(PLATFORM_ID) private platformId: Object) {
     this.subdomain = "";
-    if(window != null){
+    if (isPlatformBrowser(this.platformId)) {
       this.subdomain = this.extractSubdomain(window.location.hostname);
     }
   }

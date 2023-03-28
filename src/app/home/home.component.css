@@ -1,0 +1,16 @@
+.home-container{
+    position: relative; 
+    margin-top: 10px; 
+    margin-bottom: 20px;
+}
+
+.comment {
+    font-style: italic;
+    font-size: 80%;
+    color: #666;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+  }

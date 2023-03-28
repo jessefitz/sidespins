@@ -20,3 +20,7 @@
   max-width: 800px; /* Set the maximum width of the container */
   margin: 0 auto; /* Center the container horizontally */
 }
+
+body {
+  font-family: Arial, sans-serif;
+}

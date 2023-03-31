@@ -168,5 +168,15 @@
     "src": "not-me.md",
     "rank": 1,
     "category": "Tech and Biz"
+  },
+  {
+    "urlpath": "hope-and-validation",
+    "title": "Hope and Validation",
+    "id": "22",
+    "tagline": "Somebody should probably add a tagline to this article...",
+    "date": "3/31/2023",
+    "src": "hope-and-validation.md",
+    "rank": 1,
+    "category": "Tech and Biz"
   }
 ]

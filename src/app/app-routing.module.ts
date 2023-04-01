@@ -4,7 +4,8 @@ import { ArticleListComponent } from './article-list/article-list.component';
 import { HomeComponent } from './home/home.component';
 import { SandboxComponent } from './sandbox/sandbox.component';
 import { ArticlePresenterComponent } from './article-presenter/article-presenter.component';
-
+import { AboutComponent } from './about/about.component';
+import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
@@ -26,6 +27,8 @@ const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full' },
   {path: 'article-list', component: ArticleListComponent},
   {path: 'home', component:HomeComponent},
+  {path: 'about', component:AboutComponent},
+  {path: 'ai', component:AiUsageComponent},
   {path: 'articles/chatgpt', component:ArticlePresenterComponent},  
   {path: 'articles/how-it-works', component:ArticlePresenterComponent},  
   {path: 'articles/website-infrastructure', component:ArticlePresenterComponent},  

@@ -38,6 +38,7 @@ import { FriendsComponent } from './articles/friends/friends.component';
 import { MillTownComponent } from './articles/mill-town/mill-town.component';
 import { SandboxComponent } from './sandbox/sandbox.component';
 import { ArticlePresenterComponent } from './article-presenter/article-presenter.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
@@ -68,7 +69,8 @@ import { ArticlePresenterComponent } from './article-presenter/article-presenter
     FriendsComponent,
     MillTownComponent,
     SandboxComponent,
-    ArticlePresenterComponent
+    ArticlePresenterComponent,
+    AboutComponent
   ],
   imports: [
     FormsModule,

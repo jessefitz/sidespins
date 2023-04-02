@@ -35,9 +35,12 @@ module.exports = async function (context, req) {
             const openAiHelper = new OpenAiHelper();
             let decodedPersona = decodeURIComponent(persona);
 
-            const role = 'You are ' + persona + ".";
-            const prompt = 'Rephrase this markdown content according to your role as ' +
-            decodedPersona + '.  Return only markdown content.  Do not alter the image elements.  The content to translate is: ' + article.content;
+            let role = process.env.OpenAiRoleStatement.replace("#", persona);  //'You are ' + persona + ".";
+            // const prompt = 'Rephrase this markdown content according to your role as ' +
+            // decodedPersona + '.  Return only markdown content.  Do not alter the image elements.  The content to translate is: ' + article.content;
+            let prompt = process.env.OpenAiPromptStatement.replace("#", persona);
+            prompt = prompt.replace("*", article.content);
+            
             const temp = 1; // Choose the desired temperature value
 
             try {

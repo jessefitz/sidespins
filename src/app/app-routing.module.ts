@@ -9,6 +9,7 @@ import { AiUsageComponent } from './articles/ai-usage/ai-usage.component';
 
 /*--BEGIN ROUTES--*/
 const routes: Routes = [
+  {path: 'articles/a-place-problem', component:ArticlePresenterComponent},
   {path: 'articles/hope-and-validation', component:ArticlePresenterComponent},
   {path: 'articles/not-me', component:ArticlePresenterComponent},
   {path: 'articles/friends-and-enemies', component:ArticlePresenterComponent},

@@ -178,5 +178,15 @@
     "src": "hope-and-validation.md",
     "rank": 1,
     "category": "Tech and Biz"
+  },
+  {
+    "urlpath": "a-place-problem",
+    "title": "A Place Problem",
+    "id": "23",
+    "tagline": "Who's on First?",
+    "date": "4/7/2023",
+    "src": "third-place.md",
+    "rank": 1,
+    "category": "Tech and Biz"
   }
 ]

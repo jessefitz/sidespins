@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { TransferState } from '@angular/platform-browser';
 import { MarkdownModule } from 'ngx-markdown';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -79,7 +80,9 @@ import { AboutComponent } from './about/about.component';
     HttpClientModule,
     MarkdownModule.forRoot({ loader: HttpClient })
   ],
-  providers: [],
+  providers: [
+    TransferState
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

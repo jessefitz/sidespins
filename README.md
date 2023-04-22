@@ -6,6 +6,31 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Decoupling Content from Source
+
+### Goals
+- Streamline the process for getting new content into the website
+- Decouple code changes from content changes
+- Don't lose the backup/history of markdown and images... this is the content that should be transient across future platforms
+
+### Areas
+- Change content migration tool to include all metadata in article directory
+- Get rid of article-directory.json... make everything data driven by content in Cosmos.
+  - Decouple article ArticleService.getArticleList from article-directory.json
+    - Make a call to the existing API endpoint for getting article by path in the API
+    - Change the logic in that API endpoint where if path parameter is empty, it returns all articles
+      - Future improvement: cache all article content when this call is made to improve site performance
+- Build a secure content management area in the site that only I can access
+  - https://www.npmjs.com/package/ngx-markdown-editor
+- Better understand what you want to do with backups...  According to [MS](https://learn.microsoft.com/en-us/azure/cosmos-db/periodic-backup-restore-introduction) "You can't access this backup directly. Azure Cosmos DB team restores your backup when you request through a support request."
+
+### Phases
+1. Phase 1
+   1.  Decouple ArticleService from Article Directory
+   2.  Couple ArticleService with Cosmos 
+   3.  Put all article metadata in migrate utility
+   4.  At this point, site should be able to receive new articles without needing a release.... 
+
 ## CMS vNext Notes
 
 ### Plan
@@ -72,3 +97,42 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+# Future Considerations
+
+## Improve Performance with Blob and CDN
+Azure Content Delivery Network (CDN) and Azure Blob Storage serve different purposes, but they can be used together to deliver an enhanced experience for serving content to users. Here are some benefits of using Azure CDN over just using Blob Storage:
+
+Global distribution: Azure CDN has a network of edge servers located across the globe. When you use Azure CDN to serve content, it is automatically cached at these edge servers. This allows users to access the content from the server closest to their location, reducing latency and improving load times.
+
+Improved performance: Azure CDN uses various optimization techniques such as compression, caching, and connection reuse to ensure faster content delivery. These optimizations help reduce the load times of your content, improving the user experience.
+
+Scalability: Azure CDN can handle large amounts of traffic and is designed to scale with your needs. As your traffic grows, the CDN automatically scales to accommodate the increased load. This means you don't have to worry about provisioning and managing additional resources to handle traffic spikes.
+
+Reduced load on origin: By caching and serving content from edge servers, Azure CDN reduces the load on your origin server (e.g., Blob Storage). This can help save bandwidth and improve the overall performance of your application.
+
+Security: Azure CDN offers features such as custom domain HTTPS, token-based authentication, and DDoS protection to help secure your content and protect your infrastructure from attacks.
+
+Analytics and monitoring: Azure CDN provides built-in analytics and monitoring capabilities, giving you insights into user activity, traffic patterns, and performance metrics.
+
+It is important to note that Azure CDN and Blob Storage are not mutually exclusive solutions. You can use Azure Blob Storage as your origin server to store content, and then use Azure CDN to deliver that content to users with lower latency and improved performance. This combination can help you achieve the best of both worlds: a scalable, cost-effective storage solution and a high-performance content delivery network.
+## SEO
+Check your server-side rendering setup: Ensure that your Angular application is correctly configured for SSR. This allows search engines to crawl and index your content more effectively. Review your Angular Universal setup and make sure it's working as expected.
+
+Create a sitemap: Generate a sitemap.xml file that lists all the pages on your website. This helps search engines discover and index your content more effectively. You can submit the sitemap to Google Search Console and Bing Webmaster Tools.
+
+Register with Google Search Console and Bing Webmaster Tools: Register your website with these tools to monitor your site's performance, get insights, and submit your sitemap. They also provide valuable information on any crawl errors or indexing issues.
+
+Optimize metadata: Ensure that your pages have unique and descriptive title tags and meta descriptions. This helps search engines understand your content better and display relevant snippets in search results.
+
+Use semantic HTML tags: Use appropriate HTML tags like <header>, <nav>, <main>, and <footer> to structure your content. This helps search engines understand the structure of your website and index it accordingly.
+
+Use descriptive URLs: Use clear, descriptive URLs that include relevant keywords. This makes it easier for search engines to understand your content and improves your SEO ranking.
+
+Improve page load speed: Optimize your website's performance by compressing images, minifying JavaScript and CSS files, and using caching techniques. Faster load times can lead to better rankings in search results.
+
+Add structured data: Use structured data markup (such as JSON-LD or schema.org) to provide search engines with additional information about your content. This can improve your visibility in search results and increase click-through rates.
+
+Build quality backlinks: Earn backlinks from reputable websites by creating valuable content and promoting it through social media, guest posting, or outreach. High-quality backlinks can improve your website's authority and search engine ranking.
+
+Monitor your progress: Regularly check your website's performance in Google Search Console and Bing Webmaster Tools. Address any issues and continue to optimize your content for better visibility in search results.

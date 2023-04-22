@@ -84,9 +84,26 @@ namespace MigrateContent
                     string content = File.ReadAllText(filePath);
 
                     // Insert the document into Cosmos DB
-                    dynamic response = await devContainer.CreateItemAsync(new { id = id, content = content, urlpath = urlPath });
+                    dynamic response = await devContainer.CreateItemAsync(new { 
+                            id = id, 
+                            content = content,
+                            urlpath = urlPath,
+                            title = title,
+                            tagline  = tagline,
+                            date = date,
+                            rank = rank,
+                            category = category });
+                            
                     if(migrateToProd){
-                        dynamic responseFromProd = await prodContainer.CreateItemAsync(new { id = id, content = content, urlpath = urlPath });
+                        dynamic responseFromProd = await prodContainer.CreateItemAsync(new { 
+                            id = id, 
+                            content = content,
+                            urlpath = urlPath,
+                            title = title,
+                            tagline  = tagline,
+                            date = date,
+                            rank = rank,
+                            category = category });
                     }
 
                     // Output the response

@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
+import { TransferState, makeStateKey } from '@angular/platform-browser';
 // import axios from 'axios';
 
 
@@ -14,14 +16,17 @@ export class ArticlesService {
   
   AllArticles : ArticleInfo[] = [];
   subscription: any;
-  httpService: HttpClient;
-  
+  httpService: HttpClient;  
   private _jsonURL = 'assets/article-directory.json';
 
 
-  constructor(private http: HttpClient) {
-    //read json data from the articles json directory and push it into the ArticleInfo array
+  constructor(private http: HttpClient, private transferState: TransferState) {
     this.httpService = http;    
+
+    /*  To fetch data from the API on the server side, you can use Angular's HttpClient in combination with the TransferState service. 
+    This will allow you to make API calls on the server, and then transfer the fetched data to the client side. */
+
+
   }
   public getArticlesList (){
     if(this.AllArticles.length === 0){
@@ -41,13 +46,24 @@ export class ArticlesService {
 
   //in its current implementation, this function returns a json string representation of the article item in cosmos.
   public getArticleContent(urlPath: any): Observable<string> {
+    
+   const articleKey = makeStateKey<any>(urlPath);
+   const articleContent = this.transferState.get(articleKey, null);
+  
+   if( articleContent){
+     return of(articleContent); // The of() function is a creation operator that creates an Observable emitting the provided values.
+   }
+   else
+   {
     return this.http.get(`/api/GetArticleContent?urlPath=${urlPath}`)
       .pipe(
         map((response: any) => {
           const valToReturn = response && response.length ? response[0] : 'No matching article found';
+          this.transferState.set(articleKey, valToReturn);
           return valToReturn;
         })
       );
+   }
 
      /*
       The getArticleContent() method takes an id parameter and returns an observable of type string.

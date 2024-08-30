@@ -4,3 +4,5 @@
 
 layout: home
 ---
+
+This is a space for things I find interesting in the moment that may not seem so interesting many moments later.... 

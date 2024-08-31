@@ -3,7 +3,6 @@ layout: post
 title: "Lessons Learned - An Introduction"
 date: 2024-08-30 12:00:00 -0500
 categories: Business
-image: /assets/img/trapped.jpg
 excerpt: "The first in what will be a series of lessons learned posts."
 published: true
 ---

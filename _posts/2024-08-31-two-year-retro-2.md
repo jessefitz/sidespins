@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "2nd Year Retro - Understanding Your Customer"
+title: "Lessons Learned - Understanding Your Customer"
 date: 2024-08-31 12:00:00 -0500
 categories: Business
 excerpt: "It's how you know."

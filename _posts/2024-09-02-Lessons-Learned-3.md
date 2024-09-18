@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Lessons Learned - Trust You Gut"
+title: "Lessons Learned - Trust Your Gut"
 published: true
 date: 2024-09-02 06:00:00 -0500
 categories: Business

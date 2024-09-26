@@ -1,7 +1,7 @@
 ---
-layout: page
-title: "Hidden Page"
-published: false
+layout: page-no-heading
+title: Travel
+permalink: /travel/
 ---
 
-This is a hidden page that won't show up in the navigation or blog lists.
+This is a page that will eventually contain information about travel I'm doing or want to do.

@@ -26,8 +26,11 @@ In the meanwhile, I'll share some details about the plan (ideas) for my unplanne
 
 Stick with Option 1 plans for Home -> Buckhorn SP (stay there Monday night, work from there on Tuesday) and instead of continuing north up to Rt 2, start heading west on 90.  This option mitigates some of the weather challenges but requires more research re: places to stay as I head west.
 
-## Narrative
+## Check Ins and Photos
 
-{% for post in site.categories.travel %}
-- [{{ post.title }}]({{ post.url }})
+{% assign travel_posts = site.categories.travel | sort: 'date' | reverse %}
+{% for post in travel_posts %}
+- **[{{ post.title }}]({{ post.url }})**  
+  _Posted on: {{ post.date | date: "%B %d, %Y" }}_  
+  {{ post.excerpt }}
 {% endfor %}

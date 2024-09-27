@@ -28,4 +28,6 @@ Stick with Option 1 plans for Home -> Buckhorn SP (stay there Monday night, work
 
 ## Narrative
 
-[Link to my post]({% post_url 2024-09-27-travel1 %})
+{% for post in site.categories.travel %}
+- [{{ post.title }}]({{ post.url }})
+{% endfor %}

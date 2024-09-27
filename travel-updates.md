@@ -25,3 +25,7 @@ In the meanwhile, I'll share some details about the plan (ideas) for my unplanne
 ### Option 2: Home -> Midwest via Rt 90
 
 Stick with Option 1 plans for Home -> Buckhorn SP (stay there Monday night, work from there on Tuesday) and instead of continuing north up to Rt 2, start heading west on 90.  This option mitigates some of the weather challenges but requires more research re: places to stay as I head west.
+
+## Narrative
+
+[Link to my post]({% post_url 2024-09-27-travel1 %})

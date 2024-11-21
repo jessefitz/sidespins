@@ -31,7 +31,7 @@ Jesse’s skills, interests, and success are built on a foundation of technology
 | Visual Studio Code | Risk Management |
 | DevOps and CI/CD  | Stakeholder Relationship Management |
 | Git | Requirements Gathering and Documentation |
-| Various Progamming Languages (Full Stack) | Budget and Finance Management |
+| Various Programming Languages (Full Stack) | Budget and Finance Management |
 | IT Operations and Strategy | Project Estimation and Reporting |
 | Office 365| Contracts and Procurement |
 | Test Strategy and Execution | Change Management |

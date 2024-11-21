@@ -8,6 +8,6 @@ I focus on building purposeful tech solutions that deliver real-world value. Wit
 
 You can learn more about me and the value I provide via the following resources:
 
+- [Profile](/work/professional-profile.md)
 - [Resume](/work/2024-resume.md)
-- [Profile](/work/consulting-profile.md)
 - [LinkedIn](https://www.linkedin.com/in/jessefitzgibbon/)

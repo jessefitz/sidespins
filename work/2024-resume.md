@@ -7,43 +7,34 @@ title: Resume
 
 **Technologist and Builder**  
 [jesse.c.fitzgibbon@gmail.com](mailto:jesse.c.fitzgibbon@gmail.com)  
+410.440.3238
 
 ---
 
 ## PROFESSIONAL STATEMENT
 
-Jesse is an accomplished professional with over 20 years of experience in building teams and technology. He has succeeded in a wide spectrum of roles, ranging from Software Engineer to Project and Program Manager, across multiple industries in both commercial and federal spaces. Jesse has consistently demonstrated an ability to excel in complex organizations and environments. His “serve first” approach has been integral to delivering successful projects and programs and growing accomplished teams.
+Jesse is an accomplished professional with over 20 years of experience in building technolgoy and team that build technology. He has succeeded in a wide spectrum of roles, ranging from Software Engineer to Chief Technology Officer and Co-Founder, across multiple industries in both commercial and federal spaces. Jesse has consistently demonstrated an ability to excel in complex organizations and environments. His “serve first” approach has been integral to delivering successful projects and programs and growing accomplished teams.
 
 Jesse’s skills, interests, and success are built on a foundation of technology, with extensive experience leading enterprise digital transformation programs, emphasizing cloud and AI technologies.
 
 ---
 
-## SKILLS AND TECHNOLOGIES
+## SKILLS
 
-- Leadership and People Development
-- Full Lifecycle Project and Program Management
-- Modern Project Management Methodologies and Best Practices
-- Technical Architecture and Design Methodologies
-- Software Development Lifecycle and Best Practices
-- Artificial Intellgience (AI) and Related Technologies
-- Cloud Platform (Azure PaaS and IaaS)
-- Office 365 and Full Office Suite
-- SharePoint Online
-- Azure DevOps
-- Git
-- Visual Studio Code
-- Microsoft Power Platform
-- DevOps and CI/CD
-- Test Strategy and Execution
-- People Management and Mentorship
-- Operations and Support
-- Risk Management
-- Stakeholder Relationship Management
-- Requirements Gathering and Documentation
-- Budget and Finance Management
-- Project Estimation and Reporting
-- Contracts and Procurement
-- Change Management
+| **Technology** | **Management** |
+| --- | --- |
+| Software Development and Technical Architecture | Leadership, Team and People Development |
+| Full SDLC and Best Practices | Product Management |
+| Artificial Intelligence (AI) and Related Technologies | Modern Project Management Methodologies and Best Practices |
+| Cloud Platform (Azure PaaS and IaaS) | Business Development |
+| Azure DevOps| Operations and Support |
+| Visual Studio Code | Risk Management |
+| DevOps and CI/CD  | Stakeholder Relationship Management |
+| Git | Requirements Gathering and Documentation |
+| Various Progamming Languages (Full Stack) | Budget and Finance Management |
+| IT Operations and Strategy | Project Estimation and Reporting |
+| Office 365| Contracts and Procurement |
+| Test Strategy and Execution | Change Management |
 
 ---
 

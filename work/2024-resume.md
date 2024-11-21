@@ -53,26 +53,20 @@ Jesse co-founded Verfico Technology to better align his technical and leadership
 ### Applied Information Sciences (AIS): 2005 - 2022  
 AIS is a professional services firm delivering technology and cloud transformation solutions. Jesse served as a Director in the Office of the Chief Technology Officer (OCTO), responsible for strategic programs.
 
-**Director, Office of the CTO (2020 - Present)**  
-- Built and executed agile programs for developing corporate intellectual property assets.
-- Designed and implemented a “hub and spoke” service model for cloud migration and modernization support.
-- Led teams of cloud solution architects and engineers to establish delivery guidance for cloud projects.
-- Operationalized and led the “TechOnDeck” program, enhancing employee experience and corporate value creation.
-- Spearheaded a cross-functional task force to evolve project monitoring and quality improvement.
-- Managed the Summer Internship program for undergraduate students.
+**Director, Office of the CTO (2020 - 2022)**  
+- Spearheaded strategic internal and external facing programs focusing advancing AIS's capabilities and growth strategy.
+
+  *Success Story*: Developed and executed agile programs to drive corporate innovation and intellectual property creation, including designing a “hub and spoke” service model for cloud modernization, leading cloud solution teams to establish delivery guidance, and operationalizing the “TechOnDeck” program to enhance employee experience and value. Additionally, spearheaded cross-functional initiatives to improve project monitoring and quality while managing the Summer Internship program to foster emerging talent.
 
 **Technical Program Manager (2015 - 2020)**  
-- Led multi-year, multi-million-dollar programs for AIS’s clients, including:
-  - **Enterprise Cloud Landing Zone**: Created a hosting platform for critical workloads at Exelon.
-  - **Utility Customer Web Channel Convergence**: Unified six web platforms as Exelon’s first major cloud migration.
-  - **Digital Platform Modernization**: Transitioned to PaaS for improved scalability and resiliency.
+- Established and led several multi-year, multi-million-dollar programs for AIS’s strategic clients.
+  
+    *Success Story*: Designed and implemented enterprise-grade digital transformation initiatives at Exelon Utilities, including the creation of a robust cloud hosting platform for critical workloads, unifying six customer web platforms to drive modernization, and transitioning to PaaS for enhanced scalability and resiliency.
 
 **Technical Project Manager and Software Engineer (2011 - 2015)**  
-- Managed and contributed to web-based application projects across various clients and industries.
-  - **WilmerHale**: Led a public-facing extranet project as Technical Lead and Project Manager.
-  - **FTI Consulting**: Managed requirements gathering, design, and implementation of a new corporate intranet.
-  - **ArentFox**: Implemented a client-facing extranet in a challenging environment.
-  - **Texas Department of Aging and Disability Services**: Participated in developing a mobile case worker solution.
+- Managed and contributed to modern application development projects across various clients and industries.
+
+    *Success Story*: Spearheaded the delivery of innovative web and mobile solutions across diverse organizations, including leading a public-facing extranet for WilmerHale, managing the design and implementation of a corporate intranet for FTI Consulting, developing a client-facing extranet for ArentFox in a complex environment, and contributing to a mobile case worker solution for the Texas Department of Aging and Disability Services
 
 **Senior Software Engineer (2005 - 2008)**  
 - Delivered full SDLC support for multiple web applications and led development teams.
@@ -105,7 +99,7 @@ Joined as part of SM Consulting, which was later acquired by SAIC.
 
 ## EDUCATION
 
-- **James Madison University** — B.A. Spanish, Minor Computer Science (1998 - 2002)  
+- **James Madison University** — Spanish, Computer Science (1998 - 2002)  
   *Immersive study abroad: Universidad de Salamanca, Spain*
 - **Loyola University** — MBA (Currently Enrolled, 2022)
 

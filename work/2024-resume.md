@@ -7,9 +7,7 @@ title: Resume
 
 **Technologist and Builder**  
 [jesse.c.fitzgibbon@gmail.com](mailto:jesse.c.fitzgibbon@gmail.com)  
-410.440.3238
 
----
 
 ## PROFESSIONAL STATEMENT
 

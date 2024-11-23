@@ -5,7 +5,7 @@
 layout: home
 ---
 
-## Fall Session 8 Ball Tournament
+# Fall Session 8 Ball Tournament
 
 APA Division 033 is organizing an 8-ball Tournament.  Time and date have yet to be settled. We're first working to gather a list of people interested in participating.  
 

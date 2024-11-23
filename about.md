@@ -1,9 +1,9 @@
 ---
 layout: page-no-heading
 title: About
-permalink: /about/
+permalink: /8ball/
 ---
 
 ### What's SideSpins?
 
-A website for pool enthusiasts!
+This is the unofficial website for APA Divsion 033.

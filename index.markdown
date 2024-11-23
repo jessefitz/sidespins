@@ -13,4 +13,4 @@ As of 11/23/2024, we've had more than 10 people express interest.  We're hoping 
 
 This page will be updated with more information as it becomes available!
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScdnP7pLZJ4iy-5Nmzf5RIXhu4FnVo-A4vyhTeyQCr9RlrCzg/viewform?embedded=true" width="640" height="1256" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScdnP7pLZJ4iy-5Nmzf5RIXhu4FnVo-A4vyhTeyQCr9RlrCzg/viewform?embedded=true" width="640" height="1256" frameborder="0" marginheight="0" marginwidth="0" style="width: 100%; max-width: 640px;">Loading…</iframe>

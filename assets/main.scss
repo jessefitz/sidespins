@@ -221,3 +221,57 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Schedule nav pills */
+.schedule-nav {
+  padding: 1rem;
+  background: #f6f6f6;
+  border: 1px solid #e3e3e3;
+  border-radius: .75rem;
+  margin: 1em 0 2em;
+}
+.schedule-nav .label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: .5rem;
+}
+.schedule-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.schedule-nav li {
+  margin: .25rem 0;
+}
+.schedule-nav a {
+  display: block;
+  padding: .5rem .75rem;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: .5rem;
+  text-decoration: none;
+  color: inherit;
+}
+.schedule-nav a:hover {
+  background: #f1f5f9;
+}
+.schedule-nav a:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.pill {
+  display: inline-block;
+  padding: .4rem .75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  text-decoration: none;
+  color: inherit;
+  line-height: 1;
+}
+.pill:hover { background: #f1f5f9; }
+.pill:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+.pill--primary { background: #eef2ff; border-color: #c7d2fe; }
+.back-to-top { text-align: right; margin-top: .5em; }
+.back-to-top a { text-decoration: none; }
+.back-to-top a:hover { text-decoration: underline; }

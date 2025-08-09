@@ -1,0 +1,118 @@
+---
+layout: default
+title: Schedule
+---
+
+<h1>{{ page.title }}</h1>
+
+<a id="top"></a>
+{% assign days = site.data.schedule | sort: "date" %}
+
+<!-- Jump-to navigation -->
+<nav class="schedule-nav" aria-label="Jump to sections">
+  <span class="label">Jump to:</span>
+  <ul>
+    <li><a href="#rotation-tracker">🧭 Rotation Tracker</a></li>
+    {% for day in days %}
+      {% assign anchor = day.date | date: "%Y-%m-%d" %}
+      <li>
+        <a href="#day-{{ anchor }}">
+          {{ day.date | date: "%A, %B %-d, %Y" }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+
+{% for day in days %}
+  {% assign anchor = day.date | date: "%Y-%m-%d" %}
+  <div id="day-{{ anchor }}" class="schedule-day" style="margin-bottom:2em;">
+    <h2>{{ day.date | date: "%A, %B %-d, %Y" }}</h2>
+
+    {% if day.backup %}
+      <p style="margin: 0 0 1em 0; font-style: italic;">
+        <span style="background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 4px; padding: 0.2em 0.5em;">
+          Backup: {{ day.backup }}
+        </span>
+      </p>
+    {% endif %}
+
+    {% assign total_skill = 0 %}
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left;">Player</th>
+          <th>Skill</th>
+          <th>Scheduled</th>
+          <th>Played</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in day.players %}
+          {% assign skill = site.data.players[p.name] | default: 0 | plus: 0 %}
+          {% if p.scheduled %}
+            {% assign total_skill = total_skill | plus: skill %}
+          {% endif %}
+          <tr>
+            <td style="text-align:left;">{{ p.name }}</td>
+            <td style="text-align:center;">{{ skill }}</td>
+            <td style="text-align:center;">{% if p.scheduled %}✅{% else %}—{% endif %}</td>
+            <td style="text-align:center;">{% if p.played %}🎯{% else %}—{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if total_skill > 23 %}
+      <p style="color:#b00020; font-weight:600; margin:0.5em 0 0 0;">
+        ⚠️ Planned lineup exceeds 23 ({{ total_skill }}). Adjust before match night.
+      </p>
+    {% endif %}
+
+    <p style="text-align:right; font-style:italic; margin-top:0.5em;">
+      Sum of scheduled skill: {{ total_skill }}
+    </p>
+
+    <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
+  </div>
+
+  <hr style="margin: 2em 0; border-top: 2px solid #ccc;">
+{% endfor %}
+
+<h2 id="rotation-tracker">Rotation Tracker</h2>
+<p>This helps us keep play time fair across the season.</p>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left;">Player</th>
+      <th>Scheduled Count</th>
+      <th>Played Count</th>
+      <th>Backup Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for name in site.data.players %}
+      {% assign player_name = name[0] %}
+      {% assign sched_count = 0 %}
+      {% assign played_count = 0 %}
+      {% assign backup_count = 0 %}
+      {% for day in days %}
+        {% for p in day.players %}
+          {% if p.name == player_name and p.scheduled %}{% assign sched_count = sched_count | plus: 1 %}{% endif %}
+          {% if p.name == player_name and p.played %}{% assign played_count = played_count | plus: 1 %}{% endif %}
+        {% endfor %}
+        {% if day.backup == player_name %}
+          {% assign backup_count = backup_count | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+      <tr>
+        <td style="text-align:left;">{{ player_name }}</td>
+        <td style="text-align:center;">{{ sched_count }}</td>
+        <td style="text-align:center;">{{ played_count }}</td>
+        <td style="text-align:center;">{{ backup_count }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p class="back-to-top"><a href="#top">↑ Back to top</a></p>

@@ -21,7 +21,7 @@
 title: SideSpins
 #email: jesse.c.fitzgibbon@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Unofficial homepage for APA Division 033.
+  Unofficial homepage for Break of Dawn.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://sidespins.com" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb

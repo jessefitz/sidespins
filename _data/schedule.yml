@@ -1,0 +1,191 @@
+- date: 2025-08-06
+  backup: Jesse
+  players:
+    - { name: Jesse,   scheduled: false,  played: false }
+    - { name: Brian,   scheduled: false,  played: true }
+    - { name: Chris,   scheduled: false,  played: true }
+    - { name: Ed,      scheduled: false,  played: true }
+    - { name: Ty,      scheduled: false,  played: true }
+    - { name: Anthony, scheduled: false,  played: true }
+    - { name: Ann,     scheduled: false,  played: false }
+    - { name: Gail,    scheduled: false,  played: false }
+
+- date: 2025-08-13
+  backup: Ty
+  players:
+    - { name: Jesse,   scheduled: true, played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: false,  played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: false, played: false }
+    - { name: Anthony, scheduled: false, played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-08-20
+  backup: Chris
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: false, played: false }
+    - { name: Chris,   scheduled: false, played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: false, played: false }
+
+- date: 2025-08-27
+  backup: Anthony
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: false, played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: false, played: false }
+    - { name: Ann,     scheduled: false, played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-09-03
+  backup: Ed
+  players:
+    - { name: Jesse,   scheduled: false, played: false }
+    - { name: Brian,   scheduled: true, played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: false,  played: false }
+    - { name: Ty,      scheduled: true, played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: false,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-09-10
+  backup: Gail
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: false, played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: false, played: false }
+    - { name: Gail,    scheduled: false, played: false }
+
+- date: 2025-09-17
+  backup: Jesse
+  players:
+    - { name: Jesse,   scheduled: false, played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: false, played: false }
+    - { name: Anthony, scheduled: false, played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-09-24
+  backup: Brian
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: false, played: false }
+    - { name: Chris,   scheduled: true, played: false }
+    - { name: Ed,      scheduled: false, played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: false,  played: false }
+
+- date: 2025-10-01
+  backup: Chris
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: false, played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: false, played: false }
+    - { name: Gail,    scheduled: false, played: false }
+
+- date: 2025-10-08
+  backup: Ty
+  players:
+    - { name: Jesse,   scheduled: false, played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: false, played: false }
+    - { name: Anthony, scheduled: false, played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-10-15
+  backup: Anthony
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: false, played: false }
+    - { name: Chris,   scheduled: false, played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: false, played: false }
+
+- date: 2025-10-22
+  backup: Ann
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: false, played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: false, played: false }
+    - { name: Ann,     scheduled: false, played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-10-29
+  backup: Gail
+  players:
+    - { name: Jesse,   scheduled: false, played: false }
+    - { name: Brian,   scheduled: false, played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: false, played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-11-05
+  backup: Jesse
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: false, played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: false, played: false }
+    - { name: Gail,    scheduled: false, played: false }
+
+- date: 2025-11-12
+  backup: Brian
+  players:
+    - { name: Jesse,   scheduled: false, played: false }
+    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Chris,   scheduled: true,  played: false }
+    - { name: Ed,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: false, played: false }
+    - { name: Anthony, scheduled: false, played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }
+
+- date: 2025-11-19
+  backup: Chris
+  players:
+    - { name: Jesse,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: false, played: false }
+    - { name: Chris,   scheduled: false, played: false }
+    - { name: Ed,      scheduled: false, played: false }
+    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ann,     scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: false }

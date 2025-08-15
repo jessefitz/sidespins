@@ -13,14 +13,14 @@
 - date: 2025-08-13
   backup: Ty
   players:
-    - { name: Jesse,   scheduled: true, played: false }
+    - { name: Jesse,   scheduled: true, played: true }
     - { name: Brian,   scheduled: true,  played: false }
     - { name: Chris,   scheduled: false,  played: false }
-    - { name: Ed,      scheduled: true,  played: false }
-    - { name: Ty,      scheduled: false, played: false }
+    - { name: Ed,      scheduled: true,  played: true }
+    - { name: Ty,      scheduled: false, played: true }
     - { name: Anthony, scheduled: false, played: false }
     - { name: Ann,     scheduled: true,  played: false }
-    - { name: Gail,    scheduled: true,  played: false }
+    - { name: Gail,    scheduled: true,  played: true }
 
 - date: 2025-08-20
   backup: Brian
@@ -29,10 +29,10 @@
     - { name: Brian,   scheduled: false, played: false }
     - { name: Chris,   scheduled: true, played: false }
     - { name: Ed,      scheduled: true,  played: false }
-    - { name: Ty,      scheduled: true,  played: false }
+    - { name: Ty,      scheduled: false,  played: false }
     - { name: Anthony, scheduled: true,  played: false }
     - { name: Ann,     scheduled: false,  played: false }
-    - { name: Gail,    scheduled: false, played: false }
+    - { name: Gail,    scheduled: true, played: false }
 
 - date: 2025-08-27
   backup: Anthony

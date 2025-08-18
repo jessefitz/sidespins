@@ -28,8 +28,8 @@
     - { name: Jesse,   scheduled: true,  played: false }
     - { name: Brian,   scheduled: false, played: false }
     - { name: Chris,   scheduled: true, played: false }
-    - { name: Ed,      scheduled: true,  played: false }
-    - { name: Ty,      scheduled: false,  played: false }
+    - { name: Ed,      scheduled: false,  played: false }
+    - { name: Ty,      scheduled: true,  played: false }
     - { name: Anthony, scheduled: true,  played: false }
     - { name: Ann,     scheduled: false,  played: false }
     - { name: Gail,    scheduled: true, played: false }

@@ -14,7 +14,7 @@
   backup: Ty
   players:
     - { name: Jesse,   scheduled: true, played: true }
-    - { name: Brian,   scheduled: true,  played: false }
+    - { name: Brian,   scheduled: true,  played: true }
     - { name: Chris,   scheduled: false,  played: false }
     - { name: Ed,      scheduled: false,  played: true }
     - { name: Ty,      scheduled: true, played: true }

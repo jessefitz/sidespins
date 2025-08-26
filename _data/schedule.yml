@@ -27,10 +27,10 @@
   players:
     - { name: Jesse,   scheduled: true,  played: false }
     - { name: Brian,   scheduled: false, played: false }
-    - { name: Chris,   scheduled: true, played: false }
+    - { name: Chris,   scheduled: true, played: true }
     - { name: Ed,      scheduled: false,  played: false }
-    - { name: Ty,      scheduled: true,  played: false }
-    - { name: Anthony, scheduled: true,  played: false }
+    - { name: Ty,      scheduled: true,  played: true }
+    - { name: Anthony, scheduled: true,  played: true }
     - { name: Ann,     scheduled: false,  played: false }
     - { name: Gail,    scheduled: true, played: false }
 

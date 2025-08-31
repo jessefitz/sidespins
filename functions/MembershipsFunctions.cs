@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using SideSpins.Api.Services;
 using SideSpins.Api.Models;
 using SideSpins.Api.Helpers;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace SideSpins.Api;
 
@@ -23,9 +23,6 @@ public class MembershipsFunctions
     [Function("GetMemberships")]
     public async Task<IActionResult> GetMemberships([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var teamId = req.Query["teamId"].FirstOrDefault();
@@ -54,7 +51,7 @@ public class MembershipsFunctions
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var membership = JsonSerializer.Deserialize<TeamMembership>(requestBody);
+            var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
             
             if (membership == null || string.IsNullOrEmpty(membership.TeamId) || string.IsNullOrEmpty(membership.PlayerId))
             {
@@ -67,6 +64,37 @@ public class MembershipsFunctions
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating membership");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("UpdateMembership")]
+    public async Task<IActionResult> UpdateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "memberships/{membershipId}")] HttpRequest req, string membershipId)
+    {
+        var authResult = AuthHelper.ValidateApiSecret(req);
+        if (authResult != null) return authResult;
+
+        try
+        {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
+            
+            if (membership == null || string.IsNullOrEmpty(membership.TeamId) || string.IsNullOrEmpty(membership.PlayerId))
+            {
+                return new BadRequestObjectResult("Invalid membership data - teamId and playerId are required");
+            }
+
+            var updatedMembership = await _cosmosService.UpdateMembershipAsync(membershipId, membership.TeamId, membership);
+            if (updatedMembership == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(updatedMembership);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating membership {MembershipId}", membershipId);
             return new StatusCodeResult(500);
         }
     }
@@ -101,4 +129,48 @@ public class MembershipsFunctions
             return new StatusCodeResult(500);
         }
     }
+
+    [Function("UpdatePlayerSkillInFutureLineups")]
+    public async Task<IActionResult> UpdatePlayerSkillInFutureLineups([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "memberships/update-future-lineups")] HttpRequest req)
+    {
+        var authResult = AuthHelper.ValidateApiSecret(req);
+        if (authResult != null) return authResult;
+
+        try
+        {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var request = JsonConvert.DeserializeObject<UpdateSkillInLineupsRequest>(requestBody);
+            
+            if (request == null || string.IsNullOrEmpty(request.PlayerId) || string.IsNullOrEmpty(request.DivisionId) || request.NewSkillLevel <= 0)
+            {
+                return new BadRequestObjectResult("Invalid request - playerId, divisionId, and newSkillLevel are required");
+            }
+
+            await _cosmosService.UpdateFutureLineupsForPlayerSkillChangePublicAsync(request.PlayerId, request.DivisionId, request.NewSkillLevel);
+            
+            return new OkObjectResult(new { 
+                Message = $"Updated skill levels for player {request.PlayerId} in future lineups", 
+                PlayerId = request.PlayerId, 
+                DivisionId = request.DivisionId, 
+                NewSkillLevel = request.NewSkillLevel 
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating player skill in future lineups");
+            return new StatusCodeResult(500);
+        }
+    }
+}
+
+public class UpdateSkillInLineupsRequest
+{
+    [JsonProperty("playerId")]
+    public string PlayerId { get; set; } = string.Empty;
+
+    [JsonProperty("divisionId")]
+    public string DivisionId { get; set; } = string.Empty;
+
+    [JsonProperty("newSkillLevel")]
+    public int NewSkillLevel { get; set; }
 }

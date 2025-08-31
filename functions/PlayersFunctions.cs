@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using SideSpins.Api.Services;
 using SideSpins.Api.Models;
 using SideSpins.Api.Helpers;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace SideSpins.Api;
 
@@ -23,9 +23,6 @@ public class PlayersFunctions
     [Function("GetPlayers")]
     public async Task<IActionResult> GetPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var players = await _cosmosService.GetPlayersAsync();
@@ -47,7 +44,7 @@ public class PlayersFunctions
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var player = JsonSerializer.Deserialize<Player>(requestBody);
+            var player = JsonConvert.DeserializeObject<Player>(requestBody);
             
             if (player == null || string.IsNullOrEmpty(player.FirstName))
             {
@@ -75,7 +72,7 @@ public class PlayersFunctions
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             _logger.LogInformation("Updating player {PlayerId} with data: {RequestBody}", id, requestBody);
             
-            var player = JsonSerializer.Deserialize<Player>(requestBody);
+            var player = JsonConvert.DeserializeObject<Player>(requestBody);
             
             if (player == null)
             {

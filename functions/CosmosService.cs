@@ -2,6 +2,7 @@ using Microsoft.Azure.Cosmos;
 using SideSpins.Api.Models;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace SideSpins.Api.Services;
 
@@ -138,6 +139,61 @@ public class CosmosService
         return response.Resource;
     }
 
+    public async Task<TeamMembership?> GetMembershipByIdAsync(string membershipId, string teamId)
+    {
+        try
+        {
+            var response = await _membershipsContainer.ReadItemAsync<TeamMembership>(membershipId, new PartitionKey(teamId));
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<TeamMembership?> UpdateMembershipAsync(string membershipId, string teamId, TeamMembership membership)
+    {
+        try
+        {
+            // Get the existing membership to compare skill levels
+            var existingMembership = await GetMembershipByIdAsync(membershipId, teamId);
+            
+            // Explicitly set the ID and type to ensure consistency
+            membership.Id = membershipId;
+            membership.Type = "membership";
+            membership.TeamId = teamId;
+            
+            // Ensure we have a valid joinedAt timestamp
+            if (membership.JoinedAt == default(DateTime))
+            {
+                membership.JoinedAt = DateTime.UtcNow;
+            }
+            
+            var response = await _membershipsContainer.ReplaceItemAsync(
+                membership, 
+                membershipId, 
+                new PartitionKey(teamId));
+            
+            // If skill level changed, update future lineups
+            if (existingMembership != null && 
+                existingMembership.SkillLevel_9b != membership.SkillLevel_9b && 
+                membership.SkillLevel_9b.HasValue)
+            {
+                await UpdateFutureLineupsForPlayerSkillChangeAsync(
+                    membership.PlayerId, 
+                    membership.DivisionId, 
+                    membership.SkillLevel_9b.Value);
+            }
+            
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
     public async Task<bool> DeleteMembershipAsync(string membershipId, string teamId)
     {
         try
@@ -191,7 +247,31 @@ public class CosmosService
             if (match == null) 
                 return null;
 
+            // Log the match state before update for debugging
+            
+            // Update only the lineup plan, preserving all other properties
             match.LineupPlan = lineupPlan;
+            
+            // Ensure all required properties are set correctly - these must be set BEFORE serialization
+            if (string.IsNullOrEmpty(match.Id))
+            {
+                match.Id = id;
+            }
+            if (string.IsNullOrEmpty(match.DivisionId))
+            {
+                match.DivisionId = divisionId;
+            }
+            if (string.IsNullOrEmpty(match.Type))
+            {
+                match.Type = "teamMatch";
+            }
+            
+            // Ensure we have a valid createdAt timestamp
+            if (match.CreatedAt == default(DateTime))
+            {
+                match.CreatedAt = DateTime.UtcNow;
+            }
+            
             var response = await _matchesContainer.ReplaceItemAsync(match, id, new PartitionKey(divisionId));
             return response.Resource;
         }
@@ -199,5 +279,190 @@ public class CosmosService
         {
             return null;
         }
+        catch (CosmosException ex)
+        {
+            Console.WriteLine($"Cosmos exception during lineup update: {ex.StatusCode} - {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task<TeamMatch> CreateMatchAsync(TeamMatch match)
+    {
+        // Ensure the ID is properly set
+        if (string.IsNullOrEmpty(match.Id))
+        {
+            match.Id = $"tm_{match.DivisionId}_{match.Week}_{Guid.NewGuid():N}";
+        }
+        match.CreatedAt = DateTime.UtcNow;
+        match.Type = "teamMatch";
+        
+        var response = await _matchesContainer.CreateItemAsync(match, new PartitionKey(match.DivisionId));
+        return response.Resource;
+    }
+
+    public async Task<TeamMatch?> UpdateMatchAsync(string id, string divisionId, TeamMatch match)
+    {
+        try
+        {
+            // Explicitly set the ID and type to ensure consistency
+            match.Id = id;
+            match.Type = "teamMatch";
+            match.DivisionId = divisionId;
+            
+            // Ensure we have a valid createdAt timestamp
+            if (match.CreatedAt == default(DateTime))
+            {
+                match.CreatedAt = DateTime.UtcNow;
+            }
+            
+            var response = await _matchesContainer.ReplaceItemAsync(
+                match, 
+                id, 
+                new PartitionKey(divisionId));
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteMatchAsync(string id, string divisionId)
+    {
+        try
+        {
+            await _matchesContainer.DeleteItemAsync<TeamMatch>(id, new PartitionKey(divisionId));
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+    }
+
+    public async Task<IEnumerable<TeamMatch>> GetMatchesByDateRangeAsync(string divisionId, DateTime startDate, DateTime endDate)
+    {
+        var query = "SELECT * FROM c WHERE c.scheduledAt >= @startDate AND c.scheduledAt <= @endDate ORDER BY c.scheduledAt";
+        var queryDefinition = new QueryDefinition(query)
+            .WithParameter("@startDate", startDate)
+            .WithParameter("@endDate", endDate);
+            
+        var resultSet = _matchesContainer.GetItemQueryIterator<TeamMatch>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) });
+
+        var matches = new List<TeamMatch>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            matches.AddRange(response.ToList());
+        }
+
+        return matches;
+    }
+
+    /// <summary>
+    /// Updates skill levels for a player in all future lineups (today and beyond).
+    /// Historic lineups are left untouched.
+    /// </summary>
+    /// <param name="playerId">The player whose skill level changed</param>
+    /// <param name="divisionId">The division the player is in</param>
+    /// <param name="newSkillLevel">The new skill level to apply</param>
+    private async Task UpdateFutureLineupsForPlayerSkillChangeAsync(string playerId, string divisionId, int newSkillLevel)
+    {
+        try
+        {
+            // Get all matches from today forward for this division
+            var today = DateTime.UtcNow.Date;
+            var futureMatches = await GetMatchesByDateRangeAsync(divisionId, today, DateTime.MaxValue.Date);
+            
+            bool anyUpdates = false;
+            
+            foreach (var match in futureMatches)
+            {
+                bool matchUpdated = false;
+                
+                // Update home team lineup if player is present
+                foreach (var player in match.LineupPlan.Home.Where(p => p.PlayerId == playerId))
+                {
+                    if (player.SkillLevel != newSkillLevel)
+                    {
+                        player.SkillLevel = newSkillLevel;
+                        matchUpdated = true;
+                    }
+                }
+                
+                // Update away team lineup if player is present  
+                foreach (var player in match.LineupPlan.Away.Where(p => p.PlayerId == playerId))
+                {
+                    if (player.SkillLevel != newSkillLevel)
+                    {
+                        player.SkillLevel = newSkillLevel;
+                        matchUpdated = true;
+                    }
+                }
+                
+                // If this match was updated, recalculate totals and save
+                if (matchUpdated)
+                {
+                    RecalculateLineupTotals(match.LineupPlan);
+                    
+                    // Add history entry
+                    match.LineupPlan.History.Add(new LineupHistoryEntry
+                    {
+                        At = DateTime.UtcNow,
+                        By = "System",
+                        Change = $"Updated skill level for player {playerId} to {newSkillLevel} due to membership change"
+                    });
+                    
+                    // Save the updated match
+                    await _matchesContainer.ReplaceItemAsync(match, match.Id, new PartitionKey(match.DivisionId));
+                    anyUpdates = true;
+                }
+            }
+            
+            if (anyUpdates)
+            {
+                Console.WriteLine($"Updated skill levels for player {playerId} in future lineups for division {divisionId}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating future lineups for player {playerId}: {ex.Message}");
+            // Don't throw - we don't want to fail the membership update if lineup updates fail
+        }
+    }
+    
+    /// <summary>
+    /// Recalculates the skill totals and cap validation for a lineup
+    /// </summary>
+    /// <param name="lineupPlan">The lineup plan to recalculate</param>
+    private void RecalculateLineupTotals(LineupPlan lineupPlan)
+    {
+        // Calculate home team skill sum (excluding alternates)
+        lineupPlan.Totals.HomePlannedSkillSum = lineupPlan.Home
+            .Where(p => !p.IsAlternate)
+            .Sum(p => p.SkillLevel);
+            
+        // Calculate away team skill sum (excluding alternates)
+        lineupPlan.Totals.AwayPlannedSkillSum = lineupPlan.Away
+            .Where(p => !p.IsAlternate)
+            .Sum(p => p.SkillLevel);
+            
+        // Check if teams are within skill cap
+        lineupPlan.Totals.HomeWithinCap = lineupPlan.Totals.HomePlannedSkillSum <= lineupPlan.MaxTeamSkillCap;
+        lineupPlan.Totals.AwayWithinCap = lineupPlan.Totals.AwayPlannedSkillSum <= lineupPlan.MaxTeamSkillCap;
+    }
+
+    /// <summary>
+    /// Public method to manually update skill levels for a player in all future lineups.
+    /// This can be called directly from an API endpoint for manual corrections.
+    /// </summary>
+    /// <param name="playerId">The player whose skill level should be updated</param>
+    /// <param name="divisionId">The division the player is in</param>
+    /// <param name="newSkillLevel">The new skill level to apply</param>
+    public async Task UpdateFutureLineupsForPlayerSkillChangePublicAsync(string playerId, string divisionId, int newSkillLevel)
+    {
+        await UpdateFutureLineupsForPlayerSkillChangeAsync(playerId, divisionId, newSkillLevel);
     }
 }

@@ -4,18 +4,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Azure.Cosmos;
 using SideSpins.Api.Services;
-using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-// Configure JSON serialization options
-builder.Services.Configure<JsonSerializerOptions>(options =>
+// Configure JSON serialization options for Newtonsoft.Json
+JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    options.PropertyNameCaseInsensitive = true;
-});
+    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+    NullValueHandling = NullValueHandling.Ignore,
+    DateTimeZoneHandling = DateTimeZoneHandling.Utc
+};
 
 // Add Application Insights
 builder.Services.AddApplicationInsightsTelemetryWorkerService();
@@ -53,7 +55,7 @@ builder.Services.AddSingleton<CosmosClient>(serviceProvider =>
     {
         SerializerOptions = new CosmosSerializationOptions
         {
-            PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+            PropertyNamingPolicy = CosmosPropertyNamingPolicy.Default
         }
     };
 

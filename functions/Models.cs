@@ -1,231 +1,232 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace SideSpins.Api.Models;
 
 public class Division
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; } = "division";
 
-    [JsonPropertyName("league")]
+    [JsonProperty("league")]
     public string League { get; set; } = string.Empty;
 
-    [JsonPropertyName("name")]
+    [JsonProperty("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("area")]
+    [JsonProperty("area")]
     public string Area { get; set; } = string.Empty;
 
-    [JsonPropertyName("createdAt")]
+    [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
 }
 
 public class Team
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; } = "team";
 
-    [JsonPropertyName("divisionId")]
+    [JsonProperty("divisionId")]
     public string DivisionId { get; set; } = string.Empty;
 
-    [JsonPropertyName("name")]
+    [JsonProperty("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("captainPlayerId")]
+    [JsonProperty("captainPlayerId")]
     public string CaptainPlayerId { get; set; } = string.Empty;
 
-    [JsonPropertyName("createdAt")]
+    [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
 }
 
 public class Player
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; } = "player";
 
-    [JsonPropertyName("firstName")]
+    [JsonProperty("firstName")]
     public string FirstName { get; set; } = string.Empty;
 
-    [JsonPropertyName("lastName")]
+    [JsonProperty("lastName")]
     public string LastName { get; set; } = string.Empty;
 
-    [JsonPropertyName("apaNumber")]
+    [JsonProperty("apaNumber")]
     public string? ApaNumber { get; set; }
 
-    [JsonPropertyName("createdAt")]
+    [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
 }
 
 public class TeamMembership
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; } = "membership";
 
-    [JsonPropertyName("teamId")]
+    [JsonProperty("teamId")]
     public string TeamId { get; set; } = string.Empty;
 
-    [JsonPropertyName("divisionId")]
+    [JsonProperty("divisionId")]
     public string DivisionId { get; set; } = string.Empty;
 
-    [JsonPropertyName("playerId")]
+    [JsonProperty("playerId")]
     public string PlayerId { get; set; } = string.Empty;
 
-    [JsonPropertyName("role")]
+    [JsonProperty("role")]
     public string Role { get; set; } = string.Empty;
 
-    [JsonPropertyName("skillLevel_9b")]
-    public int? SkillLevel9B { get; set; }
+    // Change this property name to match your JSON exactly
+    [JsonProperty("skillLevel_9b")]
+    public int? SkillLevel_9b { get; set; } // Changed property name to match JSON
 
-    [JsonPropertyName("joinedAt")]
+    [JsonProperty("joinedAt")]
     public DateTime JoinedAt { get; set; }
 
-    [JsonPropertyName("leftAt")]
+    [JsonProperty("leftAt")]
     public DateTime? LeftAt { get; set; }
 }
 
 public class LineupPlayer
 {
-    [JsonPropertyName("playerId")]
+    [JsonProperty("playerId")]
     public string PlayerId { get; set; } = string.Empty;
 
-    [JsonPropertyName("skillLevel")]
+    [JsonProperty("skillLevel")]
     public int SkillLevel { get; set; }
 
-    [JsonPropertyName("intendedOrder")]
+    [JsonProperty("intendedOrder")]
     public int IntendedOrder { get; set; }
 
-    [JsonPropertyName("isAlternate")]
+    [JsonProperty("isAlternate")]
     public bool IsAlternate { get; set; }
 
-    [JsonPropertyName("notes")]
+    [JsonProperty("notes")]
     public string? Notes { get; set; }
 }
 
 public class LineupHistoryEntry
 {
-    [JsonPropertyName("at")]
+    [JsonProperty("at")]
     public DateTime At { get; set; }
 
-    [JsonPropertyName("by")]
+    [JsonProperty("by")]
     public string By { get; set; } = string.Empty;
 
-    [JsonPropertyName("change")]
+    [JsonProperty("change")]
     public string Change { get; set; } = string.Empty;
 }
 
 public class LineupPlan
 {
-    [JsonPropertyName("ruleset")]
+    [JsonProperty("ruleset")]
     public string Ruleset { get; set; } = string.Empty;
 
-    [JsonPropertyName("maxTeamSkillCap")]
+    [JsonProperty("maxTeamSkillCap")]
     public int MaxTeamSkillCap { get; set; }
 
-    [JsonPropertyName("home")]
+    [JsonProperty("home")]
     public List<LineupPlayer> Home { get; set; } = new();
 
-    [JsonPropertyName("away")]
+    [JsonProperty("away")]
     public List<LineupPlayer> Away { get; set; } = new();
 
-    [JsonPropertyName("totals")]
+    [JsonProperty("totals")]
     public LineupTotals Totals { get; set; } = new();
 
-    [JsonPropertyName("locked")]
+    [JsonProperty("locked")]
     public bool Locked { get; set; }
 
-    [JsonPropertyName("lockedBy")]
+    [JsonProperty("lockedBy")]
     public string? LockedBy { get; set; }
 
-    [JsonPropertyName("lockedAt")]
+    [JsonProperty("lockedAt")]
     public DateTime? LockedAt { get; set; }
 
-    [JsonPropertyName("history")]
+    [JsonProperty("history")]
     public List<LineupHistoryEntry> History { get; set; } = new();
 }
 
 public class LineupTotals
 {
-    [JsonPropertyName("homePlannedSkillSum")]
+    [JsonProperty("homePlannedSkillSum")]
     public int HomePlannedSkillSum { get; set; }
 
-    [JsonPropertyName("awayPlannedSkillSum")]
+    [JsonProperty("awayPlannedSkillSum")]
     public int AwayPlannedSkillSum { get; set; }
 
-    [JsonPropertyName("homeWithinCap")]
+    [JsonProperty("homeWithinCap")]
     public bool HomeWithinCap { get; set; }
 
-    [JsonPropertyName("awayWithinCap")]
+    [JsonProperty("awayWithinCap")]
     public bool AwayWithinCap { get; set; }
 }
 
 public class MatchTotals
 {
-    [JsonPropertyName("homePoints")]
+    [JsonProperty("homePoints")]
     public int HomePoints { get; set; }
 
-    [JsonPropertyName("awayPoints")]
+    [JsonProperty("awayPoints")]
     public int AwayPoints { get; set; }
 
-    [JsonPropertyName("bonusPoints")]
+    [JsonProperty("bonusPoints")]
     public BonusPoints BonusPoints { get; set; } = new();
 }
 
 public class BonusPoints
 {
-    [JsonPropertyName("home")]
+    [JsonProperty("home")]
     public int Home { get; set; }
 
-    [JsonPropertyName("away")]
+    [JsonProperty("away")]
     public int Away { get; set; }
 }
 
 public class TeamMatch
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; } = "teamMatch";
 
-    [JsonPropertyName("divisionId")]
+    [JsonProperty("divisionId")]
     public string DivisionId { get; set; } = string.Empty;
 
-    [JsonPropertyName("week")]
+    [JsonProperty("week")]
     public int Week { get; set; }
 
-    [JsonPropertyName("scheduledAt")]
+    [JsonProperty("scheduledAt")]
     public DateTime ScheduledAt { get; set; }
 
-    [JsonPropertyName("homeTeamId")]
+    [JsonProperty("homeTeamId")]
     public string? HomeTeamId { get; set; }
 
-    [JsonPropertyName("awayTeamId")]
+    [JsonProperty("awayTeamId")]
     public string? AwayTeamId { get; set; }
 
-    [JsonPropertyName("status")]
+    [JsonProperty("status")]
     public string Status { get; set; } = string.Empty;
 
-    [JsonPropertyName("lineupPlan")]
+    [JsonProperty("lineupPlan")]
     public LineupPlan LineupPlan { get; set; } = new();
 
-    [JsonPropertyName("playerMatches")]
+    [JsonProperty("playerMatches")]
     public List<object> PlayerMatches { get; set; } = new();
 
-    [JsonPropertyName("totals")]
+    [JsonProperty("totals")]
     public MatchTotals Totals { get; set; } = new();
 
-    [JsonPropertyName("createdAt")]
+    [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
 }

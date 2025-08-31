@@ -1,9 +1,9 @@
 # Jekyll
-_site
-.sass-cache
-.jekyll-cache
-.jekyll-metadata
-vendor
+site/_site
+site/.sass-cache
+site/.jekyll-cache
+site/.jekyll-metadata
+site/vendor
 
 # .NET / Azure Functions
 functions/bin/

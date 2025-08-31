@@ -72,7 +72,7 @@
         <h3>Select Team to Manage</h3>
         <div class="form-group">
           <label for="team-id">Team ID:</label>
-          <input type="text" id="team-id" placeholder="Enter team ID">
+          <input type="text" id="team-id" placeholder="Enter team ID" value="team_break_of_dawn_9b">
           <button onclick="loadMemberships()" class="btn-secondary">Load Memberships</button>
         </div>
       </div>
@@ -83,11 +83,11 @@
         <form id="membership-form" onsubmit="createMembership(event)">
           <div class="form-group">
             <label for="membership-team-id">Team ID:</label>
-            <input type="text" id="membership-team-id" required>
+            <input type="text" id="membership-team-id" value="team_break_of_dawn_9b" required>
           </div>
           <div class="form-group">
             <label for="membership-division-id">Division ID:</label>
-            <input type="text" id="membership-division-id" required>
+            <input type="text" id="membership-division-id" value="div_nottingham_wed_9b_311" required>
           </div>
           <div class="form-group">
             <label for="membership-player-id">Player ID:</label>
@@ -95,7 +95,12 @@
           </div>
           <div class="form-group">
             <label for="membership-role">Role:</label>
-            <input type="text" id="membership-role" required>
+            <select id="membership-role" required>
+              <option value="">Select role...</option>
+              <option value="player">Player</option>
+              <option value="captain">Captain</option>
+              <option value="co-captain">Co-Captain</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="membership-skill-level">Skill Level (9-Ball):</label>
@@ -116,14 +121,73 @@
     <div id="matches-tab" class="tab-content">
       <h2>Matches Management</h2>
       
-      <!-- Division Selection for Matches -->
+      <!-- Date Range Search -->
       <div class="form-section">
-        <h3>Select Division</h3>
+        <h3>Search Matches by Date (Division: div_nottingham_wed_9b_311)</h3>
         <div class="form-group">
-          <label for="division-id">Division ID:</label>
-          <input type="text" id="division-id" placeholder="Enter division ID">
-          <button onclick="loadMatches()" class="btn-secondary">Load Matches</button>
+          <label for="match-start-date">Start Date:</label>
+          <input type="date" id="match-start-date">
+          <label for="match-end-date">End Date:</label>
+          <input type="date" id="match-end-date">
+          <button onclick="loadMatches()" class="btn-secondary">Search Matches</button>
+          <button onclick="clearMatchDates()" class="btn-secondary">Clear Dates</button>
         </div>
+        <p class="help-text">Leave dates empty to load all matches for the division</p>
+      </div>
+
+      <!-- Add Match Form -->
+      <div class="form-section">
+        <h3>Add New Match</h3>
+        <form id="match-form" onsubmit="createMatch(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="match-week">Week:</label>
+              <input type="number" id="match-week" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="match-scheduled-date">Date:</label>
+              <input type="date" id="match-scheduled-date" required>
+            </div>
+            <div class="form-group">
+              <label for="match-scheduled-time">Time:</label>
+              <input type="time" id="match-scheduled-time" value="19:00" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="match-home-team">Home Team ID:</label>
+              <input type="text" id="match-home-team" placeholder="Optional">
+            </div>
+            <div class="form-group">
+              <label for="match-away-team">Away Team ID:</label>
+              <input type="text" id="match-away-team" placeholder="Optional">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="match-status">Status:</label>
+              <select id="match-status">
+                <option value="scheduled">Scheduled</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="postponed">Postponed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="match-ruleset">Ruleset:</label>
+              <select id="match-ruleset">
+                <option value="9-ball">9-Ball</option>
+                <option value="8-ball">8-Ball</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="match-skill-cap">Skill Cap:</label>
+              <input type="number" id="match-skill-cap" value="23" min="1" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Create Match</button>
+        </form>
       </div>
 
       <!-- Matches List -->
@@ -219,7 +283,8 @@
   color: #495057;
 }
 
-.form-group input {
+  .form-group input,
+  .form-group select {
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #ced4da;
@@ -227,10 +292,255 @@
   font-size: 1rem;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.help-text {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.match-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.lineup-actions {
+  border-top: 1px solid #dee2e6;
+  padding-top: 0.5rem;
+}
+
+/* Lineup Modal Styles */
+.lineup-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.lineup-modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lineup-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+.lineup-modal-header h3 {
+  margin: 0;
+  color: #495057;
+}
+
+.lineup-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lineup-close:hover {
+  background-color: #e9ecef;
+  border-radius: 50%;
+}
+
+.lineup-modal-body {
+  padding: 1rem;
+}
+
+.team-roster {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.team-roster h4 {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 14px;
+}
+
+.roster-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.roster-player {
+  background: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.roster-player:hover {
+  background: #0056b3;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-display-name {
+  font-size: 11px;
+  color: #6c757d;
+  font-style: italic;
+  min-height: 14px;
+}
+
+.player-display-name.found {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.player-display-name.not-found {
+  color: #dc3545;
+}
+
+.lineup-info {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.lineup-teams {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.lineup-team-section {
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.lineup-team-section h4 {
+  margin-top: 0;
+  color: #495057;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+.lineup-players-editor {
+  margin-bottom: 1rem;
+}
+
+.lineup-player-editor {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto auto 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.lineup-player-editor input[type="text"],
+.lineup-player-editor input[type="number"] {
+  padding: 0.25rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.lineup-player-editor label {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  gap: 0.25rem;
+}
+
+.btn-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.team-total {
+  font-weight: bold;
+  text-align: center;
+  padding: 0.5rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.lineup-modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .lineup-teams {
+    grid-template-columns: 1fr;
+  }
+  
+  .lineup-player-editor {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  
+  .lineup-info {
+    flex-direction: column;
+  }
 }
 
 .btn-primary {
@@ -375,6 +685,9 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #495057;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .match-details {

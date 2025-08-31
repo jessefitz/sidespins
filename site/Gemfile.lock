@@ -40,6 +40,8 @@ GEM
       logger
     faraday-net_http (3.3.0)
       net-http
+    faraday-retry (2.3.2)
+      faraday (~> 2.0)
     ffi (1.17.0-x64-mingw-ucrt)
     ffi (1.17.0-x86_64-linux-gnu)
     forwardable-extended (2.6.0)
@@ -276,6 +278,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  faraday-retry
   github-pages
   http_parser.rb (~> 0.6.0)
   jekyll-feed (~> 0.12)

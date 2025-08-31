@@ -1,0 +1,37 @@
+{
+    "version": "2.0",
+    "logging": {
+        "applicationInsights": {
+            "samplingSettings": {
+                "isEnabled": true,
+                "excludedTypes": "Request"
+            }
+        }
+    },
+    "extensions": {
+        "http": {
+            "cors": {
+                "allowedOrigins": [
+                    "http://localhost:4000",
+                    "http://127.0.0.1:4000",
+                    "https://localhost:4000",
+                    "https://127.0.0.1:4000"
+                ],
+                "allowedHeaders": [
+                    "content-type",
+                    "x-api-secret",
+                    "authorization"
+                ],
+                "allowedMethods": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "OPTIONS"
+                ],
+                "allowCredentials": true
+            }
+        }
+    }
+}

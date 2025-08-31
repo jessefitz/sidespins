@@ -1,0 +1,7 @@
+{
+  "endpoint": "https://YOUR-COSMOS-ACCOUNT.documents.azure.com:443/",
+  "key": "COSMOS_PRIMARY_KEY_OR_CONN_STRING_SECRET",
+  "database": "sidespins",
+  "container": "app",
+  "teamId": "TEAM123"
+}

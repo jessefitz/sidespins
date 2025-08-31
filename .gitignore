@@ -1,5 +1,82 @@
+# Jekyll
 _site
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
 vendor
+
+# .NET / Azure Functions
+functions/bin/
+functions/obj/
+functions/.vscode/
+*.user
+*.suo
+*.cache
+*.log
+*.vsidx
+*.v2
+.vs/
+
+# Azurite (local Azure storage emulator)
+__azurite_db_*.json
+__blobstorage__/
+__queuestorage__/
+__tablestorage__/
+AzuriteConfig
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+.env
+.venv
+
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Local configuration files
+local.settings.json
+config.json
+*.local.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Temporary files
+*.tmp
+*.temp

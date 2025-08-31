@@ -1,0 +1,1221 @@
+{
+  "Divisions": [
+    {
+      "id": "div_nottingham_wed_9b_311",
+      "type": "division",
+      "league": "APA",
+      "name": "Nottingham Wednesday 9-Ball",
+      "area": "Nottingham, MD",
+      "createdAt": "2025-08-30T23:02:05Z"
+    }
+  ],
+  "Teams": [
+    {
+      "id": "team_break_of_dawn_9b",
+      "type": "team",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "name": "Break of Dawn (9-Ball)",
+      "captainPlayerId": "p_jesse",
+      "createdAt": "2025-08-30T23:02:05Z"
+    }
+  ],
+  "Players": [
+    {
+      "id": "p_jesse",
+      "type": "player",
+      "firstName": "Jesse",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_brian",
+      "type": "player",
+      "firstName": "Brian",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_chris",
+      "type": "player",
+      "firstName": "Chris",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_ed",
+      "type": "player",
+      "firstName": "Ed",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_ty",
+      "type": "player",
+      "firstName": "Ty",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_anthony",
+      "type": "player",
+      "firstName": "Anthony",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_ann",
+      "type": "player",
+      "firstName": "Ann",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_gail",
+      "type": "player",
+      "firstName": "Gail",
+      "lastName": "",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
+    }
+  ],
+  "TeamMemberships": [
+    {
+      "id": "m_team_break_of_dawn_9b_p_jesse",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_jesse",
+      "role": "player",
+      "skillLevel_9b": 4,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_brian",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_brian",
+      "role": "player",
+      "skillLevel_9b": 5,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_chris",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_chris",
+      "role": "player",
+      "skillLevel_9b": 7,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_ed",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_ed",
+      "role": "player",
+      "skillLevel_9b": 5,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_ty",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_ty",
+      "role": "player",
+      "skillLevel_9b": 4,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_anthony",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_anthony",
+      "role": "player",
+      "skillLevel_9b": 3,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_ann",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_ann",
+      "role": "player",
+      "skillLevel_9b": 3,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_gail",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_gail",
+      "role": "player",
+      "skillLevel_9b": 3,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    }
+  ],
+  "TeamMatches": [
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250806_001",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 1,
+      "scheduledAt": "2025-08-06T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 0,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250813_002",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 2,
+      "scheduledAt": "2025-08-13T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 20,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250820_003",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 3,
+      "scheduledAt": "2025-08-20T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 19,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250827_004",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 4,
+      "scheduledAt": "2025-08-27T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 23,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250903_005",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 5,
+      "scheduledAt": "2025-09-03T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 22,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250910_006",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 6,
+      "scheduledAt": "2025-09-10T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 21,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250917_007",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 7,
+      "scheduledAt": "2025-09-17T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 23,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20250924_008",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 8,
+      "scheduledAt": "2025-09-24T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 21,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251001_009",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 9,
+      "scheduledAt": "2025-10-01T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 23,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251008_010",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 10,
+      "scheduledAt": "2025-10-08T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 23,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251015_011",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 11,
+      "scheduledAt": "2025-10-15T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 19,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251022_012",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 12,
+      "scheduledAt": "2025-10-22T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 23,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251029_013",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 13,
+      "scheduledAt": "2025-10-29T23:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 21,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251105_014",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 14,
+      "scheduledAt": "2025-11-06T00:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 21,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251112_015",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 15,
+      "scheduledAt": "2025-11-13T00:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_brian",
+            "skillLevel": 5,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_chris",
+            "skillLevel": 7,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ed",
+            "skillLevel": 5,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 23,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "tm_div_nottingham_wed_9b_311_20251119_016",
+      "type": "teamMatch",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "week": 16,
+      "scheduledAt": "2025-11-20T00:00:00Z",
+      "homeTeamId": "team_break_of_dawn_9b",
+      "awayTeamId": null,
+      "status": "scheduled",
+      "lineupPlan": {
+        "ruleset": "APA_9B",
+        "maxTeamSkillCap": 23,
+        "home": [
+          {
+            "playerId": "p_jesse",
+            "skillLevel": 4,
+            "intendedOrder": 1,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ty",
+            "skillLevel": 4,
+            "intendedOrder": 2,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_anthony",
+            "skillLevel": 3,
+            "intendedOrder": 3,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_ann",
+            "skillLevel": 3,
+            "intendedOrder": 4,
+            "isAlternate": false
+          },
+          {
+            "playerId": "p_gail",
+            "skillLevel": 3,
+            "intendedOrder": 5,
+            "isAlternate": false
+          }
+        ],
+        "away": [],
+        "totals": {
+          "homePlannedSkillSum": 17,
+          "awayPlannedSkillSum": 0,
+          "homeWithinCap": true,
+          "awayWithinCap": true
+        },
+        "locked": false,
+        "lockedBy": null,
+        "lockedAt": null,
+        "history": []
+      },
+      "playerMatches": [],
+      "totals": {
+        "homePoints": 0,
+        "awayPoints": 0,
+        "bonusPoints": {
+          "home": 0,
+          "away": 0
+        }
+      },
+      "createdAt": "2025-08-30T23:02:05Z"
+    }
+  ]
+}

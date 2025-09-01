@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="SideSpins" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">SideSpins</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/">Home</a><a class="page-link" href="/schedule.html">Schedule</a><a class="page-link" href="/lineup-explorer.html">Lineup Explorer</a><a class="page-link" href="/availability.html">Availability</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <h1>Schedule</h1>
+
+<div id="loading" style="text-align: center; padding: 2em;">
+  <p>Loading schedule data...</p>
+</div>
+
+<div id="schedule-content" style="display: none;">
+  <a id="top"></a>
+  
+  <!-- Jump-to navigation will be populated by JavaScript -->
+  <nav class="schedule-nav" aria-label="Jump to sections" id="schedule-nav">
+    <span class="label">Jump to:</span>
+    <ul id="nav-list">
+      <!-- Navigation items will be added by JavaScript -->
+    </ul>
+  </nav>
+
+  <!-- Schedule days will be populated by JavaScript -->
+  <div id="schedule-days">
+    <!-- Schedule content will be added by JavaScript -->
+  </div>
+</div>
+
+<div id="error-message" style="display: none; color: #b00020; text-align: center; padding: 2em;">
+  <p>Error loading schedule data. Please try again later.</p>
+</div>
+
+<script>
+class ScheduleLoader {
+  constructor() {
+    this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? 'http://localhost:7071/api' 
+      : 'https://sidespinsapi.azurewebsites.net/api';
+    this.teamId = 'team_break_of_dawn_9b';
+    this.divisionId = 'div_nottingham_wed_9b_311';
+  }
+
+  async loadSchedule() {
+    try {
+      // Show loading
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('schedule-content').style.display = 'none';
+      document.getElementById('error-message').style.display = 'none';
+
+      // Fetch matches and team data
+      const [matches, players, memberships] = await Promise.all([
+        this.fetchMatches(),
+        this.fetchPlayers(),
+        this.fetchMemberships()
+      ]);
+
+      // Create player lookup with skill levels
+      const playerSkills = this.createPlayerSkillMap(players, memberships);
+
+      // Group matches by date
+      const matchesByDate = this.groupMatchesByDate(matches);
+
+      // Render the schedule
+      this.renderSchedule(matchesByDate, playerSkills);
+
+      // Hide loading and show content
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('schedule-content').style.display = 'block';
+
+    } catch (error) {
+      console.error('Error loading schedule:', error);
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-message').style.display = 'block';
+    }
+  }
+
+  async fetchMatches() {
+    const response = await fetch(`${this.apiBaseUrl}/GetMatches?divisionId=${this.divisionId}`);
+    if (!response.ok) throw new Error('Failed to fetch matches');
+    return response.json();
+  }
+
+  async fetchPlayers() {
+    const response = await fetch(`${this.apiBaseUrl}/GetPlayers`);
+    if (!response.ok) throw new Error('Failed to fetch players');
+    return response.json();
+  }
+
+  async fetchMemberships() {
+    const response = await fetch(`${this.apiBaseUrl}/GetMemberships?teamId=${this.teamId}`);
+    if (!response.ok) throw new Error('Failed to fetch memberships');
+    return response.json();
+  }
+
+  createPlayerSkillMap(players, memberships) {
+    const playerMap = {};
+    players.forEach(player => {
+      playerMap[player.id] = player;
+    });
+
+    const skillMap = {};
+    memberships.forEach(membership => {
+      const player = playerMap[membership.playerId];
+      if (player) {
+        skillMap[player.id] = {
+          name: `${player.firstName} ${player.lastName}`.trim(),
+          skill: membership.skillLevel_9b || 0
+        };
+      }
+    });
+
+    return skillMap;
+  }
+
+  groupMatchesByDate(matches) {
+    const matchesByDate = {};
+    
+    // Filter matches for our team
+    const teamMatches = matches.filter(match => 
+      match.homeTeamId === this.teamId || match.awayTeamId === this.teamId
+    );
+
+    teamMatches.forEach(match => {
+      const matchDate = new Date(match.scheduledAt);
+      const dateKey = matchDate.toISOString().split('T')[0];
+      
+      if (!matchesByDate[dateKey]) {
+        matchesByDate[dateKey] = {
+          date: matchDate,
+          matches: []
+        };
+      }
+      
+      matchesByDate[dateKey].matches.push(match);
+    });
+
+    return matchesByDate;
+  }
+
+  renderSchedule(matchesByDate, playerSkills) {
+    const navList = document.getElementById('nav-list');
+    const scheduleDays = document.getElementById('schedule-days');
+    
+    navList.innerHTML = '';
+    scheduleDays.innerHTML = '';
+
+    // Sort dates
+    const sortedDates = Object.keys(matchesByDate).sort();
+
+    // Create navigation
+    sortedDates.forEach(dateKey => {
+      const dayData = matchesByDate[dateKey];
+      const anchor = dateKey;
+      const dateStr = dayData.date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const navItem = document.createElement('li');
+      navItem.innerHTML = `<a href="#day-${anchor}">${dateStr}</a>`;
+      navList.appendChild(navItem);
+
+      // Create day section
+      this.renderDay(scheduleDays, dayData, anchor, playerSkills);
+    });
+  }
+
+  renderDay(container, dayData, anchor, playerSkills) {
+    const dayDiv = document.createElement('div');
+    dayDiv.id = `day-${anchor}`;
+    dayDiv.className = 'schedule-day';
+    dayDiv.style.marginBottom = '2em';
+
+    const dateStr = dayData.date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    let html = `<h2>${dateStr}</h2>`;
+
+    dayData.matches.forEach(match => {
+      html += this.renderMatch(match, playerSkills);
+    });
+
+    html += `<p class="back-to-top"><a href="#top">↑ Back to top</a></p>`;
+    html += `<hr style="margin: 2em 0; border-top: 2px solid #ccc;">`;
+
+    dayDiv.innerHTML = html;
+    container.appendChild(dayDiv);
+  }
+
+  renderMatch(match, playerSkills) {
+    const isHome = match.homeTeamId === this.teamId;
+    const opponent = isHome ? (match.awayTeamId || 'TBD') : (match.homeTeamId || 'TBD');
+    
+    let html = `
+      <div style="margin-bottom: 1em; padding: 1em; border: 1px solid #ddd; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
+          <h3 style="margin: 0;">${isHome ? 'vs' : '@'} ${opponent}</h3>
+          <a href="/lineup-explorer.html?matchId=${match.id}" 
+             style="background: #007cba; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; font-size: 0.9rem;"
+             title="Experiment with different lineups for this match">
+            🎯 Lineup Explorer
+          </a>
+        </div>
+    `;
+
+    // Show lineup if available
+    if (match.lineupPlan && match.lineupPlan.home && match.lineupPlan.away) {
+      const ourLineup = isHome ? match.lineupPlan.home : match.lineupPlan.away;
+      
+      if (ourLineup.length > 0) {
+        html += `
+          <table style="margin-top: 1em;">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Player</th>
+                <th>Skill</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        let totalSkill = 0;
+        ourLineup.forEach(lineupPlayer => {
+          const playerInfo = playerSkills[lineupPlayer.playerId] || { name: lineupPlayer.playerId, skill: 0 };
+          const skill = lineupPlayer.skillLevel || playerInfo.skill || 0;
+          
+          if (!lineupPlayer.isAlternate) {
+            totalSkill += skill;
+          }
+
+          html += `
+            <tr>
+              <td style="text-align:left;">${playerInfo.name}</td>
+              <td style="text-align:center;">${skill}</td>
+              <td style="text-align:center;"></td>
+            </tr>
+          `;
+        });
+
+        html += `
+            </tbody>
+          </table>
+        `;
+
+        // Show skill total warning if over 23
+        if (totalSkill > 23) {
+          html += `
+            <p style="color:#b00020; font-weight:600; margin:0.5em 0 0 0;">
+              ⚠️ Planned lineup exceeds 23 (${totalSkill}). Adjust before match night.
+            </p>
+          `;
+        }
+
+        html += `
+          <p style="text-align:right; font-style:italic; margin-top:0.5em;">
+            Sum of scheduled skill: ${totalSkill}
+          </p>
+        `;
+      } else {
+        html += `<p style="font-style: italic;">No lineup set yet.</p>`;
+      }
+    } else {
+      html += `<p style="font-style: italic;">No lineup data available.</p>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  const loader = new ScheduleLoader();
+  loader.loadSchedule();
+});
+</script>
+
+<style>
+.schedule-nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+
+.schedule-nav .label {
+  font-weight: bold;
+  margin-right: 1em;
+}
+
+.schedule-day h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.back-to-top {
+  text-align: right;
+  margin-top: 1em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+th, td {
+  padding: 0.5em;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f5f5f5;
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+.lineup-explorer-btn {
+  background: #007cba;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.lineup-explorer-btn:hover {
+  background: #005a87;
+}
+
+@media (max-width: 768px) {
+  .schedule-nav ul {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+  
+  .match-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5em;
+  }
+  
+  .lineup-explorer-btn {
+    align-self: flex-end;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+</style>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <h2 class="footer-heading">SideSpins</h2></div>
+
+      <div class="footer-col footer-col-2">
+        <!-- This column is intentionally left empty -->
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Unofficial homepage for Break of Dawn.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+
+</html>

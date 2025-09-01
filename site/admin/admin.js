@@ -5,7 +5,7 @@ class SideSpinsAdmin {
         // Use environment-appropriate URL
         this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:7071/api' 
-            : 'https://your-production-function-app.azurewebsites.net/api';
+            : 'https://sidespinsapi.azurewebsites.net/api';
         this.authenticated = false;
     }
 

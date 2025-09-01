@@ -34,7 +34,8 @@ plugins:
 
 header_pages:
   - index.md
-  - schedule.html  
+  - schedule.html
+  - lineup-explorer.html
   - availability.html
 
 

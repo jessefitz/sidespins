@@ -23,22 +23,25 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 builder.Services.AddApplicationInsightsTelemetryWorkerService();
 builder.Services.ConfigureFunctionsApplicationInsights();
 
-// Add CORS configuration
-builder.Services.AddCors(options =>
+// Only wire up CORS in code if an env flag is set (e.g., local dev)
+var enableCodeCors = (Environment.GetEnvironmentVariable("ENABLE_CODE_CORS") ?? "false")
+    .Equals("true", StringComparison.OrdinalIgnoreCase);
+
+if (enableCodeCors)
 {
-    options.AddPolicy("AllowLocalDevelopment", policy =>
+    builder.Services.AddCors(options =>
     {
-        policy.WithOrigins(
-            "http://localhost:4000",  // Jekyll development server
-            "http://127.0.0.1:4000",
-            "https://localhost:4000",
-            "https://127.0.0.1:4000"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+        options.AddPolicy("ConfiguredOrigins", policy =>
+        {
+            var origins = (Environment.GetEnvironmentVariable("ALLOWED_ORIGINS") ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            policy.WithOrigins(origins)
+                  .WithMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
+                  .WithHeaders("authorization","content-type");
+        });
     });
-});
+}
 
 // Register Cosmos DB
 builder.Services.AddSingleton<CosmosClient>(serviceProvider =>

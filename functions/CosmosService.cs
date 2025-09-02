@@ -465,4 +465,95 @@ public class CosmosService
     {
         await UpdateFutureLineupsForPlayerSkillChangeAsync(playerId, divisionId, newSkillLevel);
     }
+
+    // Team operations (partition key: /divisionId)
+    public async Task<IEnumerable<Team>> GetTeamsByDivisionIdAsync(string divisionId)
+    {
+        var query = "SELECT * FROM c";
+        var queryDefinition = new QueryDefinition(query);
+        var resultSet = _teamsContainer.GetItemQueryIterator<Team>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions
+            {
+                PartitionKey = new PartitionKey(divisionId)
+            });
+
+        var teams = new List<Team>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            teams.AddRange(response.ToList());
+        }
+
+        return teams;
+    }
+
+    public async Task<Team?> GetTeamByIdAsync(string id, string divisionId)
+    {
+        try
+        {
+            var response = await _teamsContainer.ReadItemAsync<Team>(id, new PartitionKey(divisionId));
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<Team> CreateTeamAsync(Team team)
+    {
+        // Ensure the ID is properly set
+        if (string.IsNullOrEmpty(team.Id))
+        {
+            // Create a unique team ID based on division and team name
+            var safeName = team.Name.ToLower().Replace(" ", "_").Replace("-", "_");
+            team.Id = $"team_{safeName}_9b"; 
+        }
+        team.CreatedAt = DateTime.UtcNow;
+        team.Type = "team";
+        
+        var response = await _teamsContainer.CreateItemAsync(team, new PartitionKey(team.DivisionId));
+        return response.Resource;
+    }
+
+    public async Task<Team?> UpdateTeamAsync(string id, string divisionId, Team team)
+    {
+        try
+        {
+            // Explicitly set the ID and type to ensure consistency
+            team.Id = id;
+            team.Type = "team";
+            team.DivisionId = divisionId;
+            
+            // Ensure we have a valid createdAt timestamp
+            if (team.CreatedAt == default(DateTime))
+            {
+                team.CreatedAt = DateTime.UtcNow;
+            }
+            
+            var response = await _teamsContainer.ReplaceItemAsync(
+                team, 
+                id, 
+                new PartitionKey(divisionId));
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteTeamAsync(string id, string divisionId)
+    {
+        try
+        {
+            await _teamsContainer.DeleteItemAsync<Team>(id, new PartitionKey(divisionId));
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+    }
 }

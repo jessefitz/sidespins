@@ -138,6 +138,43 @@ class SideSpinsAdmin {
         return this.apiRequest(url);
     }
 
+    // Team API methods
+    async getTeams(divisionId) {
+        return this.apiRequest(`/GetTeams?divisionId=${encodeURIComponent(divisionId)}`);
+    }
+
+    async createTeam(team) {
+        return this.apiRequest('/CreateTeam', {
+            method: 'POST',
+            body: JSON.stringify({
+                type: 'team',
+                divisionId: team.divisionId,
+                name: team.name,
+                captainPlayerId: team.captainPlayerId || null,
+                createdAt: new Date().toISOString()
+            })
+        });
+    }
+
+    async updateTeam(teamId, divisionId, team) {
+        return this.apiRequest(`/teams/${teamId}?divisionId=${encodeURIComponent(divisionId)}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                id: teamId,
+                type: 'team',
+                divisionId: team.divisionId,
+                name: team.name,
+                captainPlayerId: team.captainPlayerId || null
+            })
+        });
+    }
+
+    async deleteTeam(teamId, divisionId) {
+        return this.apiRequest(`/teams/${teamId}?divisionId=${encodeURIComponent(divisionId)}`, {
+            method: 'DELETE'
+        });
+    }
+
     async getTeamMemberships(teamId) {
         return this.apiRequest(`/GetMemberships?teamId=${encodeURIComponent(teamId)}`);
     }
@@ -429,6 +466,160 @@ async function deletePlayer(id, name) {
         loadPlayers(); // Refresh the list
     } catch (error) {
         showStatus(`Error deleting player: ${error.message}`, 'error');
+    }
+}
+
+// Team management functions
+async function loadTeams() {
+    const divisionId = document.getElementById('teams-division-id').value.trim();
+    
+    if (!divisionId) {
+        showStatus('Please enter a division ID', 'error');
+        return;
+    }
+    
+    try {
+        const teams = await adminApi.getTeams(divisionId);
+        displayTeams(teams);
+        showStatus(`Loaded ${teams.length} teams for division ${divisionId}`, 'success');
+    } catch (error) {
+        showStatus(`Error loading teams: ${error.message}`, 'error');
+    }
+}
+
+function displayTeams(teams) {
+    const container = document.getElementById('teams-list');
+    
+    if (!teams || teams.length === 0) {
+        container.innerHTML = '<p>No teams found</p>';
+        return;
+    }
+    
+    container.innerHTML = teams.map(team => `
+        <div class="data-item">
+            <div class="data-item-content">
+                <strong>${escapeHtml(team.name)}</strong>
+                <br><small>ID: ${escapeHtml(team.id)}</small>
+                ${team.captainPlayerId ? `<br><small>Captain: ${escapeHtml(team.captainPlayerId)}</small>` : ''}
+                <br><small>Division: ${escapeHtml(team.divisionId)}</small>
+            </div>
+            <div class="data-item-actions">
+                <button class="btn-edit" onclick="editTeam('${escapeHtml(team.id)}', '${escapeHtml(team.divisionId)}', '${escapeHtml(team.name)}', '${escapeHtml(team.captainPlayerId || '')}')">Edit</button>
+                <button class="btn-danger" onclick="confirmDeleteTeam('${escapeHtml(team.id)}', '${escapeHtml(team.divisionId)}', '${escapeHtml(team.name)}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function createTeam(event) {
+    event.preventDefault();
+    
+    const divisionId = document.getElementById('team-division-id').value.trim();
+    const name = document.getElementById('team-name').value.trim();
+    const captainPlayerId = document.getElementById('team-captain-player-id').value.trim();
+    
+    if (!divisionId || !name) {
+        showStatus('Division ID and Team Name are required', 'error');
+        return;
+    }
+    
+    try {
+        const team = await adminApi.createTeam({
+            divisionId,
+            name,
+            captainPlayerId: captainPlayerId || null
+        });
+        
+        showStatus(`Team "${name}" created successfully`, 'success');
+        clearForm('team-form');
+        loadTeams(); // Refresh the list
+    } catch (error) {
+        showStatus(`Error creating team: ${error.message}`, 'error');
+    }
+}
+
+function editTeam(id, divisionId, name, captainPlayerId) {
+    // Fill the form with current values
+    document.getElementById('team-division-id').value = divisionId;
+    document.getElementById('team-name').value = name;
+    document.getElementById('team-captain-player-id').value = captainPlayerId;
+    
+    // Change the form to update mode
+    const form = document.getElementById('team-form');
+    form.onsubmit = (e) => updateTeam(e, id, divisionId);
+    
+    // Update button text
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.textContent = 'Update Team';
+    submitBtn.style.background = '#28a745';
+    
+    // Add cancel button
+    if (!form.querySelector('.cancel-edit')) {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.className = 'btn-secondary cancel-edit';
+        cancelBtn.style.marginLeft = '0.5rem';
+        cancelBtn.onclick = cancelEditTeam;
+        submitBtn.parentNode.appendChild(cancelBtn);
+    }
+}
+
+async function updateTeam(event, id, divisionId) {
+    event.preventDefault();
+    
+    const newDivisionId = document.getElementById('team-division-id').value.trim();
+    const name = document.getElementById('team-name').value.trim();
+    const captainPlayerId = document.getElementById('team-captain-player-id').value.trim();
+    
+    if (!newDivisionId || !name) {
+        showStatus('Division ID and Team Name are required', 'error');
+        return;
+    }
+    
+    try {
+        await adminApi.updateTeam(id, divisionId, {
+            divisionId: newDivisionId,
+            name,
+            captainPlayerId: captainPlayerId || null
+        });
+        
+        showStatus(`Team "${name}" updated successfully`, 'success');
+        cancelEditTeam(); // Reset form
+        loadTeams(); // Refresh the list
+    } catch (error) {
+        showStatus(`Error updating team: ${error.message}`, 'error');
+    }
+}
+
+function cancelEditTeam() {
+    const form = document.getElementById('team-form');
+    form.reset();
+    form.onsubmit = createTeam;
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.textContent = 'Add Team';
+    submitBtn.style.background = '#007bff';
+    
+    const cancelBtn = form.querySelector('.cancel-edit');
+    if (cancelBtn) {
+        cancelBtn.remove();
+    }
+}
+
+function confirmDeleteTeam(id, divisionId, name) {
+    if (confirm(`Are you sure you want to delete the team "${name}"? This action cannot be undone.`)) {
+        deleteTeam(id, divisionId, name);
+    }
+}
+
+async function deleteTeam(id, divisionId, name) {
+    try {
+        await adminApi.deleteTeam(id, divisionId);
+        showStatus(`Team "${name}" deleted successfully`, 'success');
+        loadTeams(); // Refresh the list
+    } catch (error) {
+        showStatus(`Error deleting team: ${error.message}`, 'error');
     }
 }
 

@@ -86,6 +86,9 @@ class ScheduleLoader {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('schedule-content').style.display = 'block';
 
+      // Handle hash fragment if present in URL
+      this.handleHashFragment();
+
     } catch (error) {
       console.error('Error loading schedule:', error);
       document.getElementById('loading').style.display = 'none';
@@ -292,12 +295,35 @@ class ScheduleLoader {
     html += `</div>`;
     return html;
   }
+
+  handleHashFragment() {
+    // Check if there's a hash in the URL
+    if (window.location.hash) {
+      // Small delay to ensure the DOM is fully rendered
+      setTimeout(() => {
+        const targetElement = document.querySelector(window.location.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }
 }
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
   const loader = new ScheduleLoader();
   loader.loadSchedule();
+  
+  // Also handle hash changes for direct navigation
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash) {
+      const targetElement = document.querySelector(window.location.hash);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
 });
 </script>
 

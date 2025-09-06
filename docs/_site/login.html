@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SideSpins</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #auth-container {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #auth-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        #auth-container input:focus {
+            outline: none;
+            border-color: #007cba;
+        }
+
+        #auth-container button {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background-color: #007cba;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        #auth-container button:hover {
+            background-color: #005a87;
+        }
+
+        #auth-container button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #auth-container label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        #auth-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        #auth-container h3 {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .divider {
+            margin: 2rem 0;
+            border: none;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        #error-message, #success-message {
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        #error-message {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        #success-message {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007cba;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-link a {
+            color: #007cba;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="auth-container">
+            <div id="loading" style="display:none;">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+            
+            <div id="auth-form">
+                <h1>Sign In to SideSpins</h1>
+                
+                <!-- SMS Authentication -->
+                <div id="sms-section">
+                    <h3>Sign in with SMS</h3>
+                    <div id="phone-input-section">
+                        <label for="phone">Phone Number:</label>
+                        <input type="tel" id="phone" placeholder="+1 (555) 123-4567" />
+                        <button id="send-sms-btn">Send Code</button>
+                    </div>
+                    
+                    <div id="sms-code-section" style="display:none;">
+                        <label for="sms-code">Enter the code sent to your phone:</label>
+                        <input type="text" id="sms-code" placeholder="123456" maxlength="6" />
+                        <button id="verify-sms-btn">Verify Code</button>
+                        <button id="resend-sms-btn" style="background-color: #6c757d;">Resend Code</button>
+                    </div>
+                </div>
+                
+                <hr class="divider" />
+                
+                <!-- Email Authentication -->
+                <div id="email-section">
+                    <h3>Sign in with Email</h3>
+                    <div id="email-input-section">
+                        <label for="email">Email Address:</label>
+                        <input type="email" id="email" placeholder="your.email@example.com" />
+                        <button id="send-email-btn">Send Magic Link</button>
+                    </div>
+                    <div id="email-sent-message" style="display:none;">
+                        <p style="text-align: center; color: #155724; font-weight: 500;">Check your email for a magic link to sign in!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="error-message" style="display:none;"></div>
+            <div id="success-message" style="display:none;"></div>
+            
+            <div class="back-link">
+                <a href="/">← Back to SideSpins</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const authManager = new AuthManager();
+        
+        // Elements
+        const phoneInput = document.getElementById('phone');
+        const smsCodeInput = document.getElementById('sms-code');
+        const emailInput = document.getElementById('email');
+        const sendSmsBtn = document.getElementById('send-sms-btn');
+        const verifySmsBtn = document.getElementById('verify-sms-btn');
+        const resendSmsBtn = document.getElementById('resend-sms-btn');
+        const sendEmailBtn = document.getElementById('send-email-btn');
+        const phoneInputSection = document.getElementById('phone-input-section');
+        const smsCodeSection = document.getElementById('sms-code-section');
+        const emailSentMessage = document.getElementById('email-sent-message');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const loading = document.getElementById('loading');
+        const authForm = document.getElementById('auth-form');
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+        
+        function showLoading() {
+            loading.style.display = 'block';
+            authForm.style.display = 'none';
+        }
+        
+        function hideLoading() {
+            loading.style.display = 'none';
+            authForm.style.display = 'block';
+        }
+        
+        function setButtonsEnabled(enabled) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = !enabled);
+        }
+        
+        // Phone number formatting - UPDATE THIS SECTION
+        phoneInput.addEventListener('input', function(e) {
+            const formatted = authManager.formatPhoneNumber(e.target.value);
+            e.target.value = formatted;
+            
+            // Store clean number for API calls
+            try {
+                e.target.dataset.cleanNumber = authManager.toE164(e.target.value);
+            } catch (error) {
+                // Invalid format, clear dataset
+                e.target.dataset.cleanNumber = '';
+            }
+        });
+        
+        // SMS Authentication - Using backend API
+        sendSmsBtn.addEventListener('click', async function() {
+            // Get the clean number from dataset or try to format current value
+            let formattedPhone;
+            try {
+                formattedPhone = phoneInput.dataset.cleanNumber || authManager.toE164(phoneInput.value);
+            } catch (error) {
+                showError('Please enter a valid phone number');
+                return;
+            }
+            
+            try {
+                showLoading();
+                setButtonsEnabled(false);
+                
+                console.log('Sending SMS to:', formattedPhone); // Debug log
+                
+                const response = await authManager.sendSmsCode(formattedPhone);
+                
+                if (response.ok) {
+                    phoneInputSection.style.display = 'none';
+                    smsCodeSection.style.display = 'block';
+                    showSuccess('Code sent to your phone!');
+                    
+                    // Store the formatted phone for verification
+                    phoneInput.dataset.verificationNumber = formattedPhone;
+                } else {
+                    console.error('SMS send error:', response);
+                    showError(response.message || 'Failed to send SMS code. Please try again.');
+                }
+            } catch (error) {
+                console.error('SMS send error:', error);
+                showError('Failed to send SMS code. Please try again.');
+            } finally {
+                hideLoading();
+                setButtonsEnabled(true);
+            }
+        });
+        
+        // SMS Verification - Using backend API
+        verifySmsBtn.addEventListener('click', async function() {
+            // Use the stored verification number
+            const phone = phoneInput.dataset.verificationNumber;
+            const code = smsCodeInput.value.trim();
+            
+            if (!phone) {
+                showError('Phone number not found. Please try sending the code again.');
+                return;
+            }
+            
+            if (!code || code.length !== 6) {
+                showError('Please enter the 6-digit code');
+                return;
+            }
+            
+            try {
+                showLoading();
+                setButtonsEnabled(false);
+                
+                console.log('Verifying SMS for:', phone, 'with code:', code); // Debug log
+                
+                const response = await authManager.verifySmsCode(phone, code);
+                
+                if (response.ok) {
+                    showSuccess('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = '/app.html';
+                    }, 1500);
+                } else {
+                    console.error('SMS verification error:', response);
+                    showError(response.message || 'Invalid code. Please try again.');
+                    hideLoading();
+                    setButtonsEnabled(true);
+                }
+            } catch (error) {
+                console.error('SMS verify error:', error);
+                showError('Failed to verify code. Please try again.');
+                hideLoading();
+                setButtonsEnabled(true);
+            }
+        });
+        
+        resendSmsBtn.addEventListener('click', function() {
+            smsCodeSection.style.display = 'none';
+            phoneInputSection.style.display = 'block';
+            smsCodeInput.value = '';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        });
+        
+        // Email Authentication - Using backend API
+        sendEmailBtn.addEventListener('click', async function() {
+            const email = emailInput.value.trim();
+            if (!email || !email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                showLoading();
+                setButtonsEnabled(false);
+                
+                const response = await authManager.sendMagicLink(email);
+                
+                if (response.ok) {
+                    emailSentMessage.style.display = 'block';
+                    showSuccess('Check your email for a magic link!');
+                } else {
+                    console.error('Email send error:', response);
+                    showError(response.message || 'Failed to send magic link. Please try again.');
+                }
+            } catch (error) {
+                console.error('Email send error:', error);
+                showError('Failed to send magic link. Please try again.');
+            } finally {
+                hideLoading();
+                setButtonsEnabled(true);
+            }
+        });
+        
+        resendSmsBtn.addEventListener('click', function() {
+            smsCodeSection.style.display = 'none';
+            phoneInputSection.style.display = 'block';
+            smsCodeInput.value = '';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        });
+        
+        // Check if user is already authenticated
+        async function checkCurrentUser() {
+            const isAuthenticated = await authManager.checkAuth();
+            if (isAuthenticated) {
+                window.location.href = '/app.html';
+            }
+        }
+        
+        // Check authentication status on page load
+        checkCurrentUser();
+        
+        // Enter key handlers
+        phoneInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendSmsBtn.click();
+            }
+        });
+        
+        smsCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifySmsBtn.click();
+            }
+        });
+        
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendEmailBtn.click();
+            }
+        });
+    });
+    </script>
+</body>
+</html>

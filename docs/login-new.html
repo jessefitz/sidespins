@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SideSpins</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #auth-container {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #auth-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        #auth-container input:focus {
+            outline: none;
+            border-color: #007cba;
+        }
+
+        #auth-container button {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .primary-btn {
+            background-color: #007cba;
+            color: white;
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            background-color: #005fa3;
+        }
+
+        .secondary-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .secondary-btn:hover:not(:disabled) {
+            background-color: #545b62;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .tab.active {
+            border-bottom-color: #007cba;
+            color: #007cba;
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .message {
+            padding: 0.75rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 1rem;
+            color: #6c757d;
+            display: none;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand h1 {
+            color: #007cba;
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .brand p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #sms-code-section {
+            display: none;
+        }
+
+        #email-sent-message {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="auth-container">
+            <div class="brand">
+                <h1>SideSpins</h1>
+                <p>Sign in to your account</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('sms')">SMS</button>
+                <button class="tab" onclick="showTab('email')">Email</button>
+            </div>
+
+            <div id="loading" class="loading">
+                <div>Processing...</div>
+            </div>
+
+            <div id="error-message" class="message error-message"></div>
+            <div id="success-message" class="message success-message"></div>
+            <div id="email-sent-message" class="message success-message">Check your email for a magic link!</div>
+
+            <!-- SMS Tab -->
+            <div id="sms-tab" class="tab-content active">
+                <div id="phone-input-section">
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    <button id="send-sms-btn" class="primary-btn">Send SMS Code</button>
+                </div>
+
+                <div id="sms-code-section">
+                    <input type="text" id="sms-code" placeholder="Enter verification code" maxlength="6" required>
+                    <button id="verify-sms-btn" class="primary-btn">Verify Code</button>
+                    <button id="resend-sms-btn" class="secondary-btn">Try Again</button>
+                </div>
+            </div>
+
+            <!-- Email Tab -->
+            <div id="email-tab" class="tab-content">
+                <input type="email" id="email" placeholder="Enter your email address" required>
+                <button id="send-email-btn" class="primary-btn">Send Magic Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let currentPhoneNumber = '';
+
+    function showTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabName + '-tab').classList.add('active');
+
+        // Clear messages
+        clearMessages();
+    }
+
+    function showError(message) {
+        const errorMsg = document.getElementById('error-message');
+        const successMsg = document.getElementById('success-message');
+        const emailSentMsg = document.getElementById('email-sent-message');
+        
+        errorMsg.textContent = message;
+        errorMsg.style.display = 'block';
+        successMsg.style.display = 'none';
+        emailSentMsg.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+        const errorMsg = document.getElementById('error-message');
+        const successMsg = document.getElementById('success-message');
+        
+        successMsg.textContent = message;
+        successMsg.style.display = 'block';
+        errorMsg.style.display = 'none';
+    }
+
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+        clearMessages();
+    }
+
+    function hideLoading() {
+        document.getElementById('loading').style.display = 'none';
+    }
+
+    function clearMessages() {
+        document.getElementById('error-message').style.display = 'none';
+        document.getElementById('success-message').style.display = 'none';
+        document.getElementById('email-sent-message').style.display = 'none';
+    }
+
+    function setButtonsEnabled(enabled) {
+        document.getElementById('send-sms-btn').disabled = !enabled;
+        document.getElementById('verify-sms-btn').disabled = !enabled;
+        document.getElementById('send-email-btn').disabled = !enabled;
+    }
+
+    // SMS Authentication
+    document.getElementById('send-sms-btn').addEventListener('click', async function() {
+        const phone = document.getElementById('phone').value.trim();
+        
+        if (!phone) {
+            showError('Please enter a phone number.');
+            return;
+        }
+
+        try {
+            showLoading();
+            setButtonsEnabled(false);
+            currentPhoneNumber = phone;
+            
+            const response = await fetch('http://localhost:7071/api/auth/sms/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    phoneNumber: phone
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok && result.ok) {
+                document.getElementById('phone-input-section').style.display = 'none';
+                document.getElementById('sms-code-section').style.display = 'block';
+                showSuccess('SMS code sent! Please check your phone.');
+                document.getElementById('sms-code').focus();
+            } else {
+                showError(result.message || 'Failed to send SMS code. Please try again.');
+            }
+        } catch (error) {
+            console.error('SMS send error:', error);
+            showError('Failed to send SMS code. Please try again.');
+        } finally {
+            hideLoading();
+            setButtonsEnabled(true);
+        }
+    });
+
+    document.getElementById('verify-sms-btn').addEventListener('click', async function() {
+        const code = document.getElementById('sms-code').value.trim();
+        
+        if (!code) {
+            showError('Please enter the verification code.');
+            return;
+        }
+
+        try {
+            showLoading();
+            setButtonsEnabled(false);
+            
+            const response = await fetch('http://localhost:7071/api/auth/sms/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    phoneNumber: currentPhoneNumber,
+                    code: code
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok && result.ok) {
+                showSuccess('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = '/app/';
+                }, 1500);
+            } else {
+                showError(result.message || 'Verification failed. Please check the code and try again.');
+                setButtonsEnabled(true);
+            }
+        } catch (error) {
+            console.error('SMS verification error:', error);
+            showError('Verification failed. Please try again.');
+            setButtonsEnabled(true);
+        } finally {
+            hideLoading();
+        }
+    });
+
+    document.getElementById('resend-sms-btn').addEventListener('click', function() {
+        document.getElementById('sms-code-section').style.display = 'none';
+        document.getElementById('phone-input-section').style.display = 'block';
+        document.getElementById('sms-code').value = '';
+        clearMessages();
+    });
+
+    // Email Authentication
+    document.getElementById('send-email-btn').addEventListener('click', async function() {
+        const email = document.getElementById('email').value.trim();
+        
+        if (!email) {
+            showError('Please enter an email address.');
+            return;
+        }
+        
+        if (!email.includes('@')) {
+            showError('Please enter a valid email address.');
+            return;
+        }
+        
+        try {
+            showLoading();
+            setButtonsEnabled(false);
+            
+            const response = await fetch('http://localhost:7071/api/auth/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok && result.ok) {
+                document.getElementById('email-sent-message').style.display = 'block';
+                showSuccess('Check your email for a magic link!');
+            } else {
+                showError(result.message || 'Failed to send magic link. Please try again.');
+            }
+        } catch (error) {
+            console.error('Email send error:', error);
+            showError('Failed to send magic link. Please try again.');
+        } finally {
+            hideLoading();
+            setButtonsEnabled(true);
+        }
+    });
+
+    // Check if user is already authenticated
+    async function checkCurrentUser() {
+        try {
+            const response = await fetch('http://localhost:7071/api/auth/user', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.authenticated) {
+                    window.location.href = '/app/';
+                }
+            }
+        } catch (error) {
+            console.log('Not authenticated');
+        }
+    }
+
+    // Check authentication status on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkCurrentUser();
+        
+        // Enter key handlers
+        document.getElementById('phone').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-sms-btn').click();
+            }
+        });
+        
+        document.getElementById('sms-code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('verify-sms-btn').click();
+            }
+        });
+        
+        document.getElementById('email').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-email-btn').click();
+            }
+        });
+    });
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@ using SideSpins.Api.Services;
 using SideSpins.Api.Models;
 using SideSpins.Api.Helpers;
 using Newtonsoft.Json;
+using SidesSpins.Functions;
 
 namespace SideSpins.Api;
 
@@ -21,7 +22,8 @@ public class MatchesFunctions
     }
 
     [Function("GetMatches")]
-    public async Task<IActionResult> GetMatches([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> GetMatches([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
     {
         try
         {
@@ -60,11 +62,9 @@ public class MatchesFunctions
     }
 
     [Function("CreateMatch")]
-    public async Task<IActionResult> CreateMatch([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "matches")] HttpRequest req)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> CreateMatch([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "matches")] HttpRequest req, FunctionContext context)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -92,11 +92,9 @@ public class MatchesFunctions
     }
 
     [Function("UpdateMatch")]
-    public async Task<IActionResult> UpdateMatch([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "matches/{matchId}")] HttpRequest req, string matchId)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> UpdateMatch([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "matches/{matchId}")] HttpRequest req, FunctionContext context, string matchId)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             // Extract divisionId from query parameter since we need it for partition key
@@ -131,11 +129,9 @@ public class MatchesFunctions
     }
 
     [Function("DeleteMatch")]
-    public async Task<IActionResult> DeleteMatch([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "matches/{matchId}")] HttpRequest req, string matchId)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> DeleteMatch([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "matches/{matchId}")] HttpRequest req, FunctionContext context, string matchId)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             // Extract divisionId from query parameter since we need it for partition key
@@ -162,11 +158,9 @@ public class MatchesFunctions
     }
 
     [Function("UpdateMatchLineup")]
-    public async Task<IActionResult> UpdateMatchLineup([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "matches/{matchId}/lineup")] HttpRequest req, string matchId)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> UpdateMatchLineup([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "matches/{matchId}/lineup")] HttpRequest req, FunctionContext context, string matchId)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             // Extract divisionId from query parameter since we need it for partition key

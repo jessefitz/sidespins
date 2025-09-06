@@ -6,6 +6,7 @@ using SideSpins.Api.Services;
 using SideSpins.Api.Models;
 using SideSpins.Api.Helpers;
 using Newtonsoft.Json;
+using SidesSpins.Functions;
 
 namespace SideSpins.Api;
 
@@ -21,10 +22,13 @@ public class PlayersFunctions
     }
 
     [Function("GetPlayers")]
-    public async Task<IActionResult> GetPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> GetPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
     {
         try
         {
+            // For now, allow any authenticated user to see all players
+            // You could add team-specific filtering here if needed
             var players = await _cosmosService.GetPlayersAsync();
             return new OkObjectResult(players);
         }
@@ -36,11 +40,9 @@ public class PlayersFunctions
     }
 
     [Function("CreatePlayer")]
-    public async Task<IActionResult> CreatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> CreatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, FunctionContext context)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -62,11 +64,9 @@ public class PlayersFunctions
     }
 
     [Function("UpdatePlayer")]
-    public async Task<IActionResult> UpdatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "players/{id}")] HttpRequest req, string id)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> UpdatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "players/{id}")] HttpRequest req, FunctionContext context, string id)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -101,11 +101,9 @@ public class PlayersFunctions
     }
 
     [Function("DeletePlayer")]
-    public async Task<IActionResult> DeletePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "players/{id}")] HttpRequest req, string id)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> DeletePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "players/{id}")] HttpRequest req, FunctionContext context, string id)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var success = await _cosmosService.DeletePlayerAsync(id);

@@ -13,6 +13,10 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
+// Configure middleware
+builder.Services.AddScoped<AuthenticationMiddleware>();
+builder.UseMiddleware<AuthenticationMiddleware>();
+
 // Configure JSON serialization options for Newtonsoft.Json
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {

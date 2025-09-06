@@ -20,6 +20,48 @@ SideSpins implements a **two-stage JWT authentication system** that combines Sty
 - Validated locally using our signing key
 - Contains team metadata and role information
 
+## Middleware Integration (Current Implementation)
+
+### Authentication Middleware
+The current implementation uses centralized JWT authentication middleware that automatically validates App JWTs for all protected endpoints:
+
+**Middleware Flow:**
+1. **Request Interception**: All HTTP requests are intercepted by `AuthenticationMiddleware`
+2. **Attribute Check**: Middleware examines function for `[RequireAuthentication]` attributes
+3. **JWT Extraction**: Extracts JWT from `Authorization: Bearer {token}` header
+4. **Token Validation**: Validates App JWT using `AuthService.ValidateAppJwt()`
+5. **Role Authorization**: Checks user's role meets minimum requirement
+6. **Context Population**: Adds user claims to `FunctionContext` for easy access
+
+**Function Usage Pattern:**
+```csharp
+[Function("CreateTeam")]
+[RequireAuthentication("manager")] // Requires manager or admin role
+public async Task<IActionResult> CreateTeam(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+    FunctionContext context) // <- Required for auth context
+{
+    var userClaims = context.GetUserClaims();
+    var teamId = context.GetTeamId();
+    var hasAdminRole = context.HasMinimumRole("admin");
+    
+    // Business logic with automatic auth validation
+}
+```
+
+**Client Usage:**
+```javascript
+// All API calls use the App JWT
+const response = await fetch('/api/CreateTeam', {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${appJwt}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(teamData)
+});
+```
+
 ## SMS Authentication Flow
 
 ### Step 1: Send SMS Code

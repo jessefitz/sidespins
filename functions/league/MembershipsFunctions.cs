@@ -6,6 +6,7 @@ using SideSpins.Api.Services;
 using SideSpins.Api.Models;
 using SideSpins.Api.Helpers;
 using Newtonsoft.Json;
+using SidesSpins.Functions;
 
 namespace SideSpins.Api;
 
@@ -21,7 +22,8 @@ public class MembershipsFunctions
     }
 
     [Function("GetMemberships")]
-    public async Task<IActionResult> GetMemberships([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> GetMemberships([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
     {
         try
         {
@@ -43,11 +45,9 @@ public class MembershipsFunctions
     }
 
     [Function("CreateMembership")]
-    public async Task<IActionResult> CreateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> CreateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, FunctionContext context)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -69,11 +69,9 @@ public class MembershipsFunctions
     }
 
     [Function("UpdateMembership")]
-    public async Task<IActionResult> UpdateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "memberships/{membershipId}")] HttpRequest req, string membershipId)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> UpdateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "memberships/{membershipId}")] HttpRequest req, FunctionContext context, string membershipId)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -100,11 +98,9 @@ public class MembershipsFunctions
     }
 
     [Function("DeleteMembership")]
-    public async Task<IActionResult> DeleteMembership([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "memberships/{membershipId}")] HttpRequest req, string membershipId)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> DeleteMembership([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "memberships/{membershipId}")] HttpRequest req, FunctionContext context, string membershipId)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             // Extract teamId from query parameter since we need it for partition key
@@ -131,11 +127,9 @@ public class MembershipsFunctions
     }
 
     [Function("UpdatePlayerSkillInFutureLineups")]
-    public async Task<IActionResult> UpdatePlayerSkillInFutureLineups([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "memberships/update-future-lineups")] HttpRequest req)
+    [RequireAuthentication("manager")]
+    public async Task<IActionResult> UpdatePlayerSkillInFutureLineups([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "memberships/update-future-lineups")] HttpRequest req, FunctionContext context)
     {
-        var authResult = AuthHelper.ValidateApiSecret(req);
-        if (authResult != null) return authResult;
-
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();

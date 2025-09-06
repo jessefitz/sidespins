@@ -13,9 +13,9 @@ namespace SideSpins.Api.Functions;
 public class TeamsFunctions
 {
     private readonly ILogger<TeamsFunctions> _logger;
-    private readonly CosmosService _cosmosService;
+    private readonly LeagueService _cosmosService;
 
-    public TeamsFunctions(ILogger<TeamsFunctions> logger, CosmosService cosmosService)
+    public TeamsFunctions(ILogger<TeamsFunctions> logger, LeagueService cosmosService)
     {
         _logger = logger;
         _cosmosService = cosmosService;

@@ -6,7 +6,9 @@ using Microsoft.Azure.Cosmos;
 using SideSpins.Api.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using SidesSpins.Functions;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
@@ -65,12 +67,39 @@ builder.Services.AddSingleton<CosmosClient>(serviceProvider =>
     return new CosmosClient(cosmosUri, cosmosKey, cosmosClientOptions);
 });
 
-builder.Services.AddScoped<CosmosService>(serviceProvider =>
+builder.Services.AddScoped<LeagueService>(serviceProvider =>
 {
     var cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
     var databaseName = Environment.GetEnvironmentVariable("COSMOS_DB") ?? "sidespins";
     
-    return new CosmosService(cosmosClient, databaseName);
+    return new LeagueService(cosmosClient, databaseName);
+});
+
+// Register HttpClient for Stytch API
+builder.Services.AddHttpClient<AuthService>();
+
+// Register Auth service
+builder.Services.AddScoped<AuthService>(serviceProvider =>
+{
+    var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient();
+    
+    var projectId = Environment.GetEnvironmentVariable("STYTCH_PROJECT_ID");
+    var secret = Environment.GetEnvironmentVariable("STYTCH_SECRET");
+    var jwtSigningKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
+    var logger = serviceProvider.GetRequiredService<ILogger<AuthService>>();
+    
+    if (string.IsNullOrEmpty(projectId) || string.IsNullOrEmpty(secret))
+    {
+        throw new InvalidOperationException("STYTCH_PROJECT_ID and STYTCH_SECRET must be configured");
+    }
+    
+    if (string.IsNullOrEmpty(jwtSigningKey))
+    {
+        throw new InvalidOperationException("JWT_SIGNING_KEY must be configured");
+    }
+
+    return new AuthService(httpClient, projectId, secret, jwtSigningKey, logger);
 });
 
 // Build and run the application

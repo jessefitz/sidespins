@@ -12,9 +12,9 @@ namespace SideSpins.Api;
 public class PlayersFunctions
 {
     private readonly ILogger<PlayersFunctions> _logger;
-    private readonly CosmosService _cosmosService;
+    private readonly LeagueService _cosmosService;
 
-    public PlayersFunctions(ILogger<PlayersFunctions> logger, CosmosService cosmosService)
+    public PlayersFunctions(ILogger<PlayersFunctions> logger, LeagueService cosmosService)
     {
         _logger = logger;
         _cosmosService = cosmosService;

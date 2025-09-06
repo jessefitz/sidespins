@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace SideSpins.Api.Services;
 
-public class CosmosService
+public class LeagueService
 {
     private readonly Container _playersContainer;
     private readonly Container _membershipsContainer;
@@ -14,7 +14,7 @@ public class CosmosService
     private readonly Container _teamsContainer;
     private readonly Container _divisionsContainer;
 
-    public CosmosService(CosmosClient cosmosClient, string databaseName)
+    public LeagueService(CosmosClient cosmosClient, string databaseName)
     {
         var database = cosmosClient.GetDatabase(databaseName);
         

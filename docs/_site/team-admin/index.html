@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="SideSpins" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">SideSpins</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/">Home</a><a class="page-link" href="/schedule.html">Schedule</a><a class="page-link" href="/lineup-explorer.html">Lineup Explorer</a><a class="page-link" href="/availability.html">Availability</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Team Administration</h1>
+  </header>
+
+  <div class="post-content">
+    <div class="admin-container">
+    <h1>Team Administration</h1>
+    
+    <div class="team-info">
+        <h2>Team: <span data-team-name>Loading...</span></h2>
+        <p>Your Role: <span data-role-indicator>Loading...</span></p>
+    </div>
+    
+    <!-- Add Player Section -->
+    <section class="admin-section" data-requires-role="admin">
+        <h2>Add Player to Team</h2>
+        <form id="add-player-form">
+            <div class="form-group">
+                <label for="apa-number">APA Number:</label>
+                <input type="text" id="apa-number" required placeholder="e.g., 12345">
+            </div>
+            <div class="form-group">
+                <label for="player-role">Role:</label>
+                <select id="player-role">
+                    <option value="player">Player</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <button type="submit">Add Player</button>
+        </form>
+    </section>
+
+    <!-- Manage Players Section -->
+    <section class="admin-section" data-requires-role="player">
+        <h2>Team Members</h2>
+        <div id="team-members-list" class="members-container">
+            <p>Loading team members...</p>
+        </div>
+    </section>
+
+    <!-- Access Denied Message -->
+    <div id="access-denied" style="display: none;" class="access-denied">
+        <h2>Access Denied</h2>
+        <p>You don't have permission to view this page. You need to be a team member to access team administration.</p>
+    </div>
+</div>
+
+<style>
+.admin-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.team-info {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.admin-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background: #007acc;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #005a9e;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.members-container {
+    min-height: 100px;
+}
+
+.member-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.member-info {
+    flex-grow: 1;
+}
+
+.member-info strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.role-badge {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    text-transform: capitalize;
+}
+
+.member-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.member-actions select {
+    padding: 5px;
+}
+
+.danger {
+    background: #dc3545;
+}
+
+.danger:hover {
+    background: #c82333;
+}
+
+.access-denied {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.disabled {
+    opacity: 0.6;
+}
+
+[data-requires-role] {
+    transition: opacity 0.3s ease;
+}
+</style>
+
+<script>
+/**
+ * Team Administration Interface
+ */
+class TeamAdmin {
+    constructor() {
+        this.authManager = null;
+        this.init();
+    }
+
+    async init() {
+        // Wait for auth manager to be available
+        if (typeof window.authManager !== 'undefined') {
+            this.authManager = window.authManager;
+        } else {
+            // Wait a bit for auth manager to initialize
+            await new Promise(resolve => setTimeout(resolve, 100));
+            this.authManager = window.authManager;
+        }
+
+        if (!this.authManager) {
+            console.error('Auth manager not available');
+            return;
+        }
+
+        // Ensure user is authenticated
+        const isAuth = await this.authManager.requireAuth('/login.html');
+        if (!isAuth) return;
+
+        // Setup UI permissions
+        UIPermissions.setAuthManager(this.authManager);
+        UIPermissions.setupTeamChangeListener();
+
+        // Check if user has any team access
+        if (!this.hasAnyTeamAccess()) {
+            document.getElementById('access-denied').style.display = 'block';
+            document.querySelector('.admin-container > h1').style.display = 'none';
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            return;
+        }
+
+        this.bindEvents();
+        await this.loadTeamMembers();
+        UIPermissions.applyConditionalUI();
+    }
+
+    hasAnyTeamAccess() {
+        const membership = this.authManager.getActiveMembership();
+        return membership !== null;
+    }
+
+    bindEvents() {
+        document.getElementById('add-player-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addPlayer();
+        });
+    }
+
+    async addPlayer() {
+        const apaNumber = document.getElementById('apa-number').value;
+        const role = document.getElementById('player-role').value;
+        const activeTeam = this.authManager.getActiveMembership();
+
+        if (!activeTeam) {
+            alert('No active team selected');
+            return;
+        }
+
+        try {
+            const response = await this.authManager.apiRequest(`/api/teams/${activeTeam.teamId}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ apaNumber, role })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.message || 'Player added successfully');
+                document.getElementById('add-player-form').reset();
+                await this.loadTeamMembers();
+            }
+        } catch (error) {
+            if (!error.message.includes('handled error')) {
+                alert('Network error occurred');
+            }
+        }
+    }
+
+    async loadTeamMembers() {
+        const activeTeam = this.authManager.getActiveMembership();
+        if (!activeTeam) {
+            document.getElementById('team-members-list').innerHTML = '<p>No active team selected</p>';
+            return;
+        }
+
+        try {
+            const response = await this.authManager.apiRequest(`/api/teams/${activeTeam.teamId}/members`);
+
+            if (response.ok) {
+                const members = await response.json();
+                this.renderTeamMembers(members);
+            }
+        } catch (error) {
+            if (!error.message.includes('handled error')) {
+                document.getElementById('team-members-list').innerHTML = '<p>Failed to load team members</p>';
+            }
+        }
+    }
+
+    renderTeamMembers(members) {
+        const container = document.getElementById('team-members-list');
+        
+        if (!members || members.length === 0) {
+            container.innerHTML = '<p>No team members found</p>';
+            return;
+        }
+
+        container.innerHTML = members.map(member => `
+            <div class="member-card">
+                <div class="member-info">
+                    <strong>${member.playerName || member.userId}</strong>
+                    <span class="role-badge">${member.role}</span>
+                </div>
+                <div class="member-actions" data-requires-role="admin">
+                    <select onchange="teamAdmin.changeRole('${member.userId}', this.value)">
+                        <option value="player" ${member.role === 'player' ? 'selected' : ''}>Player</option>
+                        <option value="manager" ${member.role === 'manager' ? 'selected' : ''}>Manager</option>
+                        <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    </select>
+                    <button onclick="teamAdmin.removeMember('${member.userId}')" class="danger">Remove</button>
+                </div>
+            </div>
+        `).join('');
+
+        // Re-apply UI permissions after rendering
+        UIPermissions.applyConditionalUI();
+    }
+
+    async changeRole(userId, newRole) {
+        const activeTeam = this.authManager.getActiveMembership();
+        if (!activeTeam) return;
+
+        try {
+            const response = await this.authManager.apiRequest(`/api/teams/${activeTeam.teamId}/members/${userId}/role`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ newRole })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.message || 'Role updated successfully');
+                await this.loadTeamMembers();
+            }
+        } catch (error) {
+            if (!error.message.includes('handled error')) {
+                alert('Network error occurred');
+            }
+        }
+    }
+
+    async removeMember(userId) {
+        if (!confirm('Are you sure you want to remove this player?')) return;
+
+        const activeTeam = this.authManager.getActiveMembership();
+        if (!activeTeam) return;
+
+        try {
+            const response = await this.authManager.apiRequest(`/api/teams/${activeTeam.teamId}/members/${userId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.message || 'Player removed successfully');
+                await this.loadTeamMembers();
+            }
+        } catch (error) {
+            if (!error.message.includes('handled error')) {
+                alert('Network error occurred');
+            }
+        }
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.teamAdmin = new TeamAdmin();
+});
+</script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <h2 class="footer-heading">SideSpins</h2></div>
+
+      <div class="footer-col footer-col-2">
+        <!-- This column is intentionally left empty -->
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Unofficial homepage for Break of Dawn.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+
+</html>

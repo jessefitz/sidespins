@@ -31,7 +31,16 @@
         </p>
     </header>
 
-    <div id="loading" class="loading-state">
+    <div id="auth-check" class="loading-state">
+        <div class="spinner"></div>
+        <p>Checking authentication...</p>
+    </div>
+
+    <div id="no-team" class="error-state" style="display: none;">
+        <p>Please select a team from the <a href="/app.html">main dashboard</a> to view lineup options.</p>
+    </div>
+
+    <div id="loading" class="loading-state" style="display: none;">
         <div class="spinner"></div>
         <p>Loading match data...</p>
     </div>
@@ -41,6 +50,11 @@
     </div>
 
     <div id="main-content" class="main-content" style="display: none;">
+        <div class="team-header" style="margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+            <h2>Lineup Explorer for <span id="team-name">Team</span></h2>
+            <p>Division: <span id="division-name">Loading...</span></p>
+        </div>
+
         <!-- Match Selector -->
         <div class="match-selector">
             <label for="match-select">
@@ -744,15 +758,18 @@
 }
 </style>
 
+<script src="/assets/auth.js"></script>
 <script>
 class LineupExplorer {
-    constructor() {
+    constructor(authManager) {
+        this.authManager = authManager;
         this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:7071/api' 
             : 'https://sidespinsapi.azurewebsites.net/api';
         
-        // Default division - should be configurable later
-        this.divisionId = 'div_nottingham_wed_9b_311';
+        this.divisionId = null;
+        this.teamId = null;
+        this.teamName = null;
         
         this.state = {
             matchId: null,
@@ -764,12 +781,50 @@ class LineupExplorer {
                 sort: { key: 'skill', dir: 'asc' }
             }
         };
-        
-        this.init();
+    }
+
+    async initialize() {
+        try {
+            // Check authentication
+            const isAuthenticated = await this.authManager.checkAuth();
+            if (!isAuthenticated) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            // Load memberships and get active team
+            await this.authManager.loadUserMemberships();
+            const activeMembership = this.authManager.getActiveMembership();
+            
+            if (!activeMembership) {
+                document.getElementById('auth-check').style.display = 'none';
+                document.getElementById('no-team').style.display = 'block';
+                return false;
+            }
+
+            this.teamId = activeMembership.teamId;
+            this.teamName = activeMembership.teamName || activeMembership.teamId;
+            
+            // TODO: Get division ID from team data or user preferences
+            // For now, use a hardcoded fallback
+            this.divisionId = 'div_nottingham_wed_9b_311';
+
+            document.getElementById('team-name').textContent = this.teamName;
+            document.getElementById('division-name').textContent = this.divisionId;
+
+            return true;
+        } catch (error) {
+            console.error('Lineup explorer initialization failed:', error);
+            this.showError('Failed to initialize lineup explorer. Please try again.');
+            return false;
+        }
     }
 
     async init() {
         try {
+            document.getElementById('auth-check').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            
             await this.loadMatches();
             this.bindEvents();
             
@@ -789,7 +844,7 @@ class LineupExplorer {
     }
 
     async loadMatches() {
-        const response = await fetch(`${this.apiBaseUrl}/public/matches?divisionId=${this.divisionId}`);
+        const response = await this.authManager.makeAuthenticatedRequest(`${this.apiBaseUrl}/public/matches?divisionId=${this.divisionId}`);
         if (!response.ok) throw new Error('Failed to load matches');
         
         const matches = await response.json();
@@ -831,7 +886,7 @@ class LineupExplorer {
             selectElement.value = matchId;
             
             // Fetch full match data to get lineup info
-            const matchResponse = await fetch(`${this.apiBaseUrl}/public/matches?divisionId=${this.divisionId}`);
+            const matchResponse = await this.authManager.makeAuthenticatedRequest(`${this.apiBaseUrl}/public/matches?divisionId=${this.divisionId}`);
             if (matchResponse.ok) {
                 const matches = await matchResponse.json();
                 this.currentMatch = matches.find(m => m.id === matchId);
@@ -882,7 +937,7 @@ class LineupExplorer {
 
     async loadMatchRoster(matchId) {
         console.log('Loading roster for match:', matchId);
-        const response = await fetch(`${this.apiBaseUrl}/public/matches/${matchId}/roster?divisionId=${this.divisionId}`);
+        const response = await this.authManager.makeAuthenticatedRequest(`${this.apiBaseUrl}/public/matches/${matchId}/roster?divisionId=${this.divisionId}`);
         if (!response.ok) throw new Error('Failed to load match roster');
         
         const roster = await response.json();
@@ -965,15 +1020,8 @@ class LineupExplorer {
             });
         });
 
-        // Slot add buttons
-        document.querySelectorAll('.add-btn').forEach(btn => {
-            if (btn.dataset.slot) {
-                btn.addEventListener('click', (e) => {
-                    const slot = parseInt(e.target.dataset.slot) - 1; // Convert to 0-based index
-                    this.showPlayerModal(slot);
-                });
-            }
-        });
+        // Initialize slot events (will be rebound when slots are rendered)
+        this.bindSlotEvents();
 
         // Modal events
         document.getElementById('modal-close').addEventListener('click', () => {
@@ -1016,6 +1064,16 @@ class LineupExplorer {
         const slot = parseInt(e.currentTarget.dataset.slot) - 1; // Convert to 0-based
         
         if (playerId) {
+            // Check if this would exceed the 5-player limit
+            const filledSlots = this.state.slots.filter(s => s !== null).length;
+            const isEmptySlot = this.state.slots[slot] === null;
+            const playerAlreadyInLineup = this.state.slots.includes(playerId);
+            
+            if (isEmptySlot && !playerAlreadyInLineup && filledSlots >= 5) {
+                this.showToast('Cannot add more than 5 players to the lineup');
+                return;
+            }
+            
             this.assignPlayerToSlot(playerId, slot);
         }
     }
@@ -1023,6 +1081,15 @@ class LineupExplorer {
     showPlayerModal(slotIndex) {
         if (!this.state.matchId) {
             alert('Please select a match first.');
+            return;
+        }
+
+        // Check if this is for an empty slot and we already have 5 players
+        const filledSlots = this.state.slots.filter(slot => slot !== null).length;
+        const isEmptySlot = this.state.slots[slotIndex] === null;
+        
+        if (isEmptySlot && filledSlots >= 5) {
+            this.showToast('Lineup is full (5 players maximum). Remove a player first.');
             return;
         }
 
@@ -1076,15 +1143,19 @@ class LineupExplorer {
             return;
         }
 
-        // Remove from current slot if reassigning
-        const currentSlotIndex = this.state.slots.indexOf(playerId);
-        if (currentSlotIndex !== -1) {
-            this.state.slots[currentSlotIndex] = null;
+        // Double-check that we're not exceeding 5 players (unless this is a replacement)
+        const filledSlots = this.state.slots.filter(slot => slot !== null).length;
+        const isReplacement = this.state.slots[slotIndex] !== null;
+        
+        if (!isReplacement && filledSlots >= 5) {
+            this.showToast('Cannot add more than 5 players to the lineup');
+            return;
         }
 
         // Assign to new slot
         this.state.slots[slotIndex] = playerId;
         
+        // Re-render everything to maintain consistency
         this.renderSlots();
         this.renderBenchPlayers();
         this.updateCapMeter();
@@ -1176,13 +1247,20 @@ class LineupExplorer {
             addBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 
+                // Check if we already have 5 players
+                const filledSlots = this.state.slots.filter(slot => slot !== null).length;
+                if (filledSlots >= 5) {
+                    this.showToast('Lineup is full (5 players maximum). Remove a player first or use drag-and-drop to replace.');
+                    return;
+                }
+                
                 // Find first empty slot
                 const emptySlotIndex = this.state.slots.findIndex(slot => slot === null);
                 if (emptySlotIndex !== -1) {
                     this.assignPlayerToSlot(player.playerId, emptySlotIndex);
                 } else {
-                    // Show modal to choose slot
-                    this.showSlotSelectionModal(player.playerId);
+                    // This shouldn't happen if we checked filled slots correctly above
+                    this.showToast('No empty slots available');
                 }
             });
 
@@ -1191,10 +1269,18 @@ class LineupExplorer {
     }
 
     showSlotSelectionModal(playerId) {
+        // Check if lineup is full
+        const filledSlots = this.state.slots.filter(slot => slot !== null).length;
+        if (filledSlots >= 5) {
+            this.showToast('Lineup is full (5 players maximum). Use drag-and-drop to replace a player or remove someone first.');
+            return;
+        }
+        
         // For now, just show an alert. Could be enhanced with a proper modal
-        const slotChoice = prompt('All slots are filled. Which slot would you like to replace? (1-5)');
+        const slotChoice = prompt('Which slot would you like to use? (1-5)');
         if (slotChoice && slotChoice >= 1 && slotChoice <= 5) {
-            this.assignPlayerToSlot(playerId, parseInt(slotChoice) - 1);
+            const slotIndex = parseInt(slotChoice) - 1;
+            this.assignPlayerToSlot(playerId, slotIndex);
         }
     }
 
@@ -1215,8 +1301,8 @@ class LineupExplorer {
                                 <span class="skill-badge">SL ${player.skill}</span>
                             </div>
                             <div class="player-actions">
-                                <button class="change-btn" onclick="lineupExplorer.showPlayerModal(${index})">Change</button>
-                                <button class="remove-btn" onclick="lineupExplorer.removePlayerFromSlot(${index})">×</button>
+                                <button class="change-btn" data-action="change" data-slot-index="${index}">Change</button>
+                                <button class="remove-btn" data-action="remove" data-slot-index="${index}">×</button>
                             </div>
                         </div>
                     `;
@@ -1227,11 +1313,39 @@ class LineupExplorer {
                 content.innerHTML = `
                     <div class="empty-state">
                         <p>Drop a player or click '+' to add</p>
-                        <button class="add-btn" data-slot="${index + 1}" onclick="lineupExplorer.showPlayerModal(${index})">+</button>
+                        <button class="add-btn" data-action="add" data-slot-index="${index}">+</button>
                     </div>
                 `;
             }
         });
+        
+        // Re-bind slot action events after rendering
+        this.bindSlotEvents();
+    }
+
+    bindSlotEvents() {
+        // Remove existing listeners by cloning and replacing elements is complex,
+        // so we'll use event delegation from the slots container
+        const slotsContainer = document.getElementById('slots-container');
+        
+        // Remove any existing listener
+        if (this.slotEventHandler) {
+            slotsContainer.removeEventListener('click', this.slotEventHandler);
+        }
+        
+        // Add new event listener using delegation
+        this.slotEventHandler = (e) => {
+            const action = e.target.dataset.action;
+            const slotIndex = parseInt(e.target.dataset.slotIndex);
+            
+            if (action === 'add' || action === 'change') {
+                this.showPlayerModal(slotIndex);
+            } else if (action === 'remove') {
+                this.removePlayerFromSlot(slotIndex);
+            }
+        };
+        
+        slotsContainer.addEventListener('click', this.slotEventHandler);
     }
 
     updateCapMeter() {
@@ -1311,16 +1425,25 @@ class LineupExplorer {
         document.getElementById('main-content').style.display = 'block';
     }
 
-    showError() {
+    showError(message = 'Error loading data. Please try again later.') {
+        document.getElementById('auth-check').style.display = 'none';
         document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-message').querySelector('p').textContent = message;
         document.getElementById('error-message').style.display = 'block';
     }
 }
 
 // Initialize when page loads
 let lineupExplorer;
-document.addEventListener('DOMContentLoaded', () => {
-    lineupExplorer = new LineupExplorer();
+document.addEventListener('DOMContentLoaded', async () => {
+    const authManager = new AuthManager();
+    lineupExplorer = new LineupExplorer(authManager);
+    
+    // Initialize authentication and team context
+    const initialized = await lineupExplorer.initialize();
+    if (initialized) {
+        await lineupExplorer.init();
+    }
 });
 </script>
 

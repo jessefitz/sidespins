@@ -61,6 +61,12 @@ public class Player
     [JsonProperty("apaNumber")]
     public string? ApaNumber { get; set; }
 
+    [JsonProperty("phoneNumber")]
+    public string? PhoneNumber { get; set; }
+
+    [JsonProperty("authUserId")]
+    public string? AuthUserId { get; set; }
+
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
 }

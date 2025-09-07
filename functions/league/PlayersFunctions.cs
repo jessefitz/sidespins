@@ -40,7 +40,7 @@ public class PlayersFunctions
     }
 
     [Function("CreatePlayer")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> CreatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, FunctionContext context)
     {
         try
@@ -64,7 +64,7 @@ public class PlayersFunctions
     }
 
     [Function("UpdatePlayer")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> UpdatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "players/{id}")] HttpRequest req, FunctionContext context, string id)
     {
         try

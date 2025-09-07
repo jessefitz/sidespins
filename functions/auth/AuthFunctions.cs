@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using SideSpins.Api.Services;
+using SideSpins.Api.Models;
+using Microsoft.Azure.Cosmos;
 
 namespace SidesSpins.Functions;
 
@@ -11,11 +14,22 @@ public class AuthFunctions
 {
     private readonly ILogger<AuthFunctions> _logger;
     private readonly AuthService _authService;
+    private readonly LeagueService _leagueService;
+    private readonly IMembershipService _membershipService;
+    private readonly IPlayerService _playerService;
 
-    public AuthFunctions(ILogger<AuthFunctions> logger, AuthService authService)
+    public AuthFunctions(
+        ILogger<AuthFunctions> logger, 
+        AuthService authService,
+        LeagueService leagueService,
+        IMembershipService membershipService,
+        IPlayerService playerService)
     {
         _logger = logger;
         _authService = authService;
+        _leagueService = leagueService;
+        _membershipService = membershipService;
+        _playerService = playerService;
     }
 
     [Function("ValidateSession")]
@@ -43,11 +57,7 @@ public class AuthFunctions
             if (!isValid || claims == null)
             {
                 return new UnauthorizedObjectResult(
-                    new AuthSessionResponse
-                    {
-                        Ok = false,
-                        Message = "Authentication failed",
-                    }
+                    new AuthSessionResponse { Ok = false, Message = "Authentication failed" }
                 );
             }
 
@@ -72,7 +82,7 @@ public class AuthFunctions
                     Ok = true,
                     Message = "Authentication successful",
                     UserId = claims.Sub,
-                    TeamId = claims.TeamId,
+                    TeamId = null, // Team context will be handled separately
                 }
             );
         }
@@ -129,17 +139,14 @@ public class AuthFunctions
 
             if (!isValid || claims == null)
             {
-                return new UnauthorizedObjectResult(
-                    new { message = "Authentication failed" }
-                );
+                return new UnauthorizedObjectResult(new { message = "Authentication failed" });
             }
 
             return new OkObjectResult(
                 new
                 {
                     userId = claims.Sub,
-                    teamId = claims.TeamId,
-                    teamRole = claims.TeamRole,
+                    sidespinsRole = claims.SidespinsRole,
                     authenticated = true,
                 }
             );
@@ -239,6 +246,12 @@ public class AuthFunctions
                     return new StatusCodeResult(500);
                 }
 
+                // IMPORTANT: Link authUserId to player during first successful authentication
+                if (!string.IsNullOrEmpty(result.Claims?.Sub) && !string.IsNullOrEmpty(result.PhoneNumber))
+                {
+                    await LinkAuthUserIdToPlayerAsync(result.Claims.Sub, result.PhoneNumber);
+                }
+
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
@@ -250,14 +263,13 @@ public class AuthFunctions
                 // Set the session cookie
                 req.HttpContext.Response.Cookies.Append("ssid", result.SessionToken, cookieOptions);
 
-                // Also set team cookie if available
-                if (!string.IsNullOrEmpty(result.Claims?.TeamId))
-                {
-                    req.HttpContext.Response.Cookies.Append("team", result.Claims.TeamId);
-                }
-
                 return new OkObjectResult(
-                    new AuthResponse { Ok = true, Message = "Authentication successful" }
+                    new AuthResponse
+                    {
+                        Ok = true,
+                        Message = "Authentication successful",
+                        SessionToken = result.SessionToken,
+                    }
                 );
             }
             else
@@ -366,14 +378,13 @@ public class AuthFunctions
                 // Set the session cookie
                 req.HttpContext.Response.Cookies.Append("ssid", result.SessionToken, cookieOptions);
 
-                // Also set team cookie if available
-                if (!string.IsNullOrEmpty(result.Claims?.TeamId))
-                {
-                    req.HttpContext.Response.Cookies.Append("team", result.Claims.TeamId);
-                }
-
                 return new OkObjectResult(
-                    new AuthResponse { Ok = true, Message = "Authentication successful" }
+                    new AuthResponse
+                    {
+                        Ok = true,
+                        Message = "Authentication successful",
+                        SessionToken = result.SessionToken,
+                    }
                 );
             }
             else
@@ -391,6 +402,207 @@ public class AuthFunctions
         {
             _logger.LogError(ex, "Error authenticating magic link");
             return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("SignupInit")]
+    public async Task<IActionResult> SignupInit(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "auth/signup/init")] HttpRequest req
+    )
+    {
+        try
+        {
+            var body = await new StreamReader(req.Body).ReadToEndAsync();
+            var signupRequest = JsonSerializer.Deserialize<SignupInitRequest>(
+                body,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
+
+            if (signupRequest == null || string.IsNullOrEmpty(signupRequest.PhoneNumber) || string.IsNullOrEmpty(signupRequest.ApaNumber))
+            {
+                return new BadRequestObjectResult(new SignupInitResponse
+                {
+                    Success = false,
+                    Message = "Phone number and APA member number are required"
+                });
+            }
+
+            // Validate phone number format (basic E.164 check)
+            if (!signupRequest.PhoneNumber.StartsWith("+") || signupRequest.PhoneNumber.Length < 10)
+            {
+                return new BadRequestObjectResult(new SignupInitResponse
+                {
+                    Success = false,
+                    Message = "Phone number must be in E.164 format (e.g., +1234567890)"
+                });
+            }
+
+            // Step 1: Validate APA number exists in Players collection
+            var players = await _leagueService.GetPlayersAsync();
+            var player = players.FirstOrDefault(p => 
+                string.Equals(p.ApaNumber, signupRequest.ApaNumber, StringComparison.OrdinalIgnoreCase));
+
+            if (player == null)
+            {
+                _logger.LogWarning("Signup attempt with invalid APA number: {ApaNumber}", signupRequest.ApaNumber);
+                return new ConflictObjectResult(new SignupInitResponse
+                {
+                    Success = false,
+                    Message = "We couldn't find that APA member number. Contact your captain if you believe this is an error."
+                });
+            }
+
+            // Step 2: Reconcile phone number (update if missing or different)
+            if (string.IsNullOrEmpty(player.PhoneNumber) || 
+                !string.Equals(player.PhoneNumber, signupRequest.PhoneNumber, StringComparison.OrdinalIgnoreCase))
+            {
+                player.PhoneNumber = signupRequest.PhoneNumber;
+                await _leagueService.UpdatePlayerAsync(player.Id, player);
+                _logger.LogInformation("Updated phone number for player {PlayerId}", player.Id);
+            }
+
+            // Step 3: Resolve active memberships for initial UI state
+            var memberships = await _membershipService.GetAllAsync(player.Id);
+            var membershipInfos = new List<UserTeamMembershipInfo>();
+            
+            foreach (var membership in memberships)
+            {
+                // Get team name for UI display (we already have divisionId from membership)
+                var team = await _leagueService.GetTeamByIdAsync(membership.TeamId, ""); // Try without division first
+                
+                membershipInfos.Add(new UserTeamMembershipInfo
+                {
+                    TeamId = membership.TeamId,
+                    DivisionId = "", // We'll populate this later when needed
+                    Role = membership.Role,
+                    TeamName = team?.Name ?? membership.TeamId // Fallback to teamId if name not found
+                });
+            }
+
+            // Step 4: Proceed to Stytch SMS OTP
+            var smsResult = await _authService.SendSmsCodeAsync(signupRequest.PhoneNumber);
+            
+            if (!smsResult.Success)
+            {
+                _logger.LogError("Failed to send SMS for signup: {Error}", smsResult.ErrorMessage);
+                return new BadRequestObjectResult(new SignupInitResponse
+                {
+                    Success = false,
+                    Message = smsResult.ErrorMessage ?? "Failed to send verification code"
+                });
+            }
+
+            // Step 5: Return success with phone ID for verification step
+            // Include player ID for later authUserId linking
+            return new OkObjectResult(new SignupInitResponse
+            {
+                Success = true,
+                Message = "Verification code sent successfully",
+                PhoneId = smsResult.PhoneId, // Include phone ID for verification
+                Profile = new UserProfile
+                {
+                    PlayerId = player.Id,
+                    FirstName = player.FirstName,
+                    LastName = player.LastName,
+                    SidespinsRole = "member" // Default role for new signups
+                },
+                Memberships = membershipInfos
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during signup initialization");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    private Task<string> GetDivisionIdForTeam(string teamId)
+    {
+        try
+        {
+            // Since we don't have a direct way to get team without division ID,
+            // we'll need to query all divisions or use a different approach
+            // For now, return empty string - this can be optimized later
+            return Task.FromResult("");
+        }
+        catch
+        {
+            return Task.FromResult("");
+        }
+    }
+
+    /// <summary>
+    /// Links an auth user ID to a player based on phone number lookup
+    /// This is called during the first successful SMS verification
+    /// </summary>
+    private async Task LinkAuthUserIdToPlayerAsync(string authUserId, string phoneNumber)
+    {
+        try
+        {
+            _logger.LogInformation("Attempting to link authUserId {AuthUserId} with phone {Phone}", authUserId, phoneNumber);
+            
+            // Get players by phone number using the PlayerService
+            var players = await _playerService.GetPlayersByPhoneNumberAsync(phoneNumber);
+            _logger.LogInformation("Found {Count} players with phone number {Phone}", players.Count, phoneNumber);
+            
+            if (players.Count == 0)
+            {
+                _logger.LogWarning("No players found with phone number {Phone} for authUserId {AuthUserId}", phoneNumber, authUserId);
+                return;
+            }
+            
+            if (players.Count > 1)
+            {
+                _logger.LogWarning("Multiple players found with phone number {Phone}. Cannot auto-link authUserId {AuthUserId}", phoneNumber, authUserId);
+                
+                // Log all candidates for manual review
+                foreach (var candidate in players)
+                {
+                    _logger.LogInformation("Candidate player: {PlayerId} - {FirstName} {LastName} (APA: {ApaNumber}, AuthUserId: {AuthUserId})", 
+                        candidate.Id, candidate.FirstName, candidate.LastName, candidate.ApaNumber, candidate.AuthUserId);
+                }
+                return;
+            }
+            
+            // Exactly one player found with this phone number
+            var player = players.First();
+            
+            // Check if this player already has an authUserId
+            if (!string.IsNullOrEmpty(player.AuthUserId))
+            {
+                if (player.AuthUserId == authUserId)
+                {
+                    _logger.LogInformation("Player {PlayerId} already linked to authUserId {AuthUserId}", player.Id, authUserId);
+                    return;
+                }
+                else
+                {
+                    _logger.LogWarning("Player {PlayerId} already linked to different authUserId {ExistingAuthUserId}. Cannot link to {NewAuthUserId}", 
+                        player.Id, player.AuthUserId, authUserId);
+                    return;
+                }
+            }
+            
+            // Check if this authUserId is already linked to another player
+            var existingPlayer = await _playerService.GetPlayerByAuthUserIdAsync(authUserId);
+            if (existingPlayer != null)
+            {
+                _logger.LogWarning("AuthUserId {AuthUserId} already linked to player {ExistingPlayerId}. Cannot link to player {PlayerId}", 
+                    authUserId, existingPlayer.Id, player.Id);
+                return;
+            }
+            
+            // Safe to link - update the player with authUserId
+            player.AuthUserId = authUserId;
+            await _playerService.UpdatePlayerAsync(player);
+            
+            _logger.LogInformation("Successfully linked authUserId {AuthUserId} to player {PlayerId} ({FirstName} {LastName})", 
+                authUserId, player.Id, player.FirstName, player.LastName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error linking authUserId {AuthUserId} to player with phone {Phone}", authUserId, phoneNumber);
+            // Don't throw - this shouldn't break the authentication flow
         }
     }
 }

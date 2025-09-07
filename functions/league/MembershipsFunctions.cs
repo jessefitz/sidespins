@@ -22,7 +22,7 @@ public class MembershipsFunctions
     }
 
     [Function("GetMemberships")]
-    [RequireAuthentication("player")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> GetMemberships([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
     {
         try
@@ -45,7 +45,7 @@ public class MembershipsFunctions
     }
 
     [Function("CreateMembership")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> CreateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, FunctionContext context)
     {
         try
@@ -69,7 +69,7 @@ public class MembershipsFunctions
     }
 
     [Function("UpdateMembership")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> UpdateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "memberships/{membershipId}")] HttpRequest req, FunctionContext context, string membershipId)
     {
         try
@@ -127,7 +127,7 @@ public class MembershipsFunctions
     }
 
     [Function("UpdatePlayerSkillInFutureLineups")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> UpdatePlayerSkillInFutureLineups([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "memberships/update-future-lineups")] HttpRequest req, FunctionContext context)
     {
         try

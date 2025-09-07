@@ -5,11 +5,24 @@ title: Schedule
 
 <h1>{{ page.title }}</h1>
 
-<div id="loading" style="text-align: center; padding: 2em;">
+<div id="auth-check" style="text-align: center; padding: 2em;">
+  <p>Checking authentication...</p>
+</div>
+
+<div id="loading" style="text-align: center; padding: 2em; display: none;">
   <p>Loading schedule data...</p>
 </div>
 
+<div id="no-team" style="text-align: center; padding: 2em; display: none;">
+  <p>Please select a team from the <a href="/app.html">main dashboard</a> to view schedule.</p>
+</div>
+
 <div id="schedule-content" style="display: none;">
+  <div class="team-header" style="margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+    <h2>Schedule for <span id="team-name">Team</span></h2>
+    <p>Division: <span id="division-name">Loading...</span></p>
+  </div>
+  
   <a id="top"></a>
   
   <!-- Jump-to navigation will be populated by JavaScript -->
@@ -30,24 +43,65 @@ title: Schedule
   <p>Error loading schedule data. Please try again later.</p>
 </div>
 
+<script src="/assets/auth.js"></script>
 <script>
 class ScheduleLoader {
-  constructor() {
+  constructor(authManager) {
+    this.authManager = authManager;
     this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
       ? 'http://localhost:7071/api' 
       : 'https://sidespinsapi.azurewebsites.net/api';
-    this.teamId = 'team_break_of_dawn_9b';
-    this.divisionId = 'div_nottingham_wed_9b_311';
+    this.teamId = null;
+    this.divisionId = null;
+    this.teamName = null;
+  }
+
+  async initialize() {
+    try {
+      // Check authentication
+      const isAuthenticated = await this.authManager.checkAuth();
+      if (!isAuthenticated) {
+        window.location.href = '/login.html';
+        return false;
+      }
+
+      // Load memberships and get active team
+      await this.authManager.loadUserMemberships();
+      const activeMembership = this.authManager.getActiveMembership();
+      
+      if (!activeMembership) {
+        document.getElementById('auth-check').style.display = 'none';
+        document.getElementById('no-team').style.display = 'block';
+        return false;
+      }
+
+      this.teamId = activeMembership.teamId;
+      this.teamName = activeMembership.teamName || activeMembership.teamId;
+      
+      // TODO: Get division ID from team data or user preferences
+      // For now, use a hardcoded fallback
+      this.divisionId = 'div_nottingham_wed_9b_311';
+
+      document.getElementById('team-name').textContent = this.teamName;
+      document.getElementById('division-name').textContent = this.divisionId;
+
+      return true;
+    } catch (error) {
+      console.error('Schedule initialization failed:', error);
+      this.showError('Failed to initialize schedule. Please try again.');
+      return false;
+    }
   }
 
   async loadSchedule() {
     try {
-      // Show loading
+      // Hide auth check and show loading
+      document.getElementById('auth-check').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
       document.getElementById('schedule-content').style.display = 'none';
       document.getElementById('error-message').style.display = 'none';
 
-      // Fetch matches and team data
+      // Fetch matches and team data using authenticated requests
       const [matches, players, memberships] = await Promise.all([
         this.fetchMatches(),
         this.fetchPlayers(),
@@ -72,25 +126,38 @@ class ScheduleLoader {
 
     } catch (error) {
       console.error('Error loading schedule:', error);
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('error-message').style.display = 'block';
+      this.showError('Failed to load schedule data. Please try again.');
     }
   }
 
+  showError(message) {
+    document.getElementById('auth-check').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('schedule-content').style.display = 'none';
+    document.getElementById('error-message').querySelector('p').textContent = message;
+    document.getElementById('error-message').style.display = 'block';
+  }
+
   async fetchMatches() {
-    const response = await fetch(`${this.apiBaseUrl}/GetMatches?divisionId=${this.divisionId}`);
+    const response = await this.authManager.makeAuthenticatedRequest(
+      `${this.apiBaseUrl}/GetMatches?divisionId=${this.divisionId}`
+    );
     if (!response.ok) throw new Error('Failed to fetch matches');
     return response.json();
   }
 
   async fetchPlayers() {
-    const response = await fetch(`${this.apiBaseUrl}/GetPlayers`);
+    const response = await this.authManager.makeAuthenticatedRequest(
+      `${this.apiBaseUrl}/GetPlayers`
+    );
     if (!response.ok) throw new Error('Failed to fetch players');
     return response.json();
   }
 
   async fetchMemberships() {
-    const response = await fetch(`${this.apiBaseUrl}/GetMemberships?teamId=${this.teamId}`);
+    const response = await this.authManager.makeAuthenticatedRequest(
+      `${this.apiBaseUrl}/GetMemberships?teamId=${this.teamId}`
+    );
     if (!response.ok) throw new Error('Failed to fetch memberships');
     return response.json();
   }
@@ -292,9 +359,15 @@ class ScheduleLoader {
 }
 
 // Initialize when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  const loader = new ScheduleLoader();
-  loader.loadSchedule();
+document.addEventListener('DOMContentLoaded', async () => {
+  const authManager = new AuthManager();
+  const loader = new ScheduleLoader(authManager);
+  
+  // Initialize authentication and team context
+  const initialized = await loader.initialize();
+  if (initialized) {
+    await loader.loadSchedule();
+  }
   
   // Also handle hash changes for direct navigation
   window.addEventListener('hashchange', () => {

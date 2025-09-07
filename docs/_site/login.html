@@ -159,35 +159,47 @@
             <div id="auth-form">
                 <h1>Sign In to SideSpins</h1>
                 
-                <!-- SMS Authentication -->
-                <div id="sms-section">
-                    <h3>Sign in with SMS</h3>
-                    <div id="phone-input-section">
+                <!-- APA-First Signup Flow -->
+                <div id="signup-section">
+                    <h3>League Member Sign In</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                        Only verified APA league members can create accounts. You'll need your APA member number.
+                    </p>
+                    
+                    <div id="apa-input-section">
+                        <label for="apa-number">APA Member Number:</label>
+                        <input type="text" id="apa-number" placeholder="12345" />
+                        
                         <label for="phone">Phone Number:</label>
                         <input type="tel" id="phone" placeholder="+1 (555) 123-4567" />
-                        <button id="send-sms-btn">Send Code</button>
+                        
+                        <button id="signup-init-btn">Verify & Send Code</button>
                     </div>
                     
                     <div id="sms-code-section" style="display:none;">
                         <label for="sms-code">Enter the code sent to your phone:</label>
                         <input type="text" id="sms-code" placeholder="123456" maxlength="6" />
                         <button id="verify-sms-btn">Verify Code</button>
-                        <button id="resend-sms-btn" style="background-color: #6c757d;">Resend Code</button>
+                        <button id="back-to-signup-btn" style="background-color: #6c757d;">Back</button>
                     </div>
                 </div>
                 
                 <hr class="divider" />
                 
-                <!-- Email Authentication -->
-                <div id="email-section">
-                    <h3>Sign in with Email</h3>
-                    <div id="email-input-section">
-                        <label for="email">Email Address:</label>
-                        <input type="email" id="email" placeholder="your.email@example.com" />
-                        <button id="send-email-btn">Send Magic Link</button>
+                <!-- Existing Member Quick Sign In -->
+                <div id="quick-signin-section">
+                    <h3>Returning Member</h3>
+                    <div id="phone-only-section">
+                        <label for="phone-only">Phone Number:</label>
+                        <input type="tel" id="phone-only" placeholder="+1 (555) 123-4567" />
+                        <button id="send-quick-sms-btn">Send Code</button>
                     </div>
-                    <div id="email-sent-message" style="display:none;">
-                        <p style="text-align: center; color: #155724; font-weight: 500;">Check your email for a magic link to sign in!</p>
+                    
+                    <div id="quick-sms-code-section" style="display:none;">
+                        <label for="quick-sms-code">Enter the code sent to your phone:</label>
+                        <input type="text" id="quick-sms-code" placeholder="123456" maxlength="6" />
+                        <button id="verify-quick-sms-btn">Verify Code</button>
+                        <button id="back-to-phone-btn" style="background-color: #6c757d;">Back</button>
                     </div>
                 </div>
             </div>
@@ -206,17 +218,26 @@
     document.addEventListener('DOMContentLoaded', function() {
         const authManager = new AuthManager();
         
-        // Elements
+        // Elements for APA-first signup
+        const apaNumberInput = document.getElementById('apa-number');
         const phoneInput = document.getElementById('phone');
         const smsCodeInput = document.getElementById('sms-code');
-        const emailInput = document.getElementById('email');
-        const sendSmsBtn = document.getElementById('send-sms-btn');
+        const signupInitBtn = document.getElementById('signup-init-btn');
         const verifySmsBtn = document.getElementById('verify-sms-btn');
-        const resendSmsBtn = document.getElementById('resend-sms-btn');
-        const sendEmailBtn = document.getElementById('send-email-btn');
-        const phoneInputSection = document.getElementById('phone-input-section');
+        const backToSignupBtn = document.getElementById('back-to-signup-btn');
+        const apaInputSection = document.getElementById('apa-input-section');
         const smsCodeSection = document.getElementById('sms-code-section');
-        const emailSentMessage = document.getElementById('email-sent-message');
+        
+        // Elements for quick sign in
+        const phoneOnlyInput = document.getElementById('phone-only');
+        const quickSmsCodeInput = document.getElementById('quick-sms-code');
+        const sendQuickSmsBtn = document.getElementById('send-quick-sms-btn');
+        const verifyQuickSmsBtn = document.getElementById('verify-quick-sms-btn');
+        const backToPhoneBtn = document.getElementById('back-to-phone-btn');
+        const phoneOnlySection = document.getElementById('phone-only-section');
+        const quickSmsCodeSection = document.getElementById('quick-sms-code-section');
+        
+        // Common elements
         const errorMessage = document.getElementById('error-message');
         const successMessage = document.getElementById('success-message');
         const loading = document.getElementById('loading');
@@ -249,26 +270,118 @@
             buttons.forEach(btn => btn.disabled = !enabled);
         }
         
-        // Phone number formatting - UPDATE THIS SECTION
-        phoneInput.addEventListener('input', function(e) {
-            const formatted = authManager.formatPhoneNumber(e.target.value);
-            e.target.value = formatted;
-            
-            // Store clean number for API calls
-            try {
-                e.target.dataset.cleanNumber = authManager.toE164(e.target.value);
-            } catch (error) {
-                // Invalid format, clear dataset
-                e.target.dataset.cleanNumber = '';
+        // Phone number formatting for both inputs
+        [phoneInput, phoneOnlyInput].forEach(input => {
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    const formatted = authManager.formatPhoneNumber(e.target.value);
+                    e.target.value = formatted;
+                    
+                    try {
+                        e.target.dataset.cleanNumber = authManager.toE164(e.target.value);
+                    } catch (error) {
+                        e.target.dataset.cleanNumber = '';
+                    }
+                });
             }
         });
         
-        // SMS Authentication - Using backend API
-        sendSmsBtn.addEventListener('click', async function() {
-            // Get the clean number from dataset or try to format current value
+        // APA-first signup flow
+        signupInitBtn.addEventListener('click', async function() {
+            const apaNumber = apaNumberInput.value.trim();
             let formattedPhone;
+            
             try {
                 formattedPhone = phoneInput.dataset.cleanNumber || authManager.toE164(phoneInput.value);
+            } catch (error) {
+                showError('Please enter a valid phone number');
+                return;
+            }
+            
+            if (!apaNumber) {
+                showError('Please enter your APA member number');
+                return;
+            }
+            
+            try {
+                showLoading();
+                setButtonsEnabled(false);
+                
+                const response = await authManager.signupInit(apaNumber, formattedPhone);
+                
+                if (response.success) {
+                    // Store the response data for after verification
+                    phoneInput.dataset.signupData = JSON.stringify(response);
+                    
+                    apaInputSection.style.display = 'none';
+                    smsCodeSection.style.display = 'block';
+                    showSuccess('Verification code sent to your phone!');
+                } else {
+                    showError(response.message || 'Signup failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Signup init error:', error);
+                showError('Signup failed. Please try again.');
+            } finally {
+                hideLoading();
+                setButtonsEnabled(true);
+            }
+        });
+        
+        // Verify SMS for signup
+        verifySmsBtn.addEventListener('click', async function() {
+            const code = smsCodeInput.value.trim();
+            const formattedPhone = phoneInput.dataset.cleanNumber;
+            
+            if (!code || code.length !== 6) {
+                showError('Please enter the 6-digit code');
+                return;
+            }
+            
+            if (!formattedPhone) {
+                showError('Phone number not found. Please try again.');
+                return;
+            }
+            
+            try {
+                showLoading();
+                setButtonsEnabled(false);
+                
+                const response = await authManager.verifySmsCode(formattedPhone, code);
+                
+                if (response.ok) {
+                    // Get the stored signup data
+                    const signupDataStr = phoneInput.dataset.signupData;
+                    if (signupDataStr) {
+                        const signupData = JSON.parse(signupDataStr);
+                        // Store signup data in session for team switcher
+                        sessionStorage.setItem('userProfile', JSON.stringify(signupData.profile));
+                        sessionStorage.setItem('userMemberships', JSON.stringify(signupData.memberships));
+                    }
+                    
+                    showSuccess('Welcome to SideSpins! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = '/app.html';
+                    }, 1500);
+                } else {
+                    showError(response.message || 'Invalid code. Please try again.');
+                    hideLoading();
+                    setButtonsEnabled(true);
+                }
+            } catch (error) {
+                console.error('SMS verify error:', error);
+                showError('Failed to verify code. Please try again.');
+                hideLoading();
+                setButtonsEnabled(true);
+            }
+        });
+        
+        // Quick sign in for existing users
+        sendQuickSmsBtn.addEventListener('click', async function() {
+            let formattedPhone;
+            
+            try {
+                formattedPhone = phoneOnlyInput.dataset.cleanNumber || authManager.toE164(phoneOnlyInput.value);
             } catch (error) {
                 showError('Please enter a valid phone number');
                 return;
@@ -278,19 +391,14 @@
                 showLoading();
                 setButtonsEnabled(false);
                 
-                console.log('Sending SMS to:', formattedPhone); // Debug log
-                
                 const response = await authManager.sendSmsCode(formattedPhone);
                 
                 if (response.ok) {
-                    phoneInputSection.style.display = 'none';
-                    smsCodeSection.style.display = 'block';
+                    phoneOnlyInput.dataset.verificationNumber = formattedPhone;
+                    phoneOnlySection.style.display = 'none';
+                    quickSmsCodeSection.style.display = 'block';
                     showSuccess('Code sent to your phone!');
-                    
-                    // Store the formatted phone for verification
-                    phoneInput.dataset.verificationNumber = formattedPhone;
                 } else {
-                    console.error('SMS send error:', response);
                     showError(response.message || 'Failed to send SMS code. Please try again.');
                 }
             } catch (error) {
@@ -302,11 +410,10 @@
             }
         });
         
-        // SMS Verification - Using backend API
-        verifySmsBtn.addEventListener('click', async function() {
-            // Use the stored verification number
-            const phone = phoneInput.dataset.verificationNumber;
-            const code = smsCodeInput.value.trim();
+        // Verify quick sign in SMS
+        verifyQuickSmsBtn.addEventListener('click', async function() {
+            const phone = phoneOnlyInput.dataset.verificationNumber;
+            const code = quickSmsCodeInput.value.trim();
             
             if (!phone) {
                 showError('Phone number not found. Please try sending the code again.');
@@ -322,8 +429,6 @@
                 showLoading();
                 setButtonsEnabled(false);
                 
-                console.log('Verifying SMS for:', phone, 'with code:', code); // Debug log
-                
                 const response = await authManager.verifySmsCode(phone, code);
                 
                 if (response.ok) {
@@ -332,7 +437,6 @@
                         window.location.href = '/app.html';
                     }, 1500);
                 } else {
-                    console.error('SMS verification error:', response);
                     showError(response.message || 'Invalid code. Please try again.');
                     hideLoading();
                     setButtonsEnabled(true);
@@ -345,48 +449,19 @@
             }
         });
         
-        resendSmsBtn.addEventListener('click', function() {
+        // Back button handlers
+        backToSignupBtn.addEventListener('click', function() {
             smsCodeSection.style.display = 'none';
-            phoneInputSection.style.display = 'block';
+            apaInputSection.style.display = 'block';
             smsCodeInput.value = '';
             errorMessage.style.display = 'none';
             successMessage.style.display = 'none';
         });
         
-        // Email Authentication - Using backend API
-        sendEmailBtn.addEventListener('click', async function() {
-            const email = emailInput.value.trim();
-            if (!email || !email.includes('@')) {
-                showError('Please enter a valid email address');
-                return;
-            }
-            
-            try {
-                showLoading();
-                setButtonsEnabled(false);
-                
-                const response = await authManager.sendMagicLink(email);
-                
-                if (response.ok) {
-                    emailSentMessage.style.display = 'block';
-                    showSuccess('Check your email for a magic link!');
-                } else {
-                    console.error('Email send error:', response);
-                    showError(response.message || 'Failed to send magic link. Please try again.');
-                }
-            } catch (error) {
-                console.error('Email send error:', error);
-                showError('Failed to send magic link. Please try again.');
-            } finally {
-                hideLoading();
-                setButtonsEnabled(true);
-            }
-        });
-        
-        resendSmsBtn.addEventListener('click', function() {
-            smsCodeSection.style.display = 'none';
-            phoneInputSection.style.display = 'block';
-            smsCodeInput.value = '';
+        backToPhoneBtn.addEventListener('click', function() {
+            quickSmsCodeSection.style.display = 'none';
+            phoneOnlySection.style.display = 'block';
+            quickSmsCodeInput.value = '';
             errorMessage.style.display = 'none';
             successMessage.style.display = 'none';
         });
@@ -403,9 +478,15 @@
         checkCurrentUser();
         
         // Enter key handlers
+        apaNumberInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                signupInitBtn.click();
+            }
+        });
+        
         phoneInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                sendSmsBtn.click();
+                signupInitBtn.click();
             }
         });
         
@@ -415,9 +496,15 @@
             }
         });
         
-        emailInput.addEventListener('keypress', function(e) {
+        phoneOnlyInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                sendEmailBtn.click();
+                sendQuickSmsBtn.click();
+            }
+        });
+        
+        quickSmsCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyQuickSmsBtn.click();
             }
         });
     });

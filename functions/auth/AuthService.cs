@@ -48,7 +48,8 @@ public class AuthService
     public async Task<(
         bool Success,
         string? ErrorMessage,
-        AppClaims? Claims
+        AppClaims? Claims,
+        string? PhoneNumber
     )> ValidateStytchSessionAsync(string sessionJwt)
     {
         try
@@ -69,7 +70,7 @@ public class AuthService
                     response.StatusCode,
                     errorContent
                 );
-                return (false, "Invalid session", null);
+                return (false, "Invalid session", null, null);
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -80,7 +81,7 @@ public class AuthService
             if (sessionResponse?.Session?.UserId == null)
             {
                 _logger.LogWarning("Invalid session response from Stytch");
-                return (false, "Invalid session response", null);
+                return (false, "Invalid session response", null, null);
             }
 
             // Get user details to read trusted metadata
@@ -96,39 +97,35 @@ public class AuthService
                     userResponse.StatusCode,
                     errorContent
                 );
-                return (false, "Failed to get user details", null);
+                return (false, "Failed to get user details", null, null);
             }
 
             var userContent = await userResponse.Content.ReadAsStringAsync();
             var user = JsonConvert.DeserializeObject<StytchUserResponse>(userContent);
 
-            // Parse trusted metadata isn't serializing properly.
+            // Parse trusted metadata for global role only
             var trustedMetadata = ParseTrustedMetadata(user?.TrustedMetadata);
 
-            if (trustedMetadata?.Teams?.Team == null)
-            {
-                _logger.LogWarning(
-                    "User {UserId} has no team metadata",
-                    sessionResponse.Session.UserId
-                );
-                return (false, "No team metadata found", null);
-            }
+            // Get the primary phone number (first verified one or first one)
+            var phoneNumber = user?.PhoneNumbers?.FirstOrDefault(p => p.Verified)?.PhoneNumber 
+                           ?? user?.PhoneNumbers?.FirstOrDefault()?.PhoneNumber;
 
             var claims = new AppClaims
             {
                 Sub = sessionResponse.Session.UserId,
-                TeamId = trustedMetadata.Teams.Team.TeamId,
-                TeamRole = trustedMetadata.Teams.Team.TeamRole,
+                SidespinsRole = trustedMetadata?.SidespinsRole ?? "member", // Default to member if not specified
                 Iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Exp = DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds(),
+                Ver = 1,
+                Jti = Guid.NewGuid().ToString()
             };
 
-            return (true, null, claims);
+            return (true, null, claims, phoneNumber);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error validating Stytch session");
-            return (false, "Internal error", null);
+            return (false, "Internal error", null, null);
         }
     }
 
@@ -140,10 +137,24 @@ public class AuthService
         var claimsList = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, claims.Sub),
-            new("team_id", claims.TeamId),
-            new("team_role", claims.TeamRole),
             new(JwtRegisteredClaimNames.Iat, claims.Iat.ToString(), ClaimValueTypes.Integer64),
         };
+
+        // Add optional claims
+        if (!string.IsNullOrEmpty(claims.SidespinsRole))
+        {
+            claimsList.Add(new("sidespins_role", claims.SidespinsRole));
+        }
+
+        if (claims.Ver > 0)
+        {
+            claimsList.Add(new("ver", claims.Ver.ToString()));
+        }
+
+        if (!string.IsNullOrEmpty(claims.Jti))
+        {
+            claimsList.Add(new(JwtRegisteredClaimNames.Jti, claims.Jti));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -184,10 +195,11 @@ public class AuthService
             var claims = new AppClaims
             {
                 Sub = jwtToken.Claims.First(x => x.Type == "sub").Value,
-                TeamId = jwtToken.Claims.First(x => x.Type == "team_id").Value,
-                TeamRole = jwtToken.Claims.First(x => x.Type == "team_role").Value,
+                SidespinsRole = jwtToken.Claims.FirstOrDefault(x => x.Type == "sidespins_role")?.Value,
                 Iat = long.Parse(jwtToken.Claims.First(x => x.Type == "iat").Value),
                 Exp = ((DateTimeOffset)jwtToken.ValidTo).ToUnixTimeSeconds(),
+                Ver = int.Parse(jwtToken.Claims.FirstOrDefault(x => x.Type == "ver")?.Value ?? "1"),
+                Jti = jwtToken.Claims.FirstOrDefault(x => x.Type == "jti")?.Value
             };
 
             return (true, claims);
@@ -289,28 +301,30 @@ public class AuthService
                 if (authResponse?.SessionJwt != null)
                 {
                     // Validate the session and get claims
-                    var (success, errorMessage, claims) = await ValidateStytchSessionAsync(
+                    var (success, errorMessage, claims, phoneNumber) = await ValidateStytchSessionAsync(
                         authResponse.SessionJwt
                     );
-                    
+
                     if (success && claims != null)
                     {
                         // Generate App JWT for ongoing session management
                         var appJwt = GenerateAppJwt(claims);
-                        
+
                         return new AuthResult
                         {
                             Success = true,
                             SessionToken = appJwt,
                             Claims = claims,
+                            PhoneNumber = phoneNumber
                         };
                     }
-                    
+
                     return new AuthResult
                     {
                         Success = success,
                         ErrorMessage = errorMessage,
                         Claims = claims,
+                        PhoneNumber = phoneNumber
                     };
                 }
                 else
@@ -416,28 +430,30 @@ public class AuthService
                 if (authResponse?.SessionJwt != null)
                 {
                     // Validate the session and get claims
-                    var (success, errorMessage, claims) = await ValidateStytchSessionAsync(
+                    var (success, errorMessage, claims, phoneNumber) = await ValidateStytchSessionAsync(
                         authResponse.SessionJwt
                     );
-                    
+
                     if (success && claims != null)
                     {
                         // Generate App JWT for ongoing session management
                         var appJwt = GenerateAppJwt(claims);
-                        
+
                         return new AuthResult
                         {
                             Success = true,
                             SessionToken = appJwt,
                             Claims = claims,
+                            PhoneNumber = phoneNumber
                         };
                     }
-                    
+
                     return new AuthResult
                     {
                         Success = success,
                         ErrorMessage = errorMessage,
                         Claims = claims,
+                        PhoneNumber = phoneNumber
                     };
                 }
                 else
@@ -496,28 +512,28 @@ public class StytchUserResponse
 {
     [JsonProperty("user_id")]
     public string? UserId { get; set; }
-    
+
     [JsonProperty("external_id")]
     public string? ExternalId { get; set; }
-    
+
     [JsonProperty("trusted_metadata")]
     public object? TrustedMetadata { get; set; }
-    
+
     [JsonProperty("untrusted_metadata")]
     public object? UntrustedMetadata { get; set; }
-    
+
     [JsonProperty("status")]
     public string? Status { get; set; }
-    
+
     [JsonProperty("name")]
     public StytchUserName? Name { get; set; }
-    
+
     [JsonProperty("phone_numbers")]
     public StytchPhoneNumber[]? PhoneNumbers { get; set; }
-    
+
     [JsonProperty("emails")]
     public object[]? Emails { get; set; }
-    
+
     [JsonProperty("roles")]
     public string[]? Roles { get; set; }
 }
@@ -526,10 +542,10 @@ public class StytchUserName
 {
     [JsonProperty("first_name")]
     public string? FirstName { get; set; }
-    
+
     [JsonProperty("last_name")]
     public string? LastName { get; set; }
-    
+
     [JsonProperty("middle_name")]
     public string? MiddleName { get; set; }
 }
@@ -538,10 +554,10 @@ public class StytchPhoneNumber
 {
     [JsonProperty("phone_id")]
     public string? PhoneId { get; set; }
-    
+
     [JsonProperty("phone_number")]
     public string? PhoneNumber { get; set; }
-    
+
     [JsonProperty("verified")]
     public bool Verified { get; set; }
 }

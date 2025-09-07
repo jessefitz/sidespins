@@ -22,7 +22,7 @@ public class MatchesFunctions
     }
 
     [Function("GetMatches")]
-    [RequireAuthentication("player")]
+   [RequireAuthentication("player")]
     public async Task<IActionResult> GetMatches([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
     {
         try
@@ -62,7 +62,7 @@ public class MatchesFunctions
     }
 
     [Function("CreateMatch")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> CreateMatch([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "matches")] HttpRequest req, FunctionContext context)
     {
         try
@@ -92,7 +92,7 @@ public class MatchesFunctions
     }
 
     [Function("UpdateMatch")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> UpdateMatch([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "matches/{matchId}")] HttpRequest req, FunctionContext context, string matchId)
     {
         try
@@ -158,7 +158,7 @@ public class MatchesFunctions
     }
 
     [Function("UpdateMatchLineup")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> UpdateMatchLineup([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "matches/{matchId}/lineup")] HttpRequest req, FunctionContext context, string matchId)
     {
         try

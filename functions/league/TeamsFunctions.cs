@@ -23,6 +23,7 @@ public class TeamsFunctions
     }
 
     [Function("GetTeams")]
+    [RequireAuthentication]
     public async Task<IActionResult> GetTeams(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req
     )
@@ -46,8 +47,50 @@ public class TeamsFunctions
         }
     }
 
+    [Function("GetTeamDetails")]
+    [RequireAuthentication]
+    [RequireTeamRole("player")]
+    public async Task<IActionResult> GetTeamDetails(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}")] HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
+    {
+        try
+        {
+            var membership = (UserTeamMembership?)context.Items["ActiveMembership"];
+            if (membership == null)
+            {
+                return new StatusCodeResult(403);
+            }
+
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required");
+            }
+
+            var team = await _cosmosService.GetTeamByIdAsync(teamId, divisionId);
+            if (team == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(new
+            {
+                team = team,
+                userRole = membership.Role
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting team details for {TeamId}", teamId);
+            return new StatusCodeResult(500);
+        }
+    }
+
     [Function("CreateTeam")]
-    [RequireAuthentication("manager")]
+   [RequireAuthentication("admin")]
     public async Task<IActionResult> CreateTeam(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
         FunctionContext context
@@ -87,8 +130,12 @@ public class TeamsFunctions
     }
 
     [Function("UpdateTeam")]
-    [RequireAuthentication("manager")]
-    public async Task<IActionResult> UpdateTeam([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "teams/{teamId}")] HttpRequest req, FunctionContext context, string teamId)
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> UpdateTeam(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "teams/{teamId}")] HttpRequest req, 
+        FunctionContext context, 
+        string teamId)
     {
         try
         {
@@ -100,18 +147,8 @@ public class TeamsFunctions
                 return new BadRequestObjectResult("divisionId query parameter is required for team updates");
             }
 
-            // Check if user can modify this team (must be their team for managers, or admin)
-            var userClaims = context.GetUserClaims();
-            if (userClaims == null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            // For managers, they can only update their own team
-            if (userClaims.TeamRole == "manager" && userClaims.TeamId != teamId)
-            {
-                return new StatusCodeResult(403); // Forbidden
-            }
+            // Authorization is handled by the RequireTeamRole attribute
+            var membership = (UserTeamMembership?)context.Items["ActiveMembership"];
 
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var team = JsonConvert.DeserializeObject<SideSpins.Api.Models.Team>(requestBody);
@@ -166,8 +203,12 @@ public class TeamsFunctions
     }
 
     [Function("GetTeam")]
-    [RequireAuthentication("player")]
-    public async Task<IActionResult> GetTeam([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}")] HttpRequest req, FunctionContext context, string teamId)
+    [RequireAuthentication]
+    [RequireTeamRole("player")]
+    public async Task<IActionResult> GetTeam(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}/details")] HttpRequest req, 
+        FunctionContext context, 
+        string teamId)
     {
         try
         {
@@ -178,18 +219,8 @@ public class TeamsFunctions
                 return new BadRequestObjectResult("divisionId query parameter is required");
             }
 
-            // Check if user can access this team (must be their team for players/managers, or admin)
-            var userClaims = context.GetUserClaims();
-            if (userClaims == null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            // For non-admins, they can only view their own team
-            if (userClaims.TeamRole != "admin" && userClaims.TeamId != teamId)
-            {
-                return new StatusCodeResult(403); // Forbidden
-            }
+            // Authorization is handled by the RequireTeamRole attribute
+            var membership = (UserTeamMembership?)context.Items["ActiveMembership"];
 
             var team = await _cosmosService.GetTeamByIdAsync(teamId, divisionId);
             if (team == null)
@@ -197,7 +228,11 @@ public class TeamsFunctions
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(team);
+            return new OkObjectResult(new
+            {
+                team = team,
+                userRole = membership?.Role
+            });
         }
         catch (Exception ex)
         {

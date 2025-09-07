@@ -41,6 +41,60 @@
             gap: 1rem;
         }
 
+        .team-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-switcher label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .team-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .team-select:focus {
+            outline: none;
+            border-color: #007cba;
+        }
+
+        .role-indicator {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+
+        .role-manager {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .role-captain {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .role-admin {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
         .user-details {
             font-size: 0.9rem;
             color: #666;
@@ -231,12 +285,43 @@
                 flex-direction: column;
             }
         }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-card {
+            display: block;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-content">
             <div class="logo">SideSpins</div>
+            <div class="team-switcher" id="team-switcher" style="display:none;">
+                <label for="team-select">Team:</label>
+                <select id="team-select" class="team-select">
+                    <option value="">Select a team...</option>
+                </select>
+                <span id="role-indicator" class="role-indicator">Player</span>
+            </div>
             <div class="user-info">
                 <div class="user-details" id="user-summary" style="display:none;"></div>
                 <button class="logout-btn" id="logout-btn">Logout</button>
@@ -259,11 +344,13 @@
 
         <div id="dashboard-container" style="display:none;">
             <div class="dashboard">
-                <h1>Welcome to SideSpins! 🏓</h1>
-                <p>You're successfully authenticated and ready to manage your table tennis activities.</p>
-
-                <div class="team-info" id="team-info">
-                    <h3>Your Team Information</h3>
+                <h1>Welcome to SideSpins</h1>
+                <div id="user-summary">
+                    <p>Loading user information...</p>
+                </div>
+                
+                <div class="team-info">
+                    <h3>Active Team Information</h3>
                     <div class="team-details">
                         <div class="detail-item">
                             <div class="detail-label">Team ID</div>
@@ -277,28 +364,15 @@
                             <div class="detail-label">User ID</div>
                             <div class="detail-value" id="user-id-display">-</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Session Status</div>
-                            <div class="detail-value">Active ✅</div>
-                        </div>
                     </div>
-                </div>
-
-                <div class="actions" id="role-actions">
-                    <!-- Actions will be populated based on user role -->
                 </div>
             </div>
 
             <div class="dashboard">
-                <h2>Coming Soon</h2>
-                <p>We're working on exciting features for SideSpins:</p>
-                <ul>
-                    <li><strong>Team Management</strong> - Add and remove players from your team</li>
-                    <li><strong>Match Tracking</strong> - Record and track game results</li>
-                    <li><strong>Player Statistics</strong> - View performance analytics</li>
-                    <li><strong>Tournament Organization</strong> - Create and manage tournaments</li>
-                    <li><strong>Scheduling</strong> - Coordinate practice sessions and matches</li>
-                </ul>
+                <h2>Quick Actions</h2>
+                <div id="role-actions">
+                    <p>Loading available actions...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -307,6 +381,12 @@
     <script>
     document.addEventListener('DOMContentLoaded', async function() {
         const authManager = new AuthManager();
+        window.authManager = authManager; // Make globally available
+        
+        // Setup UI permissions
+        UIPermissions.setAuthManager(authManager);
+        UIPermissions.setupTeamChangeListener();
+        
         const loading = document.getElementById('loading');
         const errorContainer = document.getElementById('error-container');
         const errorMessage = document.getElementById('error-message');
@@ -317,6 +397,11 @@
         const userIdDisplay = document.getElementById('user-id-display');
         const roleActions = document.getElementById('role-actions');
         const logoutBtn = document.getElementById('logout-btn');
+        
+        // Team switcher elements
+        const teamSwitcher = document.getElementById('team-switcher');
+        const teamSelect = document.getElementById('team-select');
+        const roleIndicator = document.getElementById('role-indicator');
 
         function showError(message) {
             loading.style.display = 'none';
@@ -336,107 +421,242 @@
             return `<span class="role-badge ${className}">${role}</span>`;
         }
 
-        function populateRoleActions(role) {
-            let actions = '';
-            
-            switch(role) {
-                case 'manager':
-                    actions = `
-                        <button class="btn btn-primary" onclick="alert('Team management coming soon!')">
-                            Manage Team Members
-                        </button>
-                        <button class="btn btn-primary" onclick="alert('Match tracking coming soon!')">
-                            Record Match Results
-                        </button>
-                        <button class="btn btn-secondary" onclick="alert('Statistics coming soon!')">
-                            View Team Statistics
-                        </button>
-                    `;
-                    break;
-                case 'player':
-                    actions = `
-                        <button class="btn btn-primary" onclick="alert('Statistics coming soon!')">
-                            View My Statistics
-                        </button>
-                        <button class="btn btn-secondary" onclick="alert('Schedule coming soon!')">
-                            View Practice Schedule
-                        </button>
-                    `;
-                    break;
-                case 'admin':
-                    actions = `
-                        <button class="btn btn-primary" onclick="alert('Admin panel coming soon!')">
-                            Admin Dashboard
-                        </button>
-                        <button class="btn btn-primary" onclick="alert('User management coming soon!')">
-                            Manage All Teams
-                        </button>
-                        <button class="btn btn-secondary" onclick="alert('Analytics coming soon!')">
-                            System Analytics
-                        </button>
-                    `;
-                    break;
-                default:
-                    actions = `
-                        <button class="btn btn-secondary" onclick="alert('Please contact an administrator to set up your team role.')">
-                            Contact Administrator
-                        </button>
-                    `;
+        function updateRoleIndicator(role) {
+            roleIndicator.textContent = role ? role.charAt(0).toUpperCase() + role.slice(1) : 'No Role';
+            roleIndicator.className = 'role-indicator';
+            if (role) {
+                roleIndicator.classList.add(`role-${role}`);
             }
-            
-            roleActions.innerHTML = actions;
         }
 
-        // Load user information
-        async function loadUserInfo() {
-            try {
-                const isAuthenticated = await authManager.checkAuth();
+        function populateTeamSwitcher(memberships) {
+            teamSelect.innerHTML = '<option value="">Select a team...</option>';
+            
+            if (memberships && memberships.length > 0) {
+                memberships.forEach(membership => {
+                    const option = document.createElement('option');
+                    option.value = membership.teamId;
+                    option.textContent = membership.teamName || membership.teamId;
+                    option.dataset.role = membership.role;
+                    teamSelect.appendChild(option);
+                });
                 
-                if (!isAuthenticated) {
-                    window.location.href = '/login.html';
-                    return;
+                teamSwitcher.style.display = 'flex';
+                
+                // Set current active team
+                if (authManager.activeTeamId) {
+                    teamSelect.value = authManager.activeTeamId;
+                    const selectedOption = teamSelect.selectedOptions[0];
+                    if (selectedOption) {
+                        updateRoleIndicator(selectedOption.dataset.role);
+                    }
                 }
-
-                const data = authManager.currentUser;
-                
-                // Populate user information
-                userIdDisplay.textContent = data.userId || 'Unknown';
-                teamIdDisplay.textContent = data.teamId || 'No team assigned';
-                teamRoleDisplay.innerHTML = data.teamRole ? 
-                    `${data.teamRole}${getRoleBadge(data.teamRole)}` : 
-                    'No role assigned';
-
-                // Update header user summary
-                const teamInfo = data.teamId ? ` - ${data.teamId}` : '';
-                const roleInfo = data.teamRole ? ` (${data.teamRole})` : '';
-                userSummary.textContent = `User: ${data.userId}${teamInfo}${roleInfo}`;
-                userSummary.style.display = 'block';
-
-                // Populate role-specific actions
-                populateRoleActions(data.teamRole);
-
-                showDashboard();
-
-            } catch (error) {
-                console.error('Error loading user info:', error);
-                showError('Failed to load user information. Please try logging in again.');
+            } else {
+                teamSwitcher.style.display = 'none';
             }
         }
 
-        // Logout functionality
+        function populateRoleActions(role) {
+            const container = document.getElementById('role-actions');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (!role) {
+                container.innerHTML = '<p class="text-muted">No role assigned for this team.</p>';
+                return;
+            }
+            
+            // Common actions for all team members
+            const commonActions = [
+                { 
+                    text: 'Schedule', 
+                    href: '/schedule-new.html',
+                    description: 'View team schedule and match results',
+                    icon: '📅'
+                },
+                { 
+                    text: 'Lineup Explorer', 
+                    href: '/lineup-explorer-new.html',
+                    description: 'Explore different player combinations',
+                    icon: '🎯'
+                }
+            ];
+            
+            // Role-specific actions
+            const roleActions = {
+                'admin': [
+                    ...commonActions,
+                    { 
+                        text: 'Admin Panel', 
+                        href: '/admin/',
+                        description: 'Manage users, teams, and system settings',
+                        icon: '⚙️'
+                    }
+                ],
+                'manager': [
+                    ...commonActions,
+                    { 
+                        text: 'Team Management', 
+                        href: '/team-admin.html',
+                        description: 'Manage team roster and settings',
+                        icon: '👥'
+                    }
+                ],
+                'captain': [
+                    ...commonActions,
+                    { 
+                        text: 'Team Management', 
+                        href: '/team-admin.html',
+                        description: 'Manage team roster and settings',
+                        icon: '👥'
+                    }
+                ],
+                'player': commonActions
+            };
+            
+            const actions = roleActions[role] || commonActions;
+            
+            if (actions.length === 0) {
+                container.innerHTML = '<p class="text-muted">No actions available for your role.</p>';
+                return;
+            }
+            
+            const actionsGrid = document.createElement('div');
+            actionsGrid.className = 'actions-grid';
+            actionsGrid.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            `;
+            
+            actions.forEach(action => {
+                const actionCard = document.createElement('a');
+                actionCard.href = action.href;
+                actionCard.className = 'action-card';
+                actionCard.style.cssText = `
+                    display: block;
+                    padding: 1.5rem;
+                    background: white;
+                    border: 1px solid #e1e5e9;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    color: inherit;
+                    transition: all 0.2s;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                `;
+                
+                actionCard.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <span style="font-size: 2rem;">${action.icon}</span>
+                        <div>
+                            <h3 style="margin: 0 0 0.5rem 0; color: #007cba; font-size: 1.1rem;">${action.text}</h3>
+                            <p style="margin: 0; color: #666; font-size: 0.9rem; line-height: 1.4;">${action.description}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Add hover effect
+                actionCard.addEventListener('mouseenter', () => {
+                    actionCard.style.transform = 'translateY(-2px)';
+                    actionCard.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                });
+                
+                actionCard.addEventListener('mouseleave', () => {
+                    actionCard.style.transform = 'translateY(0)';
+                    actionCard.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                });
+                
+                actionsGrid.appendChild(actionCard);
+            });
+            
+            container.appendChild(actionsGrid);
+        }
+
+        function showComingSoon(feature) {
+            alert(`${feature} feature is coming soon! This will be available in a future update.`);
+        }
+
+        // Team switcher change handler
+        teamSelect.addEventListener('change', function() {
+            const selectedTeamId = this.value;
+            const selectedOption = this.selectedOptions[0];
+            
+            if (selectedTeamId && selectedOption) {
+                authManager.setActiveTeam(selectedTeamId);
+                const role = selectedOption.dataset.role;
+                updateRoleIndicator(role);
+                populateRoleActions(role);
+                updateTeamDisplay(selectedTeamId, role);
+            } else {
+                updateRoleIndicator('');
+                populateRoleActions('');
+                updateTeamDisplay('', '');
+            }
+        });
+
+        // Listen for team change events
+        window.addEventListener('teamChanged', function(event) {
+            const membership = event.detail;
+            if (membership) {
+                updateTeamDisplay(membership.teamId, membership.role);
+                populateRoleActions(membership.role);
+            }
+        });
+
+        function updateTeamDisplay(teamId, role) {
+            teamIdDisplay.textContent = teamId || '-';
+            teamRoleDisplay.innerHTML = role ? `${role}${getRoleBadge(role)}` : '-';
+        }
+
+        // Logout handler
         logoutBtn.addEventListener('click', async function() {
             try {
                 await authManager.logout();
+                window.location.href = '/login.html';
             } catch (error) {
-                console.error('Logout error:', error);
-            } finally {
-                // Redirect to login regardless of response
+                console.error('Logout failed:', error);
+                // Force redirect even if logout fails
                 window.location.href = '/login.html';
             }
         });
 
-        // Load user info on page load
-        await loadUserInfo();
+        // Initialize the app
+        try {
+            const isAuthenticated = await authManager.requireAuth();
+            
+            if (isAuthenticated) {
+                // Load user profile and memberships
+                try {
+                    const profile = await authManager.getUserProfile();
+                    userIdDisplay.textContent = profile.userId || '-';
+                    userSummary.textContent = `Welcome, User ${profile.userId}`;
+                    userSummary.style.display = 'block';
+                } catch (error) {
+                    console.warn('Could not load user profile:', error);
+                }
+
+                // Load memberships for team switcher
+                const memberships = await authManager.loadUserMemberships();
+                populateTeamSwitcher(memberships);
+
+                // Set initial team display if we have an active team
+                const activeMembership = authManager.getActiveMembership();
+                if (activeMembership) {
+                    updateTeamDisplay(activeMembership.teamId, activeMembership.role);
+                    populateRoleActions(activeMembership.role);
+                }
+
+                showDashboard();
+                
+                // Apply conditional UI based on permissions
+                UIPermissions.applyConditionalUI();
+            }
+        } catch (error) {
+            console.error('App initialization failed:', error);
+            showError('Failed to load dashboard. Please try logging in again.');
+        }
     });
     </script>
 </body>

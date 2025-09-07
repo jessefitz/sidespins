@@ -79,18 +79,7 @@ builder.Services.AddScoped<LeagueService>(serviceProvider =>
     return new LeagueService(cosmosClient, databaseName);
 });
 
-// Register Membership Service
-builder.Services.AddScoped<IMembershipService, CosmosMembershipService>(serviceProvider =>
-{
-    var cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
-    var logger = serviceProvider.GetRequiredService<ILogger<CosmosMembershipService>>();
-    var databaseName = Environment.GetEnvironmentVariable("COSMOS_DB") ?? "sidespins";
-    var containerName = Environment.GetEnvironmentVariable("COSMOS_MEMBERSHIPS_CONTAINER") ?? "TeamMemberships";
-    
-    return new CosmosMembershipService(cosmosClient, logger, databaseName, containerName);
-});
-
-// Register Player Service
+// Register Player Service first (needed by MembershipService)
 builder.Services.AddScoped<IPlayerService, CosmosPlayerService>(serviceProvider =>
 {
     var cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
@@ -99,6 +88,18 @@ builder.Services.AddScoped<IPlayerService, CosmosPlayerService>(serviceProvider 
     var containerName = Environment.GetEnvironmentVariable("COSMOS_PLAYERS_CONTAINER") ?? "Players";
     
     return new CosmosPlayerService(cosmosClient, logger, databaseName, containerName);
+});
+
+// Register Membership Service
+builder.Services.AddScoped<IMembershipService, CosmosMembershipService>(serviceProvider =>
+{
+    var cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
+    var playerService = serviceProvider.GetRequiredService<IPlayerService>();
+    var logger = serviceProvider.GetRequiredService<ILogger<CosmosMembershipService>>();
+    var databaseName = Environment.GetEnvironmentVariable("COSMOS_DB") ?? "sidespins";
+    var containerName = Environment.GetEnvironmentVariable("COSMOS_MEMBERSHIPS_CONTAINER") ?? "TeamMemberships";
+    
+    return new CosmosMembershipService(cosmosClient, playerService, logger, databaseName, containerName);
 });
 
 // Register HttpClient for Stytch API

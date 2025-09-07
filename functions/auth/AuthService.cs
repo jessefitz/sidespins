@@ -275,6 +275,108 @@ public class AuthService
         }
     }
 
+    /// <summary>
+    /// Send SMS code for signup flow - creates a new user if one doesn't exist
+    /// </summary>
+    public async Task<AuthResult> SendSmsCodeForSignupAsync(string phoneNumber)
+    {
+        try
+        {
+            var requestBody = new { phone_number = phoneNumber };
+
+            var requestJson = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
+
+            // Use login_or_create for signup flow - will create user if doesn't exist
+            var response = await _httpClient.PostAsync("otps/sms/login_or_create", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var smsResponse = JsonConvert.DeserializeObject<StytchSmsResponse>(responseContent);
+
+                return new AuthResult
+                {
+                    Success = true,
+                    PhoneId = smsResponse?.PhoneId,
+                };
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                var errorResponse = JsonConvert.DeserializeObject<StytchErrorResponse>(
+                    errorContent
+                );
+                _logger.LogWarning(
+                    "Failed to send SMS code for signup. Status: {StatusCode}, Error: {Error}",
+                    response.StatusCode,
+                    errorContent
+                );
+                return new AuthResult
+                {
+                    Success = false,
+                    ErrorMessage = errorResponse?.ErrorMessage ?? "Failed to send SMS code",
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending SMS code for signup");
+            return new AuthResult { Success = false, ErrorMessage = "Failed to send SMS code" };
+        }
+    }
+
+    /// <summary>
+    /// Send SMS code for login flow - only works if user already exists
+    /// </summary>
+    public async Task<AuthResult> SendSmsCodeForLoginAsync(string phoneNumber)
+    {
+        try
+        {
+            var requestBody = new { phone_number = phoneNumber };
+
+            var requestJson = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
+
+            // Use send endpoint for login flow - will fail if user doesn't exist
+            var response = await _httpClient.PostAsync("otps/sms/send", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var smsResponse = JsonConvert.DeserializeObject<StytchSmsResponse>(responseContent);
+
+                return new AuthResult
+                {
+                    Success = true,
+                    PhoneId = smsResponse?.PhoneId,
+                };
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                var errorResponse = JsonConvert.DeserializeObject<StytchErrorResponse>(
+                    errorContent
+                );
+                _logger.LogWarning(
+                    "Failed to send SMS code for login. Status: {StatusCode}, Error: {Error}",
+                    response.StatusCode,
+                    errorContent
+                );
+                return new AuthResult
+                {
+                    Success = false,
+                    ErrorMessage = errorResponse?.ErrorMessage ?? "Failed to send SMS code",
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending SMS code for login");
+            return new AuthResult { Success = false, ErrorMessage = "Failed to send SMS code" };
+        }
+    }
+
     public async Task<AuthResult> VerifySmsCodeAsync(string phoneId, string code)
     {
         try

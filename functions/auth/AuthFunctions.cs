@@ -209,6 +209,57 @@ public class AuthFunctions
         }
     }
 
+    [Function("SendSmsCodeForLogin")]
+    public async Task<IActionResult> SendSmsCodeForLogin(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "auth/sms/send-login")] HttpRequest req
+    )
+    {
+        try
+        {
+            var body = await new StreamReader(req.Body).ReadToEndAsync();
+            var smsRequest = JsonSerializer.Deserialize<AuthSmsRequest>(
+                body,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
+
+            if (smsRequest == null || string.IsNullOrEmpty(smsRequest.PhoneNumber))
+            {
+                return new BadRequestObjectResult(
+                    new AuthResponse { Ok = false, Message = "Phone number is required" }
+                );
+            }
+
+            var result = await _authService.SendSmsCodeForLoginAsync(smsRequest.PhoneNumber);
+
+            if (result.Success)
+            {
+                return new OkObjectResult(
+                    new AuthSmsResponse
+                    {
+                        Ok = true,
+                        Message = "SMS code sent successfully",
+                        PhoneId = result.PhoneId,
+                    }
+                );
+            }
+            else
+            {
+                return new BadRequestObjectResult(
+                    new AuthResponse
+                    {
+                        Ok = false,
+                        Message = result.ErrorMessage ?? "Failed to send SMS code. Please make sure you have an existing account.",
+                    }
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending SMS code for login");
+            return new StatusCodeResult(500);
+        }
+    }
+
     [Function("VerifySmsCode")]
     public async Task<IActionResult> VerifySmsCode(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "auth/sms/verify")]
@@ -452,7 +503,31 @@ public class AuthFunctions
                 });
             }
 
-            // Step 2: Reconcile phone number (update if missing or different)
+            // Step 2: Check if this APA number is already registered to prevent duplicate accounts
+            var isApaAlreadyRegistered = await _playerService.IsApaNumberAlreadyRegisteredAsync(signupRequest.ApaNumber);
+            if (isApaAlreadyRegistered)
+            {
+                _logger.LogWarning("Signup attempt with already registered APA number: {ApaNumber}", signupRequest.ApaNumber);
+                return new ConflictObjectResult(new SignupInitResponse
+                {
+                    Success = false,
+                    Message = "This APA member number has already been registered. If you believe this is an error, please contact support."
+                });
+            }
+
+            // Step 3: Check if this phone number is already registered to prevent duplicate accounts
+            var isPhoneAlreadyRegistered = await _playerService.IsPhoneNumberAlreadyRegisteredAsync(signupRequest.PhoneNumber);
+            if (isPhoneAlreadyRegistered)
+            {
+                _logger.LogWarning("Signup attempt with already registered phone number: {PhoneNumber}", signupRequest.PhoneNumber);
+                return new ConflictObjectResult(new SignupInitResponse
+                {
+                    Success = false,
+                    Message = "This phone number has already been registered. If you believe this is an error, please contact support."
+                });
+            }
+
+            // Step 4: Reconcile phone number (update if missing or different)
             if (string.IsNullOrEmpty(player.PhoneNumber) || 
                 !string.Equals(player.PhoneNumber, signupRequest.PhoneNumber, StringComparison.OrdinalIgnoreCase))
             {
@@ -461,7 +536,7 @@ public class AuthFunctions
                 _logger.LogInformation("Updated phone number for player {PlayerId}", player.Id);
             }
 
-            // Step 3: Resolve active memberships for initial UI state
+            // Step 5: Resolve active memberships for initial UI state
             var memberships = await _membershipService.GetAllAsync(player.Id);
             var membershipInfos = new List<UserTeamMembershipInfo>();
             
@@ -479,8 +554,8 @@ public class AuthFunctions
                 });
             }
 
-            // Step 4: Proceed to Stytch SMS OTP
-            var smsResult = await _authService.SendSmsCodeAsync(signupRequest.PhoneNumber);
+            // Step 6: Proceed to Stytch SMS OTP
+            var smsResult = await _authService.SendSmsCodeForSignupAsync(signupRequest.PhoneNumber);
             
             if (!smsResult.Success)
             {
@@ -492,7 +567,7 @@ public class AuthFunctions
                 });
             }
 
-            // Step 5: Return success with phone ID for verification step
+            // Step 7: Return success with phone ID for verification step
             // Include player ID for later authUserId linking
             return new OkObjectResult(new SignupInitResponse
             {
@@ -577,8 +652,9 @@ public class AuthFunctions
                 }
                 else
                 {
-                    _logger.LogWarning("Player {PlayerId} already linked to different authUserId {ExistingAuthUserId}. Cannot link to {NewAuthUserId}", 
-                        player.Id, player.AuthUserId, authUserId);
+                    _logger.LogError("DUPLICATE ACCOUNT ATTEMPT: Player {PlayerId} (APA: {ApaNumber}) already linked to different authUserId {ExistingAuthUserId}. Attempted to link to {NewAuthUserId}", 
+                        player.Id, player.ApaNumber, player.AuthUserId, authUserId);
+                    // This should not happen due to our pre-validation, but log it as an error if it does
                     return;
                 }
             }
@@ -587,8 +663,9 @@ public class AuthFunctions
             var existingPlayer = await _playerService.GetPlayerByAuthUserIdAsync(authUserId);
             if (existingPlayer != null)
             {
-                _logger.LogWarning("AuthUserId {AuthUserId} already linked to player {ExistingPlayerId}. Cannot link to player {PlayerId}", 
-                    authUserId, existingPlayer.Id, player.Id);
+                _logger.LogError("DUPLICATE ACCOUNT ATTEMPT: AuthUserId {AuthUserId} already linked to player {ExistingPlayerId} (APA: {ExistingApaNumber}). Attempted to link to player {PlayerId} (APA: {ApaNumber})", 
+                    authUserId, existingPlayer.Id, existingPlayer.ApaNumber, player.Id, player.ApaNumber);
+                // This should not happen due to our pre-validation, but log it as an error if it does
                 return;
             }
             
@@ -596,8 +673,8 @@ public class AuthFunctions
             player.AuthUserId = authUserId;
             await _playerService.UpdatePlayerAsync(player);
             
-            _logger.LogInformation("Successfully linked authUserId {AuthUserId} to player {PlayerId} ({FirstName} {LastName})", 
-                authUserId, player.Id, player.FirstName, player.LastName);
+            _logger.LogInformation("Successfully linked authUserId {AuthUserId} to player {PlayerId} ({FirstName} {LastName}, APA: {ApaNumber})", 
+                authUserId, player.Id, player.FirstName, player.LastName, player.ApaNumber);
         }
         catch (Exception ex)
         {

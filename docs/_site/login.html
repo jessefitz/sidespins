@@ -69,6 +69,14 @@
             cursor: not-allowed;
         }
 
+        #auth-container button.secondary {
+            background-color: #6c757d;
+        }
+
+        #auth-container button.secondary:hover {
+            background-color: #5a6268;
+        }
+
         #auth-container label {
             display: block;
             margin-top: 1rem;
@@ -87,10 +95,19 @@
             margin-bottom: 1rem;
         }
 
-        .divider {
-            margin: 2rem 0;
-            border: none;
-            border-top: 1px solid #e1e5e9;
+        .toggle-link {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .toggle-link a {
+            color: #007cba;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .toggle-link a:hover {
+            text-decoration: underline;
         }
 
         #error-message, #success-message {
@@ -146,6 +163,21 @@
         .back-link a:hover {
             text-decoration: underline;
         }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -159,11 +191,36 @@
             <div id="auth-form">
                 <h1>Sign In to SideSpins</h1>
                 
-                <!-- APA-First Signup Flow -->
-                <div id="signup-section">
-                    <h3>League Member Sign In</h3>
-                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
-                        Only verified APA league members can create accounts. You'll need your APA member number.
+                <!-- Existing Member Sign In (Default View) -->
+                <div id="existing-member-view" class="view-section active">
+                    <h3>Returning Member</h3>
+                    <p class="description">
+                        Sign in with your phone number to access your SideSpins account.
+                    </p>
+                    
+                    <div id="phone-only-section">
+                        <label for="phone-only">Phone Number:</label>
+                        <input type="tel" id="phone-only" placeholder="+1 (555) 123-4567" />
+                        <button id="send-quick-sms-btn">Send Code</button>
+                    </div>
+                    
+                    <div id="quick-sms-code-section" style="display:none;">
+                        <label for="quick-sms-code">Enter the code sent to your phone:</label>
+                        <input type="text" id="quick-sms-code" placeholder="123456" maxlength="6" />
+                        <button id="verify-quick-sms-btn">Verify Code</button>
+                        <button id="back-to-phone-btn" class="secondary">Back</button>
+                    </div>
+                    
+                    <div class="toggle-link">
+                        <a href="#" id="show-new-member">New to SideSpins? Create an account →</a>
+                    </div>
+                </div>
+                
+                <!-- New Member Sign Up -->
+                <div id="new-member-view" class="view-section">
+                    <h3>New League Member</h3>
+                    <p class="description">
+                        Only verified APA league members can create accounts. You'll need your APA member number to get started.
                     </p>
                     
                     <div id="apa-input-section">
@@ -180,26 +237,11 @@
                         <label for="sms-code">Enter the code sent to your phone:</label>
                         <input type="text" id="sms-code" placeholder="123456" maxlength="6" />
                         <button id="verify-sms-btn">Verify Code</button>
-                        <button id="back-to-signup-btn" style="background-color: #6c757d;">Back</button>
-                    </div>
-                </div>
-                
-                <hr class="divider" />
-                
-                <!-- Existing Member Quick Sign In -->
-                <div id="quick-signin-section">
-                    <h3>Returning Member</h3>
-                    <div id="phone-only-section">
-                        <label for="phone-only">Phone Number:</label>
-                        <input type="tel" id="phone-only" placeholder="+1 (555) 123-4567" />
-                        <button id="send-quick-sms-btn">Send Code</button>
+                        <button id="back-to-signup-btn" class="secondary">Back</button>
                     </div>
                     
-                    <div id="quick-sms-code-section" style="display:none;">
-                        <label for="quick-sms-code">Enter the code sent to your phone:</label>
-                        <input type="text" id="quick-sms-code" placeholder="123456" maxlength="6" />
-                        <button id="verify-quick-sms-btn">Verify Code</button>
-                        <button id="back-to-phone-btn" style="background-color: #6c757d;">Back</button>
+                    <div class="toggle-link">
+                        <a href="#" id="show-existing-member">← Already have an account? Sign in</a>
                     </div>
                 </div>
             </div>
@@ -218,7 +260,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         const authManager = new AuthManager();
         
-        // Elements for APA-first signup
+        // View elements
+        const existingMemberView = document.getElementById('existing-member-view');
+        const newMemberView = document.getElementById('new-member-view');
+        const showNewMemberLink = document.getElementById('show-new-member');
+        const showExistingMemberLink = document.getElementById('show-existing-member');
+        
+        // Elements for new member signup
         const apaNumberInput = document.getElementById('apa-number');
         const phoneInput = document.getElementById('phone');
         const smsCodeInput = document.getElementById('sms-code');
@@ -228,7 +276,7 @@
         const apaInputSection = document.getElementById('apa-input-section');
         const smsCodeSection = document.getElementById('sms-code-section');
         
-        // Elements for quick sign in
+        // Elements for existing member sign in
         const phoneOnlyInput = document.getElementById('phone-only');
         const quickSmsCodeInput = document.getElementById('quick-sms-code');
         const sendQuickSmsBtn = document.getElementById('send-quick-sms-btn');
@@ -242,6 +290,45 @@
         const successMessage = document.getElementById('success-message');
         const loading = document.getElementById('loading');
         const authForm = document.getElementById('auth-form');
+        
+        // View switching functions
+        function showNewMemberView() {
+            existingMemberView.classList.remove('active');
+            newMemberView.classList.add('active');
+            resetForms();
+        }
+        
+        function showExistingMemberView() {
+            newMemberView.classList.remove('active');
+            existingMemberView.classList.add('active');
+            resetForms();
+        }
+        
+        function resetForms() {
+            // Clear all inputs
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            
+            // Hide all sub-sections
+            smsCodeSection.style.display = 'none';
+            apaInputSection.style.display = 'block';
+            quickSmsCodeSection.style.display = 'none';
+            phoneOnlySection.style.display = 'block';
+            
+            // Hide messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+        
+        // Event listeners for view switching
+        showNewMemberLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showNewMemberView();
+        });
+        
+        showExistingMemberLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showExistingMemberView();
+        });
         
         function showError(message) {
             errorMessage.textContent = message;
@@ -286,7 +373,7 @@
             }
         });
         
-        // APA-first signup flow
+        // New member signup flow
         signupInitBtn.addEventListener('click', async function() {
             const apaNumber = apaNumberInput.value.trim();
             let formattedPhone;
@@ -360,7 +447,21 @@
                     }
                     
                     showSuccess('Welcome to SideSpins! Redirecting...');
+                    
+                    // Check for return URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('returnUrl');
+                    
                     setTimeout(() => {
+                        if (returnUrl) {
+                            try {
+                                const decodedUrl = decodeURIComponent(returnUrl);
+                                window.location.href = decodedUrl;
+                                return;
+                            } catch (error) {
+                                console.warn('Invalid return URL:', error);
+                            }
+                        }
                         window.location.href = '/app.html';
                     }, 1500);
                 } else {
@@ -376,7 +477,7 @@
             }
         });
         
-        // Quick sign in for existing users
+        // Existing member sign in
         sendQuickSmsBtn.addEventListener('click', async function() {
             let formattedPhone;
             
@@ -410,7 +511,7 @@
             }
         });
         
-        // Verify quick sign in SMS
+        // Verify existing member SMS
         verifyQuickSmsBtn.addEventListener('click', async function() {
             const phone = phoneOnlyInput.dataset.verificationNumber;
             const code = quickSmsCodeInput.value.trim();
@@ -433,7 +534,21 @@
                 
                 if (response.ok) {
                     showSuccess('Login successful! Redirecting...');
+                    
+                    // Check for return URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('returnUrl');
+                    
                     setTimeout(() => {
+                        if (returnUrl) {
+                            try {
+                                const decodedUrl = decodeURIComponent(returnUrl);
+                                window.location.href = decodedUrl;
+                                return;
+                            } catch (error) {
+                                console.warn('Invalid return URL:', error);
+                            }
+                        }
                         window.location.href = '/app.html';
                     }, 1500);
                 } else {
@@ -470,6 +585,21 @@
         async function checkCurrentUser() {
             const isAuthenticated = await authManager.checkAuth();
             if (isAuthenticated) {
+                // Check for return URL in query params
+                const urlParams = new URLSearchParams(window.location.search);
+                const returnUrl = urlParams.get('returnUrl');
+                
+                if (returnUrl) {
+                    try {
+                        const decodedUrl = decodeURIComponent(returnUrl);
+                        window.location.href = decodedUrl;
+                        return;
+                    } catch (error) {
+                        console.warn('Invalid return URL:', error);
+                    }
+                }
+                
+                // Default redirect
                 window.location.href = '/app.html';
             }
         }

@@ -51,7 +51,7 @@ public class MembershipFunctions
             _logger.LogInformation("Found player {PlayerId} for authUserId {AuthUserId}", player.Id, userId);
 
             // Now get memberships using the player ID
-            var memberships = await _membershipService.GetAllAsync(player.Id);
+            var memberships = await _membershipService.GetAllAsync(player.AuthUserId);
             
             var membershipInfos = memberships.Select(m => new
             {

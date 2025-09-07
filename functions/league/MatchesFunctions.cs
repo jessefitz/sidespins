@@ -194,9 +194,61 @@ public class MatchesFunctions
         }
     }
 
+    [Function("UpdateTeamMatchLineup")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> UpdateTeamMatchLineup([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "teams/{teamId}/matches/{matchId}/lineup")] HttpRequest req, FunctionContext context, string teamId, string matchId)
+    {
+        try
+        {
+            // Extract divisionId from query parameter since we need it for partition key
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+            
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required for match updates");
+            }
+
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var lineupPlan = JsonConvert.DeserializeObject<LineupPlan>(requestBody);
+            
+            if (lineupPlan == null)
+            {
+                return new BadRequestObjectResult("Invalid lineup data");
+            }
+
+            // Verify the match exists and that the team is part of it
+            var match = await _cosmosService.GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Verify the team is either home or away team in this match
+            if (match.HomeTeamId != teamId && match.AwayTeamId != teamId)
+            {
+                return new ForbidResult();
+            }
+
+            var updatedMatch = await _cosmosService.UpdateMatchLineupAsync(matchId, divisionId, lineupPlan);
+            if (updatedMatch == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(updatedMatch);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating team match lineup {TeamId} {MatchId}", teamId, matchId);
+            return new StatusCodeResult(500);
+        }
+    }
+
     // Public endpoints for the lineup sandbox
     [Function("GetPublicMatches")]
-    public async Task<IActionResult> GetPublicMatches([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "public/matches")] HttpRequest req)
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> GetPublicMatches([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "public/matches")] HttpRequest req, FunctionContext context)
     {
         try
         {
@@ -235,7 +287,8 @@ public class MatchesFunctions
     }
 
     [Function("GetPublicMatchRoster")]
-    public async Task<IActionResult> GetPublicMatchRoster([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "public/matches/{matchId}/roster")] HttpRequest req, string matchId)
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> GetPublicMatchRoster([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "public/matches/{matchId}/roster")] HttpRequest req, FunctionContext context, string matchId)
     {
         try
         {

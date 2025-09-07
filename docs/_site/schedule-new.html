@@ -134,6 +134,29 @@
             border-radius: 8px;
         }
 
+        .back-to-top {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .back-to-top a {
+            color: #007cba;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #007cba;
+            border-radius: 6px;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .back-to-top a:hover {
+            background: #007cba;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -177,6 +200,7 @@
             padding: 0;
             background-color: #f5f5f5;
             line-height: 1.6;
+            scroll-behavior: smooth;
         }
 
         .header {
@@ -257,19 +281,96 @@
             border-color: #007cba;
         }
 
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
+        .user-avatar-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .logout-btn:hover {
-            background-color: #c82333;
+        .captain-badge {
+            background: #ffc107;
+            color: #212529;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #ffd60a;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007cba;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .user-avatar:hover {
+            background: #005a87;
+            border-color: #007cba;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .user-dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .user-dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .user-dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .user-dropdown-item.logout:hover {
+            background-color: #f8d7da;
         }
 
         .container {
@@ -531,7 +632,7 @@
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="header" id="top">
         <div class="header-content">
             <div class="logo">SideSpins</div>
             
@@ -548,7 +649,14 @@
                         <option value="">Loading...</option>
                     </select>
                 </div>
-                <button id="logout-btn" class="logout-btn">Logout</button>
+                
+                <div class="user-avatar-container">
+                    <div id="captain-badge" class="captain-badge" style="display:none;">Captain</div>
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <button class="user-dropdown-item logout" id="logout-btn">Logout</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -604,15 +712,76 @@
                 this.teamId = null;
                 this.divisionId = null;
                 this.teamName = null;
+                
+                // Avatar elements
+                this.userAvatar = document.getElementById('user-avatar');
+                this.userDropdown = document.getElementById('user-dropdown');
+                this.captainBadge = document.getElementById('captain-badge');
+                
+                this.setupAvatarDropdown();
+            }
+            
+            setupAvatarDropdown() {
+                // Avatar dropdown functionality
+                this.userAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.userDropdown.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    this.userDropdown.classList.remove('show');
+                });
+            }
+            
+            updateUserAvatar(profile) {
+                let firstName = '';
+                let lastName = '';
+                
+                // Try different profile structures
+                if (profile && profile.debug && profile.debug.playerInfo) {
+                    firstName = profile.debug.playerInfo.firstName || '';
+                    lastName = profile.debug.playerInfo.lastName || '';
+                } else if (profile && profile.playerInfo) {
+                    firstName = profile.playerInfo.firstName || '';
+                    lastName = profile.playerInfo.lastName || '';
+                } else if (profile && profile.firstName) {
+                    firstName = profile.firstName || '';
+                    lastName = profile.lastName || '';
+                }
+                
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                const displayInitials = initials || '?';
+                
+                this.userAvatar.textContent = displayInitials;
+            }
+            
+            updateCaptainBadge(role) {
+                if (role === 'captain' || role === 'manager') {
+                    this.captainBadge.style.display = 'block';
+                    this.captainBadge.textContent = role === 'manager' ? 'Manager' : 'Captain';
+                } else {
+                    this.captainBadge.style.display = 'none';
+                }
             }
 
             async initialize() {
                 try {
-                    // Check authentication
+                    // Check authentication with proper redirect URL handling
                     const isAuthenticated = await this.authManager.requireAuth();
                     if (!isAuthenticated) {
-                        window.location.href = '/login.html';
+                        // Store current URL with hash for deep linking after login
+                        const returnUrl = encodeURIComponent(window.location.href);
+                        window.location.href = `/login.html?returnUrl=${returnUrl}`;
                         return;
+                    }
+
+                    // Load user profile for avatar
+                    try {
+                        const profile = await this.authManager.getUserProfile();
+                        this.updateUserAvatar(profile);
+                    } catch (error) {
+                        console.warn('Could not load user profile:', error);
                     }
 
                     // Setup team switcher
@@ -628,6 +797,9 @@
 
                     this.teamId = activeMembership.teamId;
                     this.teamName = activeMembership.teamName || activeMembership.teamId;
+                    
+                    // Update captain badge based on role
+                    this.updateCaptainBadge(activeMembership.role);
                     
                     // TODO: Get division ID from team data or user preferences
                     // For now, use a hardcoded fallback
@@ -686,8 +858,11 @@
 
                 teamSelect.addEventListener('change', (e) => {
                     const selectedTeamId = e.target.value;
-                    if (selectedTeamId) {
+                    const selectedOption = e.target.selectedOptions[0];
+                    
+                    if (selectedTeamId && selectedOption) {
                         this.authManager.setActiveTeam(selectedTeamId);
+                        this.updateCaptainBadge(selectedOption.dataset.role);
                         window.location.reload(); // Reload to show new team's schedule
                     }
                 });
@@ -884,6 +1059,12 @@
                     dayDiv.appendChild(matchDiv);
                 });
 
+                // Add back to top link
+                const backToTopDiv = document.createElement('div');
+                backToTopDiv.className = 'back-to-top';
+                backToTopDiv.innerHTML = '<a href="#top">↑ Back to Top</a>';
+                dayDiv.appendChild(backToTopDiv);
+
                 return dayDiv;
             }
 
@@ -895,6 +1076,11 @@
                 const opponentTeamId = isHomeTeam ? match.awayTeamId : match.homeTeamId;
                 const homeTeamName = match.homeTeamName || match.homeTeamId;
                 const awayTeamName = match.awayTeamName || match.awayTeamId;
+                
+                // Handle case where opponent data might be null/undefined
+                const hasOpponent = opponentTeamId && opponentTeamId !== 'null' && opponentTeamId !== '';
+                const opponentName = hasOpponent ? (isHomeTeam ? awayTeamName : homeTeamName) : 'TBD';
+                const ourTeamName = isHomeTeam ? homeTeamName : awayTeamName;
 
                 const matchTime = new Date(match.scheduledAt).toLocaleTimeString('en-US', {
                     hour: 'numeric',
@@ -908,24 +1094,33 @@
                     const homeLineup = match.lineupPlan.home;
                     const awayLineup = match.lineupPlan.away;
                     const ourLineup = isHomeTeam ? homeLineup : awayLineup;
+                    const opponentLineup = isHomeTeam ? awayLineup : homeLineup;
                     
-                    lineupsHtml = `
-                        <div class="lineups">
-                            <div class="lineup">
-                                <div class="lineup-header">
-                                    ${isHomeTeam ? 'Our' : homeTeamName} Lineup
-                                    ${isHomeTeam ? '' : ' (Opponent)'}
+                    // Only show opponent lineup if there's a valid opponent
+                    if (hasOpponent) {
+                        lineupsHtml = `
+                            <div class="lineups">
+                                <div class="lineup">
+                                    <div class="lineup-header">Our Lineup</div>
+                                    ${this.renderLineupTable(ourLineup, playerSkills, true)}
                                 </div>
-                                ${this.renderLineupTable(homeLineup, playerSkills, isHomeTeam)}
-                            </div>
-                            <div class="lineup">
-                                <div class="lineup-header">
-                                    ${isHomeTeam ? awayTeamName + ' Lineup (Opponent)' : 'Our Lineup'}
+                                <div class="lineup">
+                                    <div class="lineup-header">${opponentName} Lineup</div>
+                                    ${this.renderLineupTable(opponentLineup, playerSkills, false)}
                                 </div>
-                                ${this.renderLineupTable(awayLineup, playerSkills, !isHomeTeam)}
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        // Only show our lineup when opponent is TBD
+                        lineupsHtml = `
+                            <div class="lineups">
+                                <div class="lineup" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
+                                    <div class="lineup-header">Our Lineup</div>
+                                    ${this.renderLineupTable(ourLineup, playerSkills, true)}
+                                </div>
+                            </div>
+                        `;
+                    }
                 } else {
                     lineupsHtml = `
                         <div class="lineups">
@@ -936,10 +1131,13 @@
                     `;
                 }
 
+                // Display match teams appropriately
+                const teamsDisplay = hasOpponent ? `${ourTeamName} vs ${opponentName}` : `${ourTeamName} vs ${opponentName}`;
+
                 matchDiv.innerHTML = `
                     <div class="match-header">
                         <div class="match-teams">
-                            ${homeTeamName} vs ${awayTeamName}
+                            ${teamsDisplay}
                         </div>
                         <div class="match-actions">
                             <div class="match-time">${matchTime}</div>
@@ -1021,7 +1219,10 @@
                 if (window.location.hash) {
                     const targetElement = document.querySelector(window.location.hash);
                     if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                        // Small delay to ensure content is rendered
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
                     }
                 }
             }
@@ -1030,7 +1231,18 @@
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             const app = new ScheduleApp();
-            app.initialize();
+            app.initialize().then(() => {
+                // Handle hash fragment after initialization
+                app.handleHashFragment();
+            });
+        });
+
+        // Handle hash changes for navigation within the page
+        window.addEventListener('hashchange', () => {
+            const targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
     </script>
 </body>

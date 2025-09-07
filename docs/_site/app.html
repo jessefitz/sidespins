@@ -35,6 +35,29 @@
             color: #007cba;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-links a:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-links a.active {
+            background-color: #007cba;
+            color: white;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -95,24 +118,101 @@
             border-color: #ffeaa7;
         }
 
+        .user-avatar-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .captain-badge {
+            background: #ffc107;
+            color: #212529;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #ffd60a;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007cba;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .user-avatar:hover {
+            background: #005a87;
+            border-color: #007cba;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .user-dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .user-dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .user-dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .user-dropdown-item.logout:hover {
+            background-color: #f8d7da;
+        }
+
         .user-details {
             font-size: 0.9rem;
             color: #666;
-        }
-
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-
-        .logout-btn:hover {
-            background-color: #c82333;
         }
 
         .container {
@@ -277,6 +377,22 @@
                 gap: 1rem;
             }
 
+            .nav-links {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .team-switcher {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+
+            .team-select {
+                min-width: 150px;
+            }
+
             .team-details {
                 grid-template-columns: 1fr;
             }
@@ -315,16 +431,28 @@
     <div class="header">
         <div class="header-content">
             <div class="logo">SideSpins</div>
-            <div class="team-switcher" id="team-switcher" style="display:none;">
-                <label for="team-select">Team:</label>
-                <select id="team-select" class="team-select">
-                    <option value="">Select a team...</option>
-                </select>
-                <span id="role-indicator" class="role-indicator">Player</span>
+            
+            <div class="nav-links">
+                <a href="/app.html" class="active">Dashboard</a>
+                <a href="/schedule-new.html">Schedule</a>
+                <a href="/lineup-explorer-new.html">Lineup Explorer</a>
             </div>
+
             <div class="user-info">
-                <div class="user-details" id="user-summary" style="display:none;"></div>
-                <button class="logout-btn" id="logout-btn">Logout</button>
+                <div class="team-switcher" id="team-switcher" style="display:none;">
+                    <label for="team-select">Team:</label>
+                    <select id="team-select" class="team-select">
+                        <option value="">Select a team...</option>
+                    </select>
+                </div>
+                
+                <div class="user-avatar-container">
+                    <div id="captain-badge" class="captain-badge" style="display:none;">Captain</div>
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <button class="user-dropdown-item logout" id="logout-btn">Logout</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -401,7 +529,56 @@
         // Team switcher elements
         const teamSwitcher = document.getElementById('team-switcher');
         const teamSelect = document.getElementById('team-select');
-        const roleIndicator = document.getElementById('role-indicator');
+        
+        // Avatar elements
+        const userAvatar = document.getElementById('user-avatar');
+        const userDropdown = document.getElementById('user-dropdown');
+        const captainBadge = document.getElementById('captain-badge');
+
+        // Avatar dropdown functionality
+        userAvatar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            userDropdown.classList.remove('show');
+        });
+
+        function updateUserAvatar(profile) {
+            console.log('Updating avatar with profile:', profile); // Debug log
+            
+            let firstName = '';
+            let lastName = '';
+            
+            // Try different profile structures
+            if (profile && profile.debug && profile.debug.playerInfo) {
+                firstName = profile.debug.playerInfo.firstName || '';
+                lastName = profile.debug.playerInfo.lastName || '';
+            } else if (profile && profile.playerInfo) {
+                firstName = profile.playerInfo.firstName || '';
+                lastName = profile.playerInfo.lastName || '';
+            } else if (profile && profile.firstName) {
+                firstName = profile.firstName || '';
+                lastName = profile.lastName || '';
+            }
+            
+            const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+            const displayInitials = initials || '?';
+            
+            console.log('Setting avatar initials:', displayInitials); // Debug log
+            userAvatar.textContent = displayInitials;
+        }
+
+        function updateCaptainBadge(role) {
+            if (role === 'captain' || role === 'manager') {
+                captainBadge.style.display = 'block';
+                captainBadge.textContent = role === 'manager' ? 'Manager' : 'Captain';
+            } else {
+                captainBadge.style.display = 'none';
+            }
+        }
 
         function showError(message) {
             loading.style.display = 'none';
@@ -422,11 +599,8 @@
         }
 
         function updateRoleIndicator(role) {
-            roleIndicator.textContent = role ? role.charAt(0).toUpperCase() + role.slice(1) : 'No Role';
-            roleIndicator.className = 'role-indicator';
-            if (role) {
-                roleIndicator.classList.add(`role-${role}`);
-            }
+            // Update captain badge (role indicator removed from team switcher)
+            updateCaptainBadge(role);
         }
 
         function populateTeamSwitcher(memberships) {
@@ -443,12 +617,12 @@
                 
                 teamSwitcher.style.display = 'flex';
                 
-                // Set current active team
+                // Set current active team and update captain badge
                 if (authManager.activeTeamId) {
                     teamSelect.value = authManager.activeTeamId;
                     const selectedOption = teamSelect.selectedOptions[0];
                     if (selectedOption) {
-                        updateRoleIndicator(selectedOption.dataset.role);
+                        updateCaptainBadge(selectedOption.dataset.role);
                     }
                 }
             } else {
@@ -633,6 +807,9 @@
                     userIdDisplay.textContent = profile.userId || '-';
                     userSummary.textContent = `Welcome, User ${profile.userId}`;
                     userSummary.style.display = 'block';
+                    
+                    // Update user avatar with initials
+                    updateUserAvatar(profile);
                 } catch (error) {
                     console.warn('Could not load user profile:', error);
                 }
@@ -646,6 +823,7 @@
                 if (activeMembership) {
                     updateTeamDisplay(activeMembership.teamId, activeMembership.role);
                     populateRoleActions(activeMembership.role);
+                    updateRoleIndicator(activeMembership.role);
                 }
 
                 showDashboard();

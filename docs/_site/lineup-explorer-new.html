@@ -91,19 +91,96 @@
             border-color: #007cba;
         }
 
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
+        .user-avatar-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .logout-btn:hover {
-            background-color: #c82333;
+        .captain-badge {
+            background: #ffc107;
+            color: #212529;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #ffd60a;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007cba;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .user-avatar:hover {
+            background: #005a87;
+            border-color: #007cba;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .user-dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .user-dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .user-dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .user-dropdown-item.logout:hover {
+            background-color: #f8d7da;
         }
 
         .container {
@@ -364,6 +441,33 @@
 
         .clear-btn:hover {
             background: #5a6268;
+        }
+
+        .save-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .save-btn:hover {
+            background: #218838;
+        }
+
+        .save-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .save-btn.saving {
+            background: #ffc107;
+            color: #212529;
         }
 
         .slots-container {
@@ -766,7 +870,14 @@
                         <option value="">Loading...</option>
                     </select>
                 </div>
-                <button id="logout-btn" class="logout-btn">Logout</button>
+                
+                <div class="user-avatar-container">
+                    <div id="captain-badge" class="captain-badge" style="display:none;">Captain</div>
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <button class="user-dropdown-item logout" id="logout-btn">Logout</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -877,6 +988,7 @@
             <div class="status-text" id="status-text">23 remaining</div>
             <div class="quick-actions">
                 <button class="clear-btn" id="clear-lineup">Clear All</button>
+                <button class="save-btn" id="save-lineup" style="display: none;">Save Lineup</button>
             </div>
         </div>
     </div>
@@ -899,6 +1011,57 @@
                 this.currentLineup = {};
                 this.maxSlots = 5; // APA 9-ball typically has 5 slots
                 this.skillLimit = 23;
+                
+                // Avatar elements
+                this.userAvatar = document.getElementById('user-avatar');
+                this.userDropdown = document.getElementById('user-dropdown');
+                this.captainBadge = document.getElementById('captain-badge');
+                
+                this.setupAvatarDropdown();
+            }
+            
+            setupAvatarDropdown() {
+                // Avatar dropdown functionality
+                this.userAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.userDropdown.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    this.userDropdown.classList.remove('show');
+                });
+            }
+            
+            updateUserAvatar(profile) {
+                let firstName = '';
+                let lastName = '';
+                
+                // Try different profile structures
+                if (profile && profile.debug && profile.debug.playerInfo) {
+                    firstName = profile.debug.playerInfo.firstName || '';
+                    lastName = profile.debug.playerInfo.lastName || '';
+                } else if (profile && profile.playerInfo) {
+                    firstName = profile.playerInfo.firstName || '';
+                    lastName = profile.playerInfo.lastName || '';
+                } else if (profile && profile.firstName) {
+                    firstName = profile.firstName || '';
+                    lastName = profile.lastName || '';
+                }
+                
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                const displayInitials = initials || '?';
+                
+                this.userAvatar.textContent = displayInitials;
+            }
+            
+            updateCaptainBadge(role) {
+                if (role === 'captain' || role === 'manager') {
+                    this.captainBadge.style.display = 'block';
+                    this.captainBadge.textContent = role === 'manager' ? 'Manager' : 'Captain';
+                } else {
+                    this.captainBadge.style.display = 'none';
+                }
             }
 
             async initialize() {
@@ -908,6 +1071,14 @@
                     if (!isAuthenticated) {
                         window.location.href = '/login.html';
                         return;
+                    }
+
+                    // Load user profile for avatar
+                    try {
+                        const profile = await this.authManager.getUserProfile();
+                        this.updateUserAvatar(profile);
+                    } catch (error) {
+                        console.warn('Could not load user profile:', error);
                     }
 
                     // Setup team switcher
@@ -923,6 +1094,9 @@
 
                     this.teamId = activeMembership.teamId;
                     this.teamName = activeMembership.teamName || activeMembership.teamId;
+                    
+                    // Update captain badge based on role
+                    this.updateCaptainBadge(activeMembership.role);
                     
                     // TODO: Get division ID from team data or user preferences
                     this.divisionId = 'div_nottingham_wed_9b_311';
@@ -1080,6 +1254,7 @@
                 this.setupDragAndDrop();
                 this.setupMatchSelector();
                 this.setupClearButton();
+                this.setupSaveButton();
                 this.updateSkillSummary();
                 
                 // Check for matchId in URL parameters
@@ -1106,6 +1281,15 @@
                 if (clearBtn) {
                     clearBtn.addEventListener('click', () => {
                         this.clearLineup();
+                    });
+                }
+            }
+
+            setupSaveButton() {
+                const saveBtn = document.getElementById('save-lineup');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', () => {
+                        this.saveLineup();
                     });
                 }
             }
@@ -1406,6 +1590,7 @@
                 const meterFillElement = document.getElementById('meter-fill');
                 const statusTextElement = document.getElementById('status-text');
                 const capMeterContainer = document.getElementById('cap-meter');
+                const saveBtn = document.getElementById('save-lineup');
 
                 if (totalValueElement) {
                     totalValueElement.textContent = totalSkill;
@@ -1445,6 +1630,15 @@
                 if (capMeterContainer) {
                     const hasPlayers = Object.keys(this.currentLineup).length > 0;
                     capMeterContainer.style.display = hasPlayers ? 'block' : 'none';
+                }
+
+                // Show/hide save button based on permissions and match selection
+                if (saveBtn) {
+                    const hasMatch = this.currentMatch;
+                    const isCaptain = this.authManager && this.authManager.hasTeamRole('captain');
+                    const hasLineup = Object.keys(this.currentLineup).length > 0;
+                    
+                    saveBtn.style.display = (hasMatch && isCaptain && hasLineup) ? 'inline-block' : 'none';
                 }
             }
 
@@ -1561,6 +1755,144 @@
                 // Update UI
                 this.updatePlayerListDisplay();
                 this.updateSkillSummary();
+            }
+
+            async saveLineup() {
+                if (!this.currentMatch) {
+                    alert('Please select a match first.');
+                    return;
+                }
+
+                if (!this.authManager || !this.authManager.hasTeamRole('captain')) {
+                    alert('You must be a team captain or manager to save lineups.');
+                    return;
+                }
+
+                const saveBtn = document.getElementById('save-lineup');
+                if (!saveBtn) return;
+
+                try {
+                    // Update button state
+                    saveBtn.disabled = true;
+                    saveBtn.classList.add('saving');
+                    saveBtn.textContent = 'Saving...';
+
+                    // Build lineup data
+                    const lineupData = this.buildLineupData();
+                    
+                    // Make API call to save lineup
+                    const response = await fetch(`${this.authManager.baseUrl}/teams/${this.teamId}/matches/${this.currentMatch.id}/lineup?divisionId=${this.divisionId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(lineupData)
+                    });
+
+                    if (response.ok) {
+                        const updatedMatch = await response.json();
+                        this.currentMatch = updatedMatch;
+                        
+                        // Show success message
+                        this.showSuccessMessage('Lineup saved successfully!');
+                        
+                        // Update match in our local matches array
+                        const matchIndex = this.matches.findIndex(m => m.id === this.currentMatch.id);
+                        if (matchIndex !== -1) {
+                            this.matches[matchIndex] = updatedMatch;
+                        }
+                    } else {
+                        // Handle error
+                        const isHandled = await this.authManager.handleApiError(response);
+                        if (!isHandled) {
+                            const errorData = await response.json().catch(() => ({}));
+                            throw new Error(errorData.message || 'Failed to save lineup');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error saving lineup:', error);
+                    alert('Failed to save lineup: ' + error.message);
+                } finally {
+                    // Reset button state
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('saving');
+                    saveBtn.textContent = 'Save Lineup';
+                }
+            }
+
+            buildLineupData() {
+                const isHomeTeam = this.currentMatch.homeTeamId === this.teamId;
+                const lineupArray = [];
+
+                // Convert current lineup to array format
+                for (let i = 1; i <= this.maxSlots; i++) {
+                    const player = this.currentLineup[i.toString()];
+                    if (player) {
+                        lineupArray.push({
+                            playerId: player.id,
+                            playerName: player.name,
+                            skillLevel: player.skill,
+                            position: i,
+                            isAlternate: false
+                        });
+                    }
+                }
+
+                // Build the complete lineup plan, preserving the other team's data
+                const lineupPlan = {
+                    home: isHomeTeam ? lineupArray : (this.currentMatch.lineupPlan?.home || []),
+                    away: isHomeTeam ? (this.currentMatch.lineupPlan?.away || []) : lineupArray,
+                    totals: {
+                        homeTotal: isHomeTeam ? lineupArray.reduce((sum, p) => sum + p.skillLevel, 0) : (this.currentMatch.lineupPlan?.totals?.homeTotal || 0),
+                        awayTotal: isHomeTeam ? (this.currentMatch.lineupPlan?.totals?.awayTotal || 0) : lineupArray.reduce((sum, p) => sum + p.skillLevel, 0)
+                    },
+                    lastUpdated: new Date().toISOString(),
+                    history: this.currentMatch.lineupPlan?.history || []
+                };
+
+                // Add history entry
+                lineupPlan.history.push({
+                    timestamp: new Date().toISOString(),
+                    teamId: this.teamId,
+                    action: 'lineup_updated',
+                    playerCount: lineupArray.length,
+                    totalSkill: lineupArray.reduce((sum, p) => sum + p.skillLevel, 0)
+                });
+
+                return lineupPlan;
+            }
+
+            showSuccessMessage(message) {
+                // Create or update success message
+                let successDiv = document.getElementById('success-message');
+                if (!successDiv) {
+                    successDiv = document.createElement('div');
+                    successDiv.id = 'success-message';
+                    successDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #28a745;
+                        color: white;
+                        padding: 1rem 1.5rem;
+                        border-radius: 6px;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        z-index: 1000;
+                        font-weight: 500;
+                    `;
+                    document.body.appendChild(successDiv);
+                }
+
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.style.display = 'none';
+                    }
+                }, 3000);
             }
 
             clearLineup() {

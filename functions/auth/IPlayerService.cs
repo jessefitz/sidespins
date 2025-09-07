@@ -38,4 +38,28 @@ public interface IPlayerService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated player</returns>
     Task<Player> UpdatePlayerAsync(Player player, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Get a player by their APA number
+    /// </summary>
+    /// <param name="apaNumber">The APA number to search for</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Player if found, null otherwise</returns>
+    Task<Player?> GetPlayerByApaNumberAsync(string apaNumber, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Check if a player with the given APA number already has an auth user ID
+    /// </summary>
+    /// <param name="apaNumber">The APA number to check</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if a player with this APA number already has an authUserId, false otherwise</returns>
+    Task<bool> IsApaNumberAlreadyRegisteredAsync(string apaNumber, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Check if a player with the given phone number already has an auth user ID
+    /// </summary>
+    /// <param name="phoneNumber">The phone number to check</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if a player with this phone number already has an authUserId, false otherwise</returns>
+    Task<bool> IsPhoneNumberAlreadyRegisteredAsync(string phoneNumber, CancellationToken cancellationToken = default);
 }

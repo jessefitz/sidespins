@@ -164,6 +164,12 @@ public class LeagueService
             membership.Type = "membership";
             membership.TeamId = teamId;
             
+            // Preserve the division ID from existing membership if not provided
+            if (string.IsNullOrEmpty(membership.DivisionId) && existingMembership != null)
+            {
+                membership.DivisionId = existingMembership.DivisionId;
+            }
+            
             // Ensure we have a valid joinedAt timestamp
             if (membership.JoinedAt == default(DateTime))
             {
@@ -178,7 +184,8 @@ public class LeagueService
             // If skill level changed, update future lineups
             if (existingMembership != null && 
                 existingMembership.SkillLevel_9b != membership.SkillLevel_9b && 
-                membership.SkillLevel_9b.HasValue)
+                membership.SkillLevel_9b.HasValue &&
+                !string.IsNullOrEmpty(membership.DivisionId))
             {
                 await UpdateFutureLineupsForPlayerSkillChangeAsync(
                     membership.PlayerId, 
@@ -372,31 +379,44 @@ public class LeagueService
     {
         try
         {
+            Console.WriteLine($"Starting skill update for player {playerId} in division {divisionId} to skill level {newSkillLevel}");
+            
             // Get all matches from today forward for this division
             var today = DateTime.UtcNow.Date;
             var futureMatches = await GetMatchesByDateRangeAsync(divisionId, today, DateTime.MaxValue.Date);
+            
+            Console.WriteLine($"Found {futureMatches.Count()} future matches for division {divisionId}");
             
             bool anyUpdates = false;
             
             foreach (var match in futureMatches)
             {
+                // Skip matches that don't have lineup plans yet
+                if (match.LineupPlan == null)
+                {
+                    Console.WriteLine($"Skipping match {match.Id} - no lineup plan exists yet");
+                    continue;
+                }
+                
                 bool matchUpdated = false;
                 
                 // Update home team lineup if player is present
-                foreach (var player in match.LineupPlan.Home.Where(p => p.PlayerId == playerId))
+                foreach (var player in match.LineupPlan.Home?.Where(p => p.PlayerId == playerId) ?? Enumerable.Empty<LineupPlayer>())
                 {
                     if (player.SkillLevel != newSkillLevel)
                     {
+                        Console.WriteLine($"Updating player {playerId} skill from {player.SkillLevel} to {newSkillLevel} in match {match.Id} home lineup");
                         player.SkillLevel = newSkillLevel;
                         matchUpdated = true;
                     }
                 }
                 
                 // Update away team lineup if player is present  
-                foreach (var player in match.LineupPlan.Away.Where(p => p.PlayerId == playerId))
+                foreach (var player in match.LineupPlan.Away?.Where(p => p.PlayerId == playerId) ?? Enumerable.Empty<LineupPlayer>())
                 {
                     if (player.SkillLevel != newSkillLevel)
                     {
+                        Console.WriteLine($"Updating player {playerId} skill from {player.SkillLevel} to {newSkillLevel} in match {match.Id} away lineup");
                         player.SkillLevel = newSkillLevel;
                         matchUpdated = true;
                     }
@@ -416,6 +436,7 @@ public class LeagueService
                     });
                     
                     // Save the updated match
+                    Console.WriteLine($"Saving updated match {match.Id} with new skill levels");
                     await _matchesContainer.ReplaceItemAsync(match, match.Id, new PartitionKey(match.DivisionId));
                     anyUpdates = true;
                 }
@@ -423,7 +444,11 @@ public class LeagueService
             
             if (anyUpdates)
             {
-                Console.WriteLine($"Updated skill levels for player {playerId} in future lineups for division {divisionId}");
+                Console.WriteLine($"Successfully updated skill levels for player {playerId} in future lineups for division {divisionId}");
+            }
+            else
+            {
+                Console.WriteLine($"No lineup updates needed for player {playerId} in division {divisionId}");
             }
         }
         catch (Exception ex)

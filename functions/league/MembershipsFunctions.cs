@@ -155,6 +155,122 @@ public class MembershipsFunctions
             return new StatusCodeResult(500);
         }
     }
+
+    // Captain-level membership management endpoints
+
+    [Function("GetTeamMemberships")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> GetTeamMemberships(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}/memberships")] HttpRequest req, 
+        FunctionContext context, 
+        string teamId)
+    {
+        try
+        {
+            var memberships = await _cosmosService.GetMembershipsByTeamIdAsync(teamId);
+            return new OkObjectResult(memberships);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting team memberships for team {TeamId}", teamId);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("CreateTeamMembership")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> CreateTeamMembership(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "teams/{teamId}/memberships")] HttpRequest req, 
+        FunctionContext context, 
+        string teamId)
+    {
+        try
+        {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
+            
+            if (membership == null || string.IsNullOrEmpty(membership.PlayerId))
+            {
+                return new BadRequestObjectResult("Invalid membership data - playerId is required");
+            }
+
+            // Override teamId from route
+            membership.TeamId = teamId;
+            
+            var createdMembership = await _cosmosService.CreateMembershipAsync(membership);
+            return new OkObjectResult(createdMembership);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating team membership for team {TeamId}", teamId);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("UpdateTeamMembership")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> UpdateTeamMembership(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "teams/{teamId}/memberships/{membershipId}")] HttpRequest req, 
+        FunctionContext context, 
+        string teamId, 
+        string membershipId)
+    {
+        try
+        {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
+            
+            if (membership == null || string.IsNullOrEmpty(membership.PlayerId))
+            {
+                return new BadRequestObjectResult("Invalid membership data - playerId is required");
+            }
+
+            // Override teamId from route
+            membership.TeamId = teamId;
+
+            var updatedMembership = await _cosmosService.UpdateMembershipAsync(membershipId, teamId, membership);
+            if (updatedMembership == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(updatedMembership);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating membership {MembershipId} for team {TeamId}", membershipId, teamId);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("DeleteTeamMembership")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> DeleteTeamMembership(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "teams/{teamId}/memberships/{membershipId}")] HttpRequest req, 
+        FunctionContext context, 
+        string teamId, 
+        string membershipId)
+    {
+        try
+        {
+            var success = await _cosmosService.DeleteMembershipAsync(membershipId, teamId);
+            if (!success)
+            {
+                return new NotFoundResult();
+            }
+
+            return new NoContentResult();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting membership {MembershipId} for team {TeamId}", membershipId, teamId);
+            return new StatusCodeResult(500);
+        }
+    }
 }
 
 public class UpdateSkillInLineupsRequest

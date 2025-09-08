@@ -191,36 +191,18 @@
             <div id="auth-form">
                 <h1>Sign In to SideSpins</h1>
                 
-                <!-- Existing Member Sign In (Default View) -->
-                <div id="existing-member-view" class="view-section active">
-                    <h3>Returning Member</h3>
-                    <p class="description">
-                        Sign in with your phone number to access your SideSpins account.
+                <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem;">
+                    <h4 style="margin: 0 0 0.75rem 0; color: #495057; font-size: 1rem; font-weight: 600;">Quick Note</h4>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5;">
+                        Since the site's getting bigger and covering more teams, lineups are now private to each team. To get started, you'll need your APA member number (find it in the APA app under your profile) and phone number for verification. Super simple!
                     </p>
-                    
-                    <div id="phone-only-section">
-                        <label for="phone-only">Phone Number:</label>
-                        <input type="tel" id="phone-only" placeholder="+1 (555) 123-4567" />
-                        <button id="send-quick-sms-btn">Send Code</button>
-                    </div>
-                    
-                    <div id="quick-sms-code-section" style="display:none;">
-                        <label for="quick-sms-code">Enter the code sent to your phone:</label>
-                        <input type="text" id="quick-sms-code" placeholder="123456" maxlength="6" />
-                        <button id="verify-quick-sms-btn">Verify Code</button>
-                        <button id="back-to-phone-btn" class="secondary">Back</button>
-                    </div>
-                    
-                    <div class="toggle-link">
-                        <a href="#" id="show-new-member">New to SideSpins? Create an account →</a>
-                    </div>
                 </div>
                 
-                <!-- New Member Sign Up -->
-                <div id="new-member-view" class="view-section">
+                <!-- New Member Sign Up (Default View) -->
+                <div id="new-member-view" class="view-section active">
                     <h3>New League Member</h3>
                     <p class="description">
-                        Only verified APA league members can create accounts. You'll need your APA member number to get started.
+                        Only verified APA league members can create accounts. You'll need your APA member number (find it in the APA app under your profile) to get started.
                     </p>
                     
                     <div id="apa-input-section">
@@ -241,17 +223,38 @@
                     </div>
                     
                     <div class="toggle-link">
-                        <a href="#" id="show-existing-member">← Already have an account? Sign in</a>
+                        <a href="#" id="show-existing-member">Already have an account? Sign in →</a>
+                    </div>
+                </div>
+                
+                <!-- Existing Member Sign In -->
+                <div id="existing-member-view" class="view-section">
+                    <h3>Returning Member</h3>
+                    <p class="description">
+                        Sign in with your phone number to access your SideSpins account.
+                    </p>
+                    
+                    <div id="phone-only-section">
+                        <label for="phone-only">Phone Number:</label>
+                        <input type="tel" id="phone-only" placeholder="+1 (555) 123-4567" />
+                        <button id="send-quick-sms-btn">Send Code</button>
+                    </div>
+                    
+                    <div id="quick-sms-code-section" style="display:none;">
+                        <label for="quick-sms-code">Enter the code sent to your phone:</label>
+                        <input type="text" id="quick-sms-code" placeholder="123456" maxlength="6" />
+                        <button id="verify-quick-sms-btn">Verify Code</button>
+                        <button id="back-to-phone-btn" class="secondary">Back</button>
+                    </div>
+                    
+                    <div class="toggle-link">
+                        <a href="#" id="show-new-member">← New to SideSpins? Create an account</a>
                     </div>
                 </div>
             </div>
             
             <div id="error-message" style="display:none;"></div>
             <div id="success-message" style="display:none;"></div>
-            
-            <div class="back-link">
-                <a href="/">← Back to SideSpins</a>
-            </div>
         </div>
     </div>
 

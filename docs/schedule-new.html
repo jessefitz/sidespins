@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - SideSpins</title>
+    <style>
+        body        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .match-teams {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .match-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .match-time {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .lineup-explorer-btn {
+            background: #007cba;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+
+        .lineup-explorer-btn:hover {
+            background: #005a87;
+        }
+
+        .match-venue {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .lineups {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .lineup {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .lineup-header {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 1rem;
+        }
+
+        .lineup-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .lineup-table th,
+        .lineup-table td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+            text-align: left;
+        }
+
+        .lineup-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .lineup-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .lineup-table tr.alternate-player {
+            background: #fff3cd;
+        }
+
+        .lineup-table tr.alternate-player:hover {
+            background: #ffeaa7;
+        }
+
+        .lineup-table td:first-child,
+        .lineup-table th:first-child {
+            text-align: center;
+            width: 50px;
+            font-weight: 600;
+        }
+
+        .lineup-table td:last-child,
+        .lineup-table th:last-child {
+            text-align: center;
+            width: 70px;
+        }
+
+        .skill-total {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            font-weight: 600;
+            color: #495057;
+            text-align: right;
+            border-top: 2px solid #e9ecef;
+            font-size: 0.95rem;
+        }
+
+        .skill-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lineup-placeholder,
+        .lineup-empty {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .back-to-top {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .back-to-top a {
+            color: #007cba;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #007cba;
+            border-radius: 6px;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .back-to-top a:hover {
+            background: #007cba;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header,
+            .schedule-content {
+                padding: 1rem;
+            }
+
+            .lineups {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .match-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .match-actions {
+                align-self: flex-end;
+                gap: 0.5rem;
+            }
+
+            .lineup-explorer-btn {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .schedule-nav ul {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e1e5e9;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007cba;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-links a:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-links a.active {
+            background-color: #007cba;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .team-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-switcher label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .team-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .team-select:focus {
+            outline: none;
+            border-color: #007cba;
+        }
+
+        .user-avatar-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .captain-badge {
+            background: #ffc107;
+            color: #212529;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #ffd60a;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007cba;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .user-avatar:hover {
+            background: #005a87;
+            border-color: #007cba;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .user-dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .user-dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .user-dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .user-dropdown-item.logout:hover {
+            background-color: #f8d7da;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            margin-top: 0;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .team-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .team-info h3 {
+            margin-top: 0;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+
+        .schedule-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .schedule-nav {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .schedule-nav .label {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 1rem;
+        }
+
+        .schedule-nav ul {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .schedule-nav li a {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            color: #007cba;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .schedule-nav li a:hover {
+            background: #007cba;
+            color: white;
+        }
+
+        .schedule-day {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .schedule-day-header {
+            background: #007cba;
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .match-card {
+            border-bottom: 1px solid #e9ecef;
+            padding: 1.5rem;
+        }
+
+        .match-card:last-child {
+            border-bottom: none;
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .match-teams {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .match-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .match-venue {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .lineups {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .lineup {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 1rem;
+        }
+
+        .lineup-header {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .lineup-players {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .lineup-players li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lineup-players li:last-child {
+            border-bottom: none;
+        }
+
+        .player-name {
+            font-weight: 500;
+        }
+
+        .player-skill {
+            background: #007cba;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .skill-total {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 2px solid #dee2e6;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007cba;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .no-team {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .no-team a {
+            color: #007cba;
+            text-decoration: none;
+        }
+
+        .no-team a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .lineups {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .schedule-nav ul {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .match-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header" id="top">
+        <div class="header-content">
+            <div class="logo">SideSpins</div>
+            
+            <div class="nav-links">
+                <a href="/app.html">Dashboard</a>
+                <a href="/schedule-new.html" class="active">Schedule</a>
+                <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+            </div>
+
+            <div class="user-info">
+                <div class="team-switcher">
+                    <label for="team-select">Team:</label>
+                    <select id="team-select" class="team-select">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                
+                <div class="user-avatar-container">
+                    <div id="captain-badge" class="captain-badge" style="display:none;">Captain</div>
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <button class="user-dropdown-item logout" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading schedule data...</p>
+        </div>
+
+        <div id="no-team" class="no-team" style="display: none;">
+            <h2>No Team Selected</h2>
+            <p>Please select a team from the <a href="/app.html">main dashboard</a> to view the schedule.</p>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;">
+            <p>Error loading schedule data. Please try again later.</p>
+        </div>
+
+        <div id="schedule-container" style="display: none;">
+            <div class="page-header">
+                <h1>Team Schedule</h1>
+                <div class="team-info">
+                    <h3>Schedule for <span id="team-name">Team</span></h3>
+                    <p>Division: <span id="division-name">Loading...</span></p>
+                </div>
+            </div>
+
+            <div class="schedule-content">
+                <nav class="schedule-nav" id="schedule-nav">
+                    <span class="label">Jump to:</span>
+                    <ul id="nav-list">
+                        <!-- Navigation items will be added by JavaScript -->
+                    </ul>
+                </nav>
+
+                <div id="schedule-days">
+                    <!-- Schedule content will be added by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+        class ScheduleApp {
+            constructor() {
+                // Set up authManager with correct base URL
+                const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                    ? 'http://localhost:7071/api' 
+                    : 'https://sidespinsapi.azurewebsites.net/api';
+                this.authManager = new AuthManager(baseUrl);
+                this.teamId = null;
+                this.divisionId = null;
+                this.teamName = null;
+                
+                // Avatar elements
+                this.userAvatar = document.getElementById('user-avatar');
+                this.userDropdown = document.getElementById('user-dropdown');
+                this.captainBadge = document.getElementById('captain-badge');
+                
+                this.setupAvatarDropdown();
+            }
+            
+            setupAvatarDropdown() {
+                // Avatar dropdown functionality
+                this.userAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.userDropdown.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    this.userDropdown.classList.remove('show');
+                });
+            }
+            
+            updateUserAvatar(profile) {
+                let firstName = '';
+                let lastName = '';
+                
+                // Try different profile structures
+                if (profile && profile.debug && profile.debug.playerInfo) {
+                    firstName = profile.debug.playerInfo.firstName || '';
+                    lastName = profile.debug.playerInfo.lastName || '';
+                } else if (profile && profile.playerInfo) {
+                    firstName = profile.playerInfo.firstName || '';
+                    lastName = profile.playerInfo.lastName || '';
+                } else if (profile && profile.firstName) {
+                    firstName = profile.firstName || '';
+                    lastName = profile.lastName || '';
+                }
+                
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                const displayInitials = initials || '?';
+                
+                this.userAvatar.textContent = displayInitials;
+            }
+            
+            updateCaptainBadge(role) {
+                if (role === 'captain' || role === 'manager') {
+                    this.captainBadge.style.display = 'block';
+                    this.captainBadge.textContent = role === 'manager' ? 'Manager' : 'Captain';
+                } else {
+                    this.captainBadge.style.display = 'none';
+                }
+            }
+
+            async initialize() {
+                try {
+                    // Check authentication with proper redirect URL handling
+                    const isAuthenticated = await this.authManager.requireAuth();
+                    if (!isAuthenticated) {
+                        // Store current URL with hash for deep linking after login
+                        const returnUrl = encodeURIComponent(window.location.href);
+                        window.location.href = `/login.html?returnUrl=${returnUrl}`;
+                        return;
+                    }
+
+                    // Load user profile for avatar
+                    try {
+                        const profile = await this.authManager.getUserProfile();
+                        this.updateUserAvatar(profile);
+                    } catch (error) {
+                        console.warn('Could not load user profile:', error);
+                    }
+
+                    // Setup team switcher
+                    await this.setupTeamSwitcher();
+
+                    // Load memberships and get active team
+                    const activeMembership = this.authManager.getActiveMembership();
+                    
+                    if (!activeMembership) {
+                        this.showNoTeam();
+                        return;
+                    }
+
+                    this.teamId = activeMembership.teamId;
+                    this.teamName = activeMembership.teamName || activeMembership.teamId;
+                    
+                    // Update captain badge based on role
+                    this.updateCaptainBadge(activeMembership.role);
+                    
+                    // TODO: Get division ID from team data or user preferences
+                    // For now, use a hardcoded fallback
+                    this.divisionId = 'div_nottingham_wed_9b_311';
+
+                    // Update team display
+                    document.getElementById('team-name').textContent = this.teamName;
+                    document.getElementById('division-name').textContent = this.divisionId;
+
+                    // Load schedule data
+                    await this.loadSchedule();
+
+                    // Setup logout handler
+                    this.setupLogoutHandler();
+
+                    // Listen for team changes
+                    this.setupTeamChangeListener();
+
+                } catch (error) {
+                    console.error('Schedule app initialization failed:', error);
+                    this.showError('Failed to initialize schedule. Please try again.');
+                }
+            }
+
+            async setupTeamSwitcher() {
+                const teamSelect = document.getElementById('team-select');
+                const memberships = await this.authManager.loadUserMemberships();
+
+                teamSelect.innerHTML = '';
+
+                if (memberships.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No teams available';
+                    teamSelect.appendChild(option);
+                    return;
+                }
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select a team...';
+                teamSelect.appendChild(defaultOption);
+
+                memberships.forEach(membership => {
+                    const option = document.createElement('option');
+                    option.value = membership.teamId;
+                    option.textContent = membership.teamName || membership.teamId;
+                    option.dataset.role = membership.role;
+                    
+                    if (membership.teamId === this.authManager.activeTeamId) {
+                        option.selected = true;
+                    }
+                    
+                    teamSelect.appendChild(option);
+                });
+
+                teamSelect.addEventListener('change', (e) => {
+                    const selectedTeamId = e.target.value;
+                    const selectedOption = e.target.selectedOptions[0];
+                    
+                    if (selectedTeamId && selectedOption) {
+                        this.authManager.setActiveTeam(selectedTeamId);
+                        this.updateCaptainBadge(selectedOption.dataset.role);
+                        window.location.reload(); // Reload to show new team's schedule
+                    }
+                });
+            }
+
+            setupTeamChangeListener() {
+                window.addEventListener('teamChanged', (event) => {
+                    window.location.reload(); // Reload to show new team's schedule
+                });
+            }
+
+            setupLogoutHandler() {
+                const logoutBtn = document.getElementById('logout-btn');
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        await this.authManager.logout();
+                        window.location.href = '/login.html';
+                    } catch (error) {
+                        console.error('Logout failed:', error);
+                        window.location.href = '/login.html';
+                    }
+                });
+            }
+
+            showNoTeam() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('no-team').style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('schedule-container').style.display = 'none';
+            }
+
+            showError(message) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('no-team').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').querySelector('p').textContent = message;
+                document.getElementById('schedule-container').style.display = 'none';
+            }
+
+            showSchedule() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('no-team').style.display = 'none';
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('schedule-container').style.display = 'block';
+            }
+
+            async loadSchedule() {
+                try {
+                    // Fetch matches and team data using authenticated requests
+                    const [matches, players, memberships] = await Promise.all([
+                        this.fetchMatches(),
+                        this.fetchPlayers(),
+                        this.fetchMemberships()
+                    ]);
+
+                    // Create player lookup with skill levels
+                    const playerSkills = this.createPlayerSkillMap(players, memberships);
+
+                    // Group matches by date
+                    const matchesByDate = this.groupMatchesByDate(matches);
+
+                    // Render the schedule
+                    this.renderSchedule(matchesByDate, playerSkills);
+
+                    this.showSchedule();
+
+                    // Handle hash fragment if present in URL
+                    this.handleHashFragment();
+
+                } catch (error) {
+                    console.error('Error loading schedule:', error);
+                    this.showError('Failed to load schedule data. Please try again.');
+                }
+            }
+
+            async fetchMatches() {
+                const response = await this.authManager.makeAuthenticatedRequest(
+                    `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`
+                );
+                if (!response.ok) throw new Error('Failed to fetch matches');
+                return response.json();
+            }
+
+            async fetchPlayers() {
+                const response = await this.authManager.makeAuthenticatedRequest(
+                    `${this.authManager.baseUrl}/GetPlayers`
+                );
+                if (!response.ok) throw new Error('Failed to fetch players');
+                return response.json();
+            }
+
+            async fetchMemberships() {
+                // Use the auth manager's method to get user memberships
+                const allMemberships = await this.authManager.loadUserMemberships();
+                // Filter to get memberships for the current team
+                return allMemberships.filter(membership => membership.teamId === this.teamId);
+            }
+
+            createPlayerSkillMap(players, memberships) {
+                const playerMap = {};
+                players.forEach(player => {
+                    playerMap[player.id] = player;
+                });
+
+                const skillMap = {};
+                // Add all players to the skill map, not just team members
+                players.forEach(player => {
+                    skillMap[player.id] = {
+                        name: `${player.firstName} ${player.lastName}`.trim(),
+                        skill: 0 // Default skill
+                    };
+                });
+
+                // Update skill levels for team members
+                memberships.forEach(membership => {
+                    if (skillMap[membership.playerId]) {
+                        skillMap[membership.playerId].skill = membership.skillLevel_9b || 0;
+                    }
+                });
+
+                return skillMap;
+            }
+
+            groupMatchesByDate(matches) {
+                const matchesByDate = {};
+                
+                // Filter matches for our team
+                const teamMatches = matches.filter(match => 
+                    match.homeTeamId === this.teamId || match.awayTeamId === this.teamId
+                );
+
+                teamMatches.forEach(match => {
+                    const matchDate = new Date(match.scheduledAt);
+                    const dateKey = matchDate.toISOString().split('T')[0];
+                    
+                    if (!matchesByDate[dateKey]) {
+                        matchesByDate[dateKey] = {
+                            date: matchDate,
+                            matches: []
+                        };
+                    }
+                    
+                    matchesByDate[dateKey].matches.push(match);
+                });
+
+                return matchesByDate;
+            }
+
+            renderSchedule(matchesByDate, playerSkills) {
+                const scheduleContainer = document.getElementById('schedule-days');
+                const navList = document.getElementById('nav-list');
+                
+                scheduleContainer.innerHTML = '';
+                navList.innerHTML = '';
+
+                const sortedDates = Object.keys(matchesByDate).sort();
+
+                sortedDates.forEach(dateKey => {
+                    const dayData = matchesByDate[dateKey];
+                    const dayElement = this.createDayElement(dateKey, dayData, playerSkills);
+                    scheduleContainer.appendChild(dayElement);
+
+                    // Add navigation item
+                    const navItem = document.createElement('li');
+                    const navLink = document.createElement('a');
+                    navLink.href = `#date-${dateKey}`; // Use same prefix as the ID
+                    navLink.textContent = dayData.date.toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    navItem.appendChild(navLink);
+                    navList.appendChild(navItem);
+                });
+            }
+
+            createDayElement(dateKey, dayData, playerSkills) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'schedule-day';
+                dayDiv.id = `date-${dateKey}`; // Prefix with 'date-' to make valid CSS selector
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'schedule-day-header';
+                headerDiv.textContent = dayData.date.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                dayDiv.appendChild(headerDiv);
+
+                dayData.matches.forEach(match => {
+                    const matchDiv = this.createMatchElement(match, playerSkills);
+                    dayDiv.appendChild(matchDiv);
+                });
+
+                // Add back to top link
+                const backToTopDiv = document.createElement('div');
+                backToTopDiv.className = 'back-to-top';
+                backToTopDiv.innerHTML = '<a href="#top">↑ Back to Top</a>';
+                dayDiv.appendChild(backToTopDiv);
+
+                return dayDiv;
+            }
+
+            createMatchElement(match, playerSkills) {
+                const matchDiv = document.createElement('div');
+                matchDiv.className = 'match-card';
+
+                const isHomeTeam = match.homeTeamId === this.teamId;
+                const opponentTeamId = isHomeTeam ? match.awayTeamId : match.homeTeamId;
+                const homeTeamName = match.homeTeamName || match.homeTeamId;
+                const awayTeamName = match.awayTeamName || match.awayTeamId;
+                
+                // Handle case where opponent data might be null/undefined
+                const hasOpponent = opponentTeamId && opponentTeamId !== 'null' && opponentTeamId !== '';
+                const opponentName = hasOpponent ? (isHomeTeam ? awayTeamName : homeTeamName) : 'TBD';
+                const ourTeamName = isHomeTeam ? homeTeamName : awayTeamName;
+
+                const matchTime = new Date(match.scheduledAt).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+
+                let lineupsHtml = '';
+                
+                // Check if lineup data is available
+                if (match.lineupPlan && match.lineupPlan.home && match.lineupPlan.away) {
+                    const homeLineup = match.lineupPlan.home;
+                    const awayLineup = match.lineupPlan.away;
+                    const ourLineup = isHomeTeam ? homeLineup : awayLineup;
+                    const opponentLineup = isHomeTeam ? awayLineup : homeLineup;
+                    
+                    // Only show opponent lineup if there's a valid opponent
+                    if (hasOpponent) {
+                        lineupsHtml = `
+                            <div class="lineups">
+                                <div class="lineup">
+                                    <div class="lineup-header">Our Lineup</div>
+                                    ${this.renderLineupTable(ourLineup, playerSkills, true)}
+                                </div>
+                                <div class="lineup">
+                                    <div class="lineup-header">${opponentName} Lineup</div>
+                                    ${this.renderLineupTable(opponentLineup, playerSkills, false)}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Only show our lineup when opponent is TBD
+                        lineupsHtml = `
+                            <div class="lineups">
+                                <div class="lineup" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
+                                    <div class="lineup-header">Our Lineup</div>
+                                    ${this.renderLineupTable(ourLineup, playerSkills, true)}
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    lineupsHtml = `
+                        <div class="lineups">
+                            <div class="lineup-placeholder">
+                                <em>Lineups will be available closer to match time</em>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Display match teams appropriately
+                const teamsDisplay = hasOpponent ? `${ourTeamName} vs ${opponentName}` : `${ourTeamName} vs ${opponentName}`;
+
+                matchDiv.innerHTML = `
+                    <div class="match-header">
+                        <div class="match-teams">
+                            ${teamsDisplay}
+                        </div>
+                        <div class="match-actions">
+                            <div class="match-time">${matchTime}</div>
+                            <a href="/lineup-explorer-new.html?matchId=${match.id}" 
+                               class="lineup-explorer-btn"
+                               title="Experiment with different lineups for this match">
+                                🎯 Lineup Explorer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="match-venue">
+                        ${match.venueName || 'Venue TBD'}
+                    </div>
+                    ${lineupsHtml}
+                `;
+
+                return matchDiv;
+            }
+
+            renderLineupTable(lineup, playerSkills, isOurTeam) {
+                if (!lineup || lineup.length === 0) {
+                    return '<div class="lineup-empty">No lineup set</div>';
+                }
+
+                let totalSkill = 0;
+                let tableRows = '';
+                
+                lineup.forEach((lineupPlayer, index) => {
+                    const playerInfo = playerSkills[lineupPlayer.playerId] || { 
+                        name: lineupPlayer.playerId, 
+                        skill: 0 
+                    };
+                    const skill = lineupPlayer.skillLevel || playerInfo.skill || 0;
+                    
+                    if (!lineupPlayer.isAlternate) {
+                        totalSkill += skill;
+                    }
+
+                    const playerName = isOurTeam ? playerInfo.name : (lineupPlayer.playerName || lineupPlayer.playerId);
+                    const isAlternateText = lineupPlayer.isAlternate ? ' (Alternate)' : '';
+                    
+                    tableRows += `
+                        <tr ${lineupPlayer.isAlternate ? 'class="alternate-player"' : ''}>
+                            <td>${index + 1}</td>
+                            <td>${playerName}${isAlternateText}</td>
+                            <td>${skill}</td>
+                        </tr>
+                    `;
+                });
+
+                let skillWarning = '';
+                if (isOurTeam && totalSkill > 23) {
+                    skillWarning = `
+                        <div class="skill-warning">
+                            ⚠️ Planned lineup exceeds 23 (${totalSkill}). Adjust before match night.
+                        </div>
+                    `;
+                }
+
+                return `
+                    <table class="lineup-table">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Player</th>
+                                <th>Skill</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    ${isOurTeam ? `<div class="skill-total">Total Skill: ${totalSkill}</div>` : ''}
+                    ${skillWarning}
+                `;
+            }
+
+            handleHashFragment() {
+                if (window.location.hash) {
+                    const targetElement = document.querySelector(window.location.hash);
+                    if (targetElement) {
+                        // Small delay to ensure content is rendered
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
+                }
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new ScheduleApp();
+            app.initialize().then(() => {
+                // Handle hash fragment after initialization
+                app.handleHashFragment();
+            });
+        });
+
+        // Handle hash changes for navigation within the page
+        window.addEventListener('hashchange', () => {
+            const targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    </script>
+</body>
+</html>

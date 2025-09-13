@@ -1,0 +1,37 @@
+{
+  "biometric_registrations": [],
+  "created_at": "2025-09-06T11:26:01Z",
+  "crypto_wallets": [],
+  "emails": [],
+  "external_id": "21249005",
+  "is_locked": false,
+  "lock_created_at": null,
+  "lock_expires_at": null,
+  "name": {
+    "first_name": "Jesse",
+    "last_name": "FitzGibbon",
+    "middle_name": "C"
+  },
+  "password": null,
+  "phone_numbers": [
+    {
+      "phone_id": "phone-number-test-a6a32837-86ef-4019-b6ec-f9e69c012966",
+      "phone_number": "+14104403238",
+      "verified": true
+    }
+  ],
+  "providers": [],
+  "request_id": "request-id-test-791ecbc7-9070-435a-b2bb-46813646649a",
+  "roles": ["stytch_user"],
+  "status": "active",
+  "status_code": 200,
+  "totps": [],
+  "trusted_metadata": {
+    "teams": {
+      "team": { "team_id": "break_of_dawn_9b", "team_role": "manager" }
+    }
+  },
+  "untrusted_metadata": {},
+  "user_id": "user-test-1a711e62-37ab-4976-b0a9-0e83b9cd35b0",
+  "webauthn_registrations": []
+}

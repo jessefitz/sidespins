@@ -58,7 +58,6 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-  - index-old.markdown # Remove conflicting index file
 
 
 

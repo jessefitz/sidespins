@@ -1,0 +1,4995 @@
+{
+	"info": {
+		"_postman_id": "986a42df-8f53-4833-98ff-b6c3ee863747",
+		"name": "Stytch Consumer API [Last Updated: 2024-02-14]",
+		"description": "The official Stytch API collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48220661",
+		"_collection_link": "https://www.postman.com/stytch/stytch-public-workspace/collection/b486eiy/stytch-consumer-api-last-updated-2024-02-14?action=share&source=collection_link&creator=48220661"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sandbox@stytch.com\"\n}\n// For all available parameters see https://stytch.com/docs/api/create-user",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"sandbox@stytch.com\"\n}\n// For all available parameters see https://stytch.com/docs/api/create-user",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 25 Mar 2022 00:12:59 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "233"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-08a7bbc49276234cb2128b6055430100-72a8cd329df2e651-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"email_id\": \"email-test-23873e89-d4ed-4e92-b3b9-e5c7198fa286\",\n    \"phone_id\": \"\",\n    \"request_id\": \"request-id-test-c9bca93e-ecbc-4877-83cf-5d697559ac23\",\n    \"status\": \"\",\n    \"status_code\": 201,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Search users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"limit\": 100,\n    \"cursor\": \"\"\n}\n// For all available parameters see https://stytch.com/docs/api/search-users",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/search",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"search"
+							]
+						},
+						"description": "Search across your users at Stytch. This endpoint also allows you to return all of your users; simply send an empty body and no filtering will be applied."
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"limit\": 1,\n    \"cursor\": \"\"\n}\n// For all available parameters see https://stytch.com/docs/api/search-users",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users/search",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"search"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 25 Mar 2022 00:14:45 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "530"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-74b0bf077381eacfbe4425d46ab27459-3f98de56eae16f53-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"request_id\": \"request-id-test-4d8947a1-0ac0-4683-a555-ed4aded605ed\",\n    \"results\": [\n        {\n            \"created_at\": \"2022-03-15T00:52:38Z\",\n            \"crypto_wallets\": [],\n            \"emails\": [\n                {\n                    \"email\": \"cal@stytch.com\",\n                    \"email_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n                    \"verified\": false\n                }\n            ],\n            \"name\": {\n                \"first_name\": \"\",\n                \"last_name\": \"\",\n                \"middle_name\": \"\"\n            },\n            \"phone_numbers\": [],\n            \"providers\": [],\n            \"status\": \"active\",\n            \"totps\": [],\n            \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\",\n            \"webauthn_registrations\": []\n        }\n    ],\n    \"results_metadata\": {\n        \"next_cursor\": null,\n        \"total\": 1\n    },\n    \"status_code\": 200\n}"
+						}
+					]
+				},
+				{
+					"name": "Get user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "user-test-61497d40-f957-45cd-a6c8-5408d22e93bc"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "user-test-61497d40-f957-45cd-a6c8-5408d22e93bc"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 25 Mar 2022 00:15:43 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "466"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-05b4cfbc0d707d974f6d751701f0dbca-507e54366acfa91b-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"created_at\": \"2022-03-15T00:52:38Z\",\n    \"crypto_wallets\": [],\n    \"emails\": [\n        {\n            \"email\": \"cal@stytch.com\",\n            \"email_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n            \"verified\": false\n        }\n    ],\n    \"name\": {\n        \"first_name\": \"\",\n        \"last_name\": \"\",\n        \"middle_name\": \"\"\n    },\n    \"phone_numbers\": [],\n    \"providers\": [],\n    \"request_id\": \"request-id-test-d0a9faab-22d2-4d5d-9405-541a2a904033\",\n    \"status\": \"active\",\n    \"status_code\": 200,\n    \"totps\": [],\n    \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\",\n    \"webauthn_registrations\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_numbers\": [\n        {\"phone_number\": \"+10000000030\"}\n    ]\n}\n// For all available parameters see https://stytch.com/docs/api/update-user",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "user-test-63611f74-7bbb-47ed-bd9c-577e2e605925"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": {\n        \"first_name\": \"Cal Ruebert\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 04 Mar 2022 19:13:45 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "177"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-c4e4f5ac8f5a99cb6df6ff7ac89545a0-cd8c07d60caf3aca-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"emails\": [],\n    \"phone_numbers\": [],\n    \"request_id\": \"request-id-test-636ae480-5f46-47d4-a7d0-e37a7dbfa9cc\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Exchange primary factor",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email_address\": \"bob@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id/exchange_primary_factor",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								":user_id",
+								"exchange_primary_factor"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "user-test-61497d40-f957-45cd-a6c8-5408d22e93bc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "user-test-8743e46a-5eac-4c50-af25-5e6533b18ebf"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users/:user_id",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 04 Mar 2022 21:15:37 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-8eb6fdb0bf385487da6102f5a09ed187-53756c2e88c42221-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\n    \"request_id\": \"request-id-test-59b3701c-06bf-4a6d-8d21-6bc29b52e778\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete user email",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/emails/:email_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"emails",
+								":email_id"
+							],
+							"variable": [
+								{
+									"key": "email_id",
+									"value": "email-test-72712dde-1daa-48fb-bb63-57359bd1e60c"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users/emails/:email_id",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"emails",
+										":email_id"
+									],
+									"variable": [
+										{
+											"key": "email_id",
+											"value": "email-test-72712dde-1daa-48fb-bb63-57359bd1e60c"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 04 Mar 2022 21:50:19 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "https://js.stytch.com"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-217bebfce875b4f30077ce715d232d04-5d69d856c154a8a5-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\n    \"request_id\": \"request-id-test-3e1279e9-efda-40ba-a361-2b3833f5409e\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-63611f74-7bbb-47ed-bd9c-577e2e605925\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete user phone number",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/phone_numbers/:phone_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"phone_numbers",
+								":phone_id"
+							],
+							"variable": [
+								{
+									"key": "phone_id",
+									"value": "phone-number-test-094fefa8-1ed4-4f28-bcd9-e1d08c499351"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/users/phone_numbers/:phone_id",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"phone_numbers",
+										":phone_id"
+									],
+									"variable": [
+										{
+											"key": "phone_id",
+											"value": "phone-number-test-094fefa8-1ed4-4f28-bcd9-e1d08c499351"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 04 Mar 2022 21:58:55 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-e2d91d9186cb87844f4c46c6e3a08045-d0d896a00a74dc77-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"request_id\": \"request-id-test-dd22f47d-c64c-49cd-a231-4bfd5798edc5\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-63611f74-7bbb-47ed-bd9c-577e2e605925\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete user WebAuthn registration",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/webauthn_registrations/:webauthn_registration_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"webauthn_registrations",
+								":webauthn_registration_id"
+							],
+							"variable": [
+								{
+									"key": "webauthn_registration_id",
+									"value": "webauthn-registration-test-5c44cc6a-8af7-48d6-8da7-ea821342f5a6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user biometric registration",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/biometric_registrations/:biometric_registration_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"biometric_registrations",
+								":biometric_registration_id"
+							],
+							"variable": [
+								{
+									"key": "biometric_registration_id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user TOTP",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/totps/:totp_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"totps",
+								":totp_id"
+							],
+							"variable": [
+								{
+									"key": "totp_id",
+									"value": "totp-test-41920359-8bbb-4fe8-8fa3-aaa83f35f02c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user crypto wallet",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/crypto_wallets/:crypto_wallet_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"crypto_wallets",
+								":crypto_wallet_id"
+							],
+							"variable": [
+								{
+									"key": "crypto_wallet_id",
+									"value": "crypto-wallet-test-dbbd372e-79f8-48ea-907c-5f0755e7d328"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user password",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/passwords/:password_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"passwords",
+								":password_id"
+							],
+							"variable": [
+								{
+									"key": "password_id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user oauth registration",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/users/oauth/:oauth_user_registration_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users",
+								"oauth",
+								":oauth_user_registration_id"
+							],
+							"variable": [
+								{
+									"key": "oauth_user_registration_id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Passkeys & WebAuthn",
+			"item": [
+				{
+					"name": "Register",
+					"item": [
+						{
+							"name": "Start",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": \"stytch_user_id\",\n    \"domain\": \"https://example.com\"\n}\n\n//Full parameter reference at https://stytch.com/docs/api/webauthn-register-start",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/webauthn/register/start",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"webauthn",
+										"register",
+										"start"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"user_id\": \"user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d\",\n    \"domain\": \"https://stytch.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://test.stytch.com/v1/webauthn/register/start",
+											"protocol": "https",
+											"host": [
+												"test",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"webauthn",
+												"register",
+												"start"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 21:13:35 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "627"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Access-Control-Allow-Headers",
+											"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+										},
+										{
+											"key": "Access-Control-Allow-Methods",
+											"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "https://js.stytch.com"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-2a3ab89e80fe053375d2cc404d1b1e58-a0f00604c8b7ff13-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"public_key_credential_creation_options\": \"{\\\"authenticatorSelection\\\":{\\\"userVerification\\\":\\\"discouraged\\\"},\\\"challenge\\\":\\\"Lcb3Dab8MDKJL4ULWQryblQZPpM7YoMd7k0jbQBDgLC-\\\",\\\"excludeCredentials\\\":[],\\\"pubKeyCredParams\\\":[{\\\"alg\\\":-7,\\\"type\\\":\\\"public-key\\\"}],\\\"rp\\\":{\\\"id\\\":\\\"https://stytch.com\\\",\\\"name\\\":\\\"My first project\\\"},\\\"timeout\\\":300000,\\\"user\\\":{\\\"displayName\\\":\\\"Cal\\\",\\\"id\\\":\\\"dXNlci10ZXN0LWNkOTczNGZmLTBkMWItNDI4OS1hMDkzLWU0ZWZhNDAyOGExZA==\\\",\\\"name\\\":\\\"Cal Rueb\\\"}}\",\n    \"request_id\": \"request-id-test-390f63d0-4dea-4eef-aa35-e02305d42450\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": \"stytch_user_id\",\n    \"public_key_credential\": \"$PUBLIC_KEY_CREDENTIAL\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/webauthn/register",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"webauthn",
+										"register"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Authenticate",
+					"item": [
+						{
+							"name": "Start",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": \"stytch_user_id\",\n    \"domain\": \"https://example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/webauthn/authenticate/start",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"webauthn",
+										"authenticate",
+										"start"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Authenticate",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"public_key_credential\": \"$PUBLIC_KEY_CREDENTIAL\",\n    \"session_duration_minutes\": 120\n}\n\n// Full parameter reference at https://stytch.com/docs/api/webauthn-authenticate",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/webauthn/authenticate",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"webauthn",
+										"authenticate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update WebAuthn registration",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"$NAME\"\n}\n\n// Full parameter reference at https://stytch.com/docs/api/webauthn-update",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/webauthn/:webauthn_registration_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"webauthn",
+								":webauthn_registration_id"
+							],
+							"variable": [
+								{
+									"key": "webauthn_registration_id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Magic Links",
+			"item": [
+				{
+					"name": "Via email",
+					"item": [
+						{
+							"name": "Send Magic Link",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"chris@stytch.com\",\n    \"login_magic_link_url\": \"http://localhost:3000\",\n    \"signup_magic_link_url\": \"http://localhost:3000\",\n    \"login_expiration_minutes\": 30,\n    \"signup_expiration_minutes\": 30,\n    \"attributes\": {\n        \"ip_address\": \"optional_ip_address\",\n        \"user_agent\": \"optional_user_agent\"\n    }\n}\n// For all available parameters see https://stytch.com/docs/api/send-by-email",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/send",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"magic_links",
+										"email",
+										"send"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"cal@stytch.com\",\n    \"login_magic_link_url\": \"http://localhost:3000\",\n    \"signup_magic_link_url\": \"http://localhost:3000\",\n    \"login_expiration_minutes\": 30,\n    \"signup_expiration_minutes\": 30,\n    \"attributes\": {\n        \"ip_address\": \"1.0.0.0\",\n        \"user_agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/send",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"magic_links",
+												"email",
+												"send"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 17:20:02 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "207"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Access-Control-Allow-Headers",
+											"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+										},
+										{
+											"key": "Access-Control-Allow-Methods",
+											"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "https://js.stytch.com"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-b2edfff23c4f8b8afb04ab00a0b9a681-8f7bf7c5a9ab3346-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"email_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n    \"request_id\": \"request-id-test-a013c93c-ec90-4d15-86af-59ae8d751c4e\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Login Or Create User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"chris@stytch.com\",\n    \"login_expiration_minutes\": 30,\n    \"signup_expiration_minutes\": 30\n}\n// For all available parameters see https://stytch.com/docs/api/log-in-or-create-user-by-email",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/login_or_create",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"magic_links",
+										"email",
+										"login_or_create"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"cal@stytch.com\",\n    \"login_magic_link_url\": \"http://localhost:3000\",\n    \"signup_magic_link_url\": \"http://localhost:3000\",\n    \"login_expiration_minutes\": 30,\n    \"signup_expiration_minutes\": 30\n}\n// For all available parameters see https://stytch.com/docs/api/log-in-or-create-user-by-email",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/login_or_create",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"magic_links",
+												"email",
+												"login_or_create"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 17:24:47 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "228"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Access-Control-Allow-Headers",
+											"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+										},
+										{
+											"key": "Access-Control-Allow-Methods",
+											"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "https://js.stytch.com"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-5526ec7d1191cda5e50f7a97ac3459af-bebe9e27fe501c54-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"email_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n    \"request_id\": \"request-id-test-c5810993-100e-4e2f-959d-015db2eb82db\",\n    \"status_code\": 200,\n    \"user_created\": false,\n    \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Invite",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"required_email_address\",\n    \"invite_expiration_minutes\": 360\n}\n// For all available parameters see https://stytch.com/docs/api/invite-by-email",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/invite",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"magic_links",
+										"email",
+										"invite"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"cal3@stytch.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/revoke_invite",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"magic_links",
+												"email",
+												"revoke_invite"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 18:03:19 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-343649c4dd90355e1e5af7897622f014-d50b4529130d7180-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"request_id\": \"request-id-test-784a64d0-aee4-4e50-acf2-d27ddaec4025\",\n    \"status_code\": 200\n}"
+								}
+							]
+						},
+						{
+							"name": "Revoke invite",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"required_email_address\",\n    \"invite_expiration_minutes\": 360\n}\n// For all available parameters see https://stytch.com/docs/api/invite-by-email",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/revoke_invite",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"magic_links",
+										"email",
+										"revoke_invite"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"cal3@stytch.com\",\n    \"invite_expiration_minutes\": 360\n}\n// For all available parameters see https://stytch.com/docs/api/invite-by-email",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/magic_links/email/invite",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"magic_links",
+												"email",
+												"invite"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 17:28:46 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "207"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-23e2b11e722ef6518d52fad2fec0229a-f71d39e0d4db5b96-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"email_id\": \"email-test-46746d6b-56c7-451f-bc3a-1e5b72771044\",\n    \"request_id\": \"request-id-test-91769ecc-cc84-4932-8591-7802b26d4366\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-6e886d31-d757-4272-800b-354886de9ef7\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Embeddable",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": \"required_stytch_user_id\"\n}\n// For all available parameters see https://stytch.com/docs/api/create-magic-link",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/magic_links",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"magic_links"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"user_id\": \"user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/magic_links",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"magic_links"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 18:05:14 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "201"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-1dc4c52cc0ece4d6b1c267b0411f02a1-8e7c8e6cead27807-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"request_id\": \"request-id-test-1b153edb-496b-40a7-82ba-4f1ff5c59c6b\",\n    \"status_code\": 200,\n    \"token\": \"m2Eu7JoVN-vK3afWpVJ4ZSK1PcHtYdp_Ty9BKiVAD6fa\",\n    \"user_id\": \"user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"required_token_from_magic_link_redirect\",\n    \"session_duration_minutes\": \"60\"\n}\n// For all available parameters see https://stytch.com/docs/api/authenticate-magic-link",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/magic_links/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"magic_links",
+								"authenticate"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"XBneto9cvdWl6BZfbLGSxWumHP4Nbo_1235woK3YHt\",\n    \"session_duration_minutes\": \"60\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/magic_links/authenticate",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"magic_links",
+										"authenticate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 24 Mar 2022 18:09:46 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "https://js.stytch.com"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-56c3c062290b3edb4503b38547fee7e0-1a65ae833cd29df3-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"method_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n    \"request_id\": \"request-id-test-0af0c23c-1569-4d06-acb0-0c2c2adc2c6d\",\n    \"session\": {\n        \"attributes\": {\n            \"ip_address\": \"\",\n            \"user_agent\": \"\"\n        },\n        \"authentication_factors\": [\n            {\n                \"delivery_method\": \"email\",\n                \"email_factor\": {\n                    \"email_address\": \"cal@stytch.com\",\n                    \"email_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\"\n                },\n                \"last_authenticated_at\": \"2022-03-24T18:09:46Z\",\n                \"type\": \"magic_link\"\n            }\n        ],\n        \"expires_at\": \"2022-03-24T19:09:46Z\",\n        \"last_accessed_at\": \"2022-03-24T18:09:46Z\",\n        \"session_id\": \"session-test-12601f14-c354-4b5b-8ce5-ae96421aa1bb\",\n        \"started_at\": \"2022-03-24T18:09:46Z\",\n        \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\"\n    },\n    \"session_jwt\": \"session_jwt_token_here\",\n    \"session_token\": \"session_token_here\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "One-Time Passcodes (OTP)",
+			"item": [
+				{
+					"name": "Via SMS",
+					"item": [
+						{
+							"name": "Send",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phone_number\": \"required_phone_number\"\n}\n// For all available parameters see https://stytch.com/docs/api/send-otp-by-sms",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/sms/send",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"sms",
+										"send"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"phone_number\": \"+10000000000\"\n}\n// For all available parameters see https://stytch.com/docs/api/send-otp-by-sms",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/otps/sms/send",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"otps",
+												"sms",
+												"send"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 18:28:11 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "214"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-dfee4529e8a7b3180b2a88eb6cdcd249-3738e38c7daffda7-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"phone_id\": \"phone-number-test-98cfbe19-6c8f-4b8b-b62a-e78a5a7bdff3\",\n    \"request_id\": \"request-id-test-d2e5eb16-d16a-4e67-bbd8-008a7e52ffd6\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Login or create user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phone_number\": \"required_phone_number\"\n}\n// For all available parameters see https://stytch.com/docs/api/log-in-or-create-user-by-sms",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/sms/login_or_create",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"sms",
+										"login_or_create"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"phone_number\": \"+10000000000\"\n}\n// For all available parameters see https://stytch.com/docs/api/log-in-or-create-user-by-sms",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/otps/sms/login_or_create",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"otps",
+												"sms",
+												"login_or_create"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 18:30:26 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "235"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Access-Control-Allow-Headers",
+											"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+										},
+										{
+											"key": "Access-Control-Allow-Methods",
+											"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "https://js.stytch.com"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-82306b5cbb5de198bbf9fee91d26c9c3-109512d9965603ba-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"phone_id\": \"phone-number-test-98cfbe19-6c8f-4b8b-b62a-e78a5a7bdff3\",\n    \"request_id\": \"request-id-test-06426beb-374f-41a5-af6d-3136e9b9eab4\",\n    \"status_code\": 200,\n    \"user_created\": false,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Via WhatsApp",
+					"item": [
+						{
+							"name": "Send",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phone_number\": \"required_phone_number\"\n}\n// For all available parameters see https://stytch.com/docs/api/whatsapp-send",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/whatsapp/send",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"whatsapp",
+										"send"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"phone_number\": \"+10000000000\"\n}\n// For all available parameters see https://stytch.com/docs/api/whatsapp-send",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/otps/whatsapp/send",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"otps",
+												"whatsapp",
+												"send"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 18:32:30 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "214"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-96c26a3217ad45cfab144d5d1e1159b5-90bbe34c15957abd-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"phone_id\": \"phone-number-test-98cfbe19-6c8f-4b8b-b62a-e78a5a7bdff3\",\n    \"request_id\": \"request-id-test-a44824f9-6b1d-4648-939b-d23a6b08725d\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Login or create user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phone_number\": \"required_phone_number\"\n}\n// For all available parameters see https://stytch.com/docs/api/whatsapp-login-or-create",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/whatsapp/login_or_create",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"whatsapp",
+										"login_or_create"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"phone_number\": \"+10000000000\"\n}\n// For all available parameters see https://stytch.com/docs/api/whatsapp-login-or-create",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/otps/whatsapp/login_or_create",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"otps",
+												"whatsapp",
+												"login_or_create"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 18:34:07 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "235"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Access-Control-Allow-Headers",
+											"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+										},
+										{
+											"key": "Access-Control-Allow-Methods",
+											"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "https://js.stytch.com"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-6180b3d497b65734ee87ff6f7932fe3d-682543d9f2696fab-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"phone_id\": \"phone-number-test-98cfbe19-6c8f-4b8b-b62a-e78a5a7bdff3\",\n    \"request_id\": \"request-id-test-1a804d4d-1781-4b46-a63b-c90a1f806772\",\n    \"status_code\": 200,\n    \"user_created\": false,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Via email",
+					"item": [
+						{
+							"name": "Send",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"required_email_address\"\n}\n// For all available parameters see https://stytch.com/docs/api/send-otp-by-email",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/email/send",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"email",
+										"send"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"sandbox@stytch.com\"\n}\n// For all available parameters see https://stytch.com/docs/api/send-otp-by-email",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/otps/email/send",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"otps",
+												"email",
+												"send"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 20:22:42 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "207"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-dc21b095af4f729829f4bfa69faf1e1f-26dc6b047c9cfbac-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"email_id\": \"email-test-23873e89-d4ed-4e92-b3b9-e5c7198fa286\",\n    \"request_id\": \"request-id-test-e2533933-bfbf-451d-b6da-6cbf4d359a50\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Login or create user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"required_email_address\"\n}\n// For all available parameters see https://stytch.com/docs/api/log-in-or-create-user-by-email-otp",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/email/login_or_create",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"email",
+										"login_or_create"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"sandbox@stytch.com\"\n}\n// For all available parameters see https://stytch.com/docs/api/log-in-or-create-user-by-email-otp",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ENV}}.stytch.com/v1/otps/email/login_or_create",
+											"protocol": "https",
+											"host": [
+												"{{ENV}}",
+												"stytch",
+												"com"
+											],
+											"path": [
+												"v1",
+												"otps",
+												"email",
+												"login_or_create"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 24 Mar 2022 20:23:48 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "228"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Access-Control-Allow-Credentials",
+											"value": "true"
+										},
+										{
+											"key": "Access-Control-Allow-Headers",
+											"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+										},
+										{
+											"key": "Access-Control-Allow-Methods",
+											"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "https://js.stytch.com"
+										},
+										{
+											"key": "Content-Security-Policy",
+											"value": "default-src 'none'"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "origin-when-cross-origin"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=31536000; includeSubDomains"
+										},
+										{
+											"key": "Traceparent",
+											"value": "00-67f9d9fd97774c5d0302a9ba432e8fbf-1c9ad9f78a2ad206-01"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"email_id\": \"email-test-23873e89-d4ed-4e92-b3b9-e5c7198fa286\",\n    \"request_id\": \"request-id-test-6fb826e6-23f6-44e6-b981-7855a062cdd6\",\n    \"status_code\": 200,\n    \"user_created\": false,\n    \"user_id\": \"user-test-e3795c81-f849-4167-bfda-e4a6e9c280fd\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method_id\": \"the_email_id_or_phone_id\",\n    \"code\": \"OTP_code\"\n}\n// For all available parameters see https://stytch.com/docs/api/authenticate-otp",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/otps/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"otps",
+								"authenticate"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"method_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n    \"code\": \"337944\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ENV}}.stytch.com/v1/otps/authenticate",
+									"protocol": "https",
+									"host": [
+										"{{ENV}}",
+										"stytch",
+										"com"
+									],
+									"path": [
+										"v1",
+										"otps",
+										"authenticate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 24 Mar 2022 20:29:00 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "259"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "Content-Type,Authorization,X-Stytch-Oauth-Type"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "https://js.stytch.com"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "origin-when-cross-origin"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "Traceparent",
+									"value": "00-e99778e805805e436c3919166b8ce68e-0ea95c4efa1abd15-01"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"method_id\": \"email-test-407439da-103c-4dfe-904c-4b442e52ceb3\",\n    \"request_id\": \"request-id-test-a2b2a38a-f16b-4764-a9b0-1daa9178d929\",\n    \"session\": null,\n    \"session_jwt\": \"\",\n    \"session_token\": \"\",\n    \"status_code\": 200,\n    \"user_id\": \"user-test-61497d40-f957-45cd-a6c8-5408d22e93bc\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "OAuth",
+			"item": [
+				{
+					"name": "Attach",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"provider\": \"OAuth providers name. EG google\"\n}\n// For all available parameters see https://stytch.com/docs/api/oauth-attach",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/oauth/attach",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"oauth",
+								"attach"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Google",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/google/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"google",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amazon",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/amazon/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"amazon",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apple",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/apple/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"apple",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bitbucket",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/bitbucket/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"bitbucket",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Coinbase",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/coinbase/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"coinbase",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Discord",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/discord/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"discord",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facebook",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/facebook/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"facebook",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Figma",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/figma/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"figma",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GitHub",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/github/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"github",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GitLab",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/gitlab/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"gitlab",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LinkedIn",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/linkedin/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"linkedin",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Microsoft",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/microsoft/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"microsoft",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Salesforce",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/salesforcesalesforce/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"salesforcesalesforce",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Slack",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/slack/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"slack",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": null,
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Snapchat",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/snapchat/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"snapchat",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TikTok",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/tiktok/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"tiktok",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Twitch",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/twitch/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"twitch",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Twitter",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/twitter/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"twitter",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Yahoo",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/oauth/yahoo/start?public_token={{PUBLIC_TOKEN}}",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								"oauth",
+								"yahoo",
+								"start"
+							],
+							"query": [
+								{
+									"key": "public_token",
+									"value": "{{PUBLIC_TOKEN}}"
+								},
+								{
+									"key": "login_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "signup_redirect_url",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "custom_scopes",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								},
+								{
+									"key": "code_challenge",
+									"value": "",
+									"description": "OPTIONAL",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"YOUR_TOKEN_HERE\"\n}\n// For all available parameters see https://stytch.com/docs/api/oauth-authenticate",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/oauth/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"oauth",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Session Management",
+			"item": [
+				{
+					"name": "Get JWKS",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/sessions/jwks/:project_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"sessions",
+								"jwks",
+								":project_id"
+							],
+							"variable": [
+								{
+									"key": "project_id",
+									"value": "{{PROJECT_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/sessions?user_id=user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "user-test-cd9734ff-0d1b-4289-a093-e4efa4028a1d",
+									"description": "REQUIRED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_token\": \"stytch_session_token\",\n    \"session_jwt\": \"stytch_session_jwt\",\n    \"session_duration_minutes\": 120\n}\n// Only include either a session_token or session_jwt. For all available parameters see https://stytch.com/docs/api/session-auth",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/sessions/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"sessions",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_id\": \"stytch_session_id\"\n}\n// For all available parameters see https://stytch.com/docs/api/session-revoke",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/sessions/revoke",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"sessions",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Time-Based One-Time Passcodes (TOTP)",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"stytch_user_id\",\n    \"expiration_minutes\": 60\n}\n// For all available parameters see https://stytch.com/docs/api/totp-create",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/totps",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"totps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"stytch_user_id\",\n    \"totp_code\": \"TOTP_code\"\n}\n// For all available parameters see https://stytch.com/docs/api/totp-authenticate",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/totps/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"totps",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get TOTP recovery codes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"stytch_user_id\"\n}\n// For all available parameters see https://stytch.com/docs/api/totp-get-recovery-codes",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/totps/recovery_codes",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"totps",
+								"recovery_codes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recover",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"stytch_user_id\",\n    \"recovery_code\": \"recovery_code\"\n}\n// For all available parameters see https://stytch.com/docs/api/totp-recover",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/totps/recover",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"totps",
+								"recover"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Crypto Wallets",
+			"item": [
+				{
+					"name": "Authenticate start",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"crypto_wallet_type\": \"ethereum\",\n    \"crypto_wallet_address\": \"0x5207Db18A25bE52B75F2eacF6bf9161a8B69BD50\",\n    \"user_id\": \"stytch_user_id\"\n}\n// For all available parameters see https://stytch.com/docs/api/crypto-wallet-authenticate-start",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/crypto_wallets/authenticate/start",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"crypto_wallets",
+								"authenticate",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"crypto_wallet_address\": \"0x5207Db18A25bE52B75F2eacF6bf916448B69BD50\",\n    \"crypto_wallet_type\": \"ethereum\",\n    \"signature\":\"0xa203a049f3b93e1cdc46a1d243dcd64915182b3ab635ea14b3b58d66426f527b0a52a00e1e82sdf0f4b2bb981627a8c764d91dada579eec34d6887bfcc1e3fcfb1c\"\n}\n// For all available parameters see https://stytch.com/docs/api/crypto-wallet-authenticate",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/crypto_wallets/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"crypto_wallets",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Passwords",
+			"item": [
+				{
+					"name": "Create user with password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sandbox@stytch.com\",\n    \"password\": \"testP4SSw0Rd#123\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-create",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate user with password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sandbox@stytch.com\",\n    \"password\": \"testP4SSw0Rd#123\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-authenticate",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start password reset by email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sandbox@stytch.com\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-email-reset-start",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/email/reset/start",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"email",
+								"reset",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Password reset by email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"RESET_TOKEN_HERE\",\n    \"password\": \"thisIsMyNewPassword#123\"\n\n}\n// For all available parameters see https://stytch.com/docs/api/password-email-reset",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/email/reset",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"email",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Password reset by existing password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sandbox@stytch.com\",\n    \"existing_password\": \"old_password\",\n    \"new_password\": \"new_password\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-existing-password-reset",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/existing_password/reset",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"existing_password",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Password reset by existing session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_jwt\": \"session_jwt OR session_token is required\",\n    \"session_token\": \"session_jwt OR session_token is required\",\n    \"password\": \"new_password\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-existing-password-reset",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/session/reset",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"session",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Strength check",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"password123\",\n    \"email\": \"stytch@stytch.com\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-strength-check",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/strength_check",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"strength_check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Migrate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sandbox@stytch.com\",\n    \"hash\": \"HASHED_PASSWORD_STRING\",\n    \"hash_type\": \"bcrypt\"\n}\n// For all available parameters see https://stytch.com/docs/api/password-migrate",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/passwords/migrate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"passwords",
+								"migrate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "M2M Authentication",
+			"item": [
+				{
+					"name": "Get access token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"client_id\": \"\",\n    \"client_secret\": \"\",\n    \"grant_type\": \"client_credentials\"\n}\n// For all available parameters see https://stytch.com/docs/api/get-m2m-token",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/public/:project_id/oauth2/token",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"public",
+								":project_id",
+								"oauth2",
+								"token"
+							],
+							"variable": [
+								{
+									"key": "project_id",
+									"value": "{{PROJECT_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create M2M client",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get M2M client",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/:client_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								":client_id"
+							],
+							"variable": [
+								{
+									"key": "client_id",
+									"value": "m2m-client-test-a48cac88-49f5-4d4e-8951-06a2eb5b3ba4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search M2M clients",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/search",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update M2M client",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"client_name\": \"updated name\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/:client_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								":client_id"
+							],
+							"variable": [
+								{
+									"key": "client_id",
+									"value": "m2m-client-test-a48cac88-49f5-4d4e-8951-06a2eb5b3ba4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start secret rotation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/:client_id/secrets/rotate/start",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								":client_id",
+								"secrets",
+								"rotate",
+								"start"
+							],
+							"variable": [
+								{
+									"key": "client_id",
+									"value": "m2m-client-test-a48cac88-49f5-4d4e-8951-06a2eb5b3ba4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Rotate secret",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/:client_id/secrets/rotate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								":client_id",
+								"secrets",
+								"rotate"
+							],
+							"variable": [
+								{
+									"key": "client_id",
+									"value": "m2m-client-test-a48cac88-49f5-4d4e-8951-06a2eb5b3ba4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel secret rotation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/:client_id/secrets/rotate/cancel",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								":client_id",
+								"secrets",
+								"rotate",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "client_id",
+									"value": "m2m-client-test-a48cac88-49f5-4d4e-8951-06a2eb5b3ba4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete M2M client",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/m2m/clients/:client_id",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"m2m",
+								"clients",
+								":client_id"
+							],
+							"variable": [
+								{
+									"key": "client_id",
+									"value": "m2m-client-test-a48cac88-49f5-4d4e-8951-06a2eb5b3ba4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Impersonation",
+			"item": [
+				{
+					"name": "Authenticate Impersonation Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"impersonation_token\": \"\"\n}\n// For all available parameters see https://stytch.com/docs/api/authenticate-impersonation-token",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ENV}}.stytch.com/v1/b2b/impersonation/authenticate",
+							"protocol": "https",
+							"host": [
+								"{{ENV}}",
+								"stytch",
+								"com"
+							],
+							"path": [
+								"v1",
+								"b2b",
+								"impersonation",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{SECRET}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{PROJECT_ID}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

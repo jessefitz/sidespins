@@ -1,9 +1,9 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using SideSpins.Api.Services;
-using System.Text.Json;
 
 namespace SidesSpins.Functions;
 
@@ -16,7 +16,8 @@ public class PlayerManagementFunctions
     public PlayerManagementFunctions(
         ILogger<PlayerManagementFunctions> logger,
         LeagueService leagueService,
-        IPlayerService playerService)
+        IPlayerService playerService
+    )
     {
         _logger = logger;
         _leagueService = leagueService;
@@ -26,7 +27,12 @@ public class PlayerManagementFunctions
     [Function("LinkPlayerToAuthUser")]
     [RequireAuthentication("admin")]
     public async Task<IActionResult> LinkPlayerToAuthUser(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/players/{playerId}/link-auth")] HttpRequest req,
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "admin/players/{playerId}/link-auth"
+        )]
+            HttpRequest req,
         FunctionContext context,
         string playerId
     )
@@ -41,33 +47,33 @@ public class PlayerManagementFunctions
 
             if (linkRequest == null || string.IsNullOrEmpty(linkRequest.AuthUserId))
             {
-                return new BadRequestObjectResult(new
-                {
-                    success = false,
-                    message = "AuthUserId is required"
-                });
+                return new BadRequestObjectResult(
+                    new { success = false, message = "AuthUserId is required" }
+                );
             }
 
             // Get the player
             var player = await _leagueService.GetPlayerByIdAsync(playerId);
             if (player == null)
             {
-                return new NotFoundObjectResult(new
-                {
-                    success = false,
-                    message = $"Player {playerId} not found"
-                });
+                return new NotFoundObjectResult(
+                    new { success = false, message = $"Player {playerId} not found" }
+                );
             }
 
             // Check if authUserId is already in use
-            var existingPlayer = await _playerService.GetPlayerByAuthUserIdAsync(linkRequest.AuthUserId);
+            var existingPlayer = await _playerService.GetPlayerByAuthUserIdAsync(
+                linkRequest.AuthUserId
+            );
             if (existingPlayer != null && existingPlayer.Id != playerId)
             {
-                return new ConflictObjectResult(new
-                {
-                    success = false,
-                    message = $"AuthUserId {linkRequest.AuthUserId} is already linked to player {existingPlayer.Id} ({existingPlayer.FirstName} {existingPlayer.LastName})"
-                });
+                return new ConflictObjectResult(
+                    new
+                    {
+                        success = false,
+                        message = $"AuthUserId {linkRequest.AuthUserId} is already linked to player {existingPlayer.Id} ({existingPlayer.FirstName} {existingPlayer.LastName})",
+                    }
+                );
             }
 
             // Update the player with authUserId
@@ -79,21 +85,28 @@ public class PlayerManagementFunctions
                 return new StatusCodeResult(500);
             }
 
-            _logger.LogInformation("Admin linked authUserId {AuthUserId} to player {PlayerId} ({FirstName} {LastName})", 
-                linkRequest.AuthUserId, playerId, player.FirstName, player.LastName);
+            _logger.LogInformation(
+                "Admin linked authUserId {AuthUserId} to player {PlayerId} ({FirstName} {LastName})",
+                linkRequest.AuthUserId,
+                playerId,
+                player.FirstName,
+                player.LastName
+            );
 
-            return new OkObjectResult(new
-            {
-                success = true,
-                message = $"Successfully linked authUserId {linkRequest.AuthUserId} to player {playerId}",
-                player = new
+            return new OkObjectResult(
+                new
                 {
-                    id = updatedPlayer.Id,
-                    firstName = updatedPlayer.FirstName,
-                    lastName = updatedPlayer.LastName,
-                    authUserId = updatedPlayer.AuthUserId
+                    success = true,
+                    message = $"Successfully linked authUserId {linkRequest.AuthUserId} to player {playerId}",
+                    player = new
+                    {
+                        id = updatedPlayer.Id,
+                        firstName = updatedPlayer.FirstName,
+                        lastName = updatedPlayer.LastName,
+                        authUserId = updatedPlayer.AuthUserId,
+                    },
                 }
-            });
+            );
         }
         catch (Exception ex)
         {
@@ -105,7 +118,12 @@ public class PlayerManagementFunctions
     [Function("UnlinkPlayerFromAuthUser")]
     [RequireAuthentication("admin")]
     public async Task<IActionResult> UnlinkPlayerFromAuthUser(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "admin/players/{playerId}/link-auth")] HttpRequest req,
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "delete",
+            Route = "admin/players/{playerId}/link-auth"
+        )]
+            HttpRequest req,
         FunctionContext context,
         string playerId
     )
@@ -116,15 +134,13 @@ public class PlayerManagementFunctions
             var player = await _leagueService.GetPlayerByIdAsync(playerId);
             if (player == null)
             {
-                return new NotFoundObjectResult(new
-                {
-                    success = false,
-                    message = $"Player {playerId} not found"
-                });
+                return new NotFoundObjectResult(
+                    new { success = false, message = $"Player {playerId} not found" }
+                );
             }
 
             var oldAuthUserId = player.AuthUserId;
-            
+
             // Remove the authUserId
             player.AuthUserId = null;
             var updatedPlayer = await _leagueService.UpdatePlayerAsync(playerId, player);
@@ -134,21 +150,28 @@ public class PlayerManagementFunctions
                 return new StatusCodeResult(500);
             }
 
-            _logger.LogInformation("Admin unlinked authUserId {AuthUserId} from player {PlayerId} ({FirstName} {LastName})", 
-                oldAuthUserId, playerId, player.FirstName, player.LastName);
+            _logger.LogInformation(
+                "Admin unlinked authUserId {AuthUserId} from player {PlayerId} ({FirstName} {LastName})",
+                oldAuthUserId,
+                playerId,
+                player.FirstName,
+                player.LastName
+            );
 
-            return new OkObjectResult(new
-            {
-                success = true,
-                message = $"Successfully unlinked player {playerId} from authUserId {oldAuthUserId}",
-                player = new
+            return new OkObjectResult(
+                new
                 {
-                    id = updatedPlayer.Id,
-                    firstName = updatedPlayer.FirstName,
-                    lastName = updatedPlayer.LastName,
-                    authUserId = updatedPlayer.AuthUserId
+                    success = true,
+                    message = $"Successfully unlinked player {playerId} from authUserId {oldAuthUserId}",
+                    player = new
+                    {
+                        id = updatedPlayer.Id,
+                        firstName = updatedPlayer.FirstName,
+                        lastName = updatedPlayer.LastName,
+                        authUserId = updatedPlayer.AuthUserId,
+                    },
                 }
-            });
+            );
         }
         catch (Exception ex)
         {
@@ -160,7 +183,8 @@ public class PlayerManagementFunctions
     [Function("GetPlayersWithoutAuth")]
     [RequireAuthentication("admin")]
     public async Task<IActionResult> GetPlayersWithoutAuth(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "admin/players/without-auth")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "admin/players/without-auth")]
+            HttpRequest req,
         FunctionContext context
     )
     {
@@ -176,18 +200,20 @@ public class PlayerManagementFunctions
                     lastName = p.LastName,
                     apaNumber = p.ApaNumber,
                     phoneNumber = p.PhoneNumber,
-                    createdAt = p.CreatedAt
+                    createdAt = p.CreatedAt,
                 })
                 .OrderBy(p => p.lastName)
                 .ThenBy(p => p.firstName)
                 .ToList();
 
-            return new OkObjectResult(new
-            {
-                success = true,
-                count = playersWithoutAuth.Count,
-                players = playersWithoutAuth
-            });
+            return new OkObjectResult(
+                new
+                {
+                    success = true,
+                    count = playersWithoutAuth.Count,
+                    players = playersWithoutAuth,
+                }
+            );
         }
         catch (Exception ex)
         {

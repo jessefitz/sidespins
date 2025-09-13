@@ -9,7 +9,7 @@ public static class AuthHelper
     {
         var secret = req.Headers["x-api-secret"].FirstOrDefault();
         var expected = Environment.GetEnvironmentVariable("API_SHARED_SECRET");
-        
+
         if (string.IsNullOrEmpty(secret) || secret != expected)
         {
             return new UnauthorizedResult();

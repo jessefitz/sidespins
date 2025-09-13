@@ -1,4 +1,4 @@
-// Admin Panel JavaScript for SideSpins API Management
+// Admin Panel JavaScript for SideSpins API Management.
 class SideSpinsAdmin {
     constructor() {
         // Use environment-appropriate URL

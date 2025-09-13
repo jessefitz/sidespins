@@ -1,8 +1,8 @@
-using Microsoft.Azure.Cosmos;
-using SideSpins.Api.Models;
 using System.Net;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SideSpins.Api.Models;
 
 namespace SideSpins.Api.Services;
 
@@ -17,7 +17,7 @@ public class LeagueService
     public LeagueService(CosmosClient cosmosClient, string databaseName)
     {
         var database = cosmosClient.GetDatabase(databaseName);
-        
+
         _playersContainer = database.GetContainer("Players");
         _membershipsContainer = database.GetContainer("TeamMemberships");
         _matchesContainer = database.GetContainer("TeamMatches");
@@ -64,7 +64,7 @@ public class LeagueService
         }
         player.CreatedAt = DateTime.UtcNow;
         player.Type = "player";
-        
+
         var response = await _playersContainer.CreateItemAsync(player, new PartitionKey(player.Id));
         return response.Resource;
     }
@@ -76,17 +76,18 @@ public class LeagueService
             // Explicitly set the ID to ensure it matches the route parameter
             player.Id = id;
             player.Type = "player";
-            
+
             // Ensure we have a valid createdAt timestamp
             if (player.CreatedAt == default(DateTime))
             {
                 player.CreatedAt = DateTime.UtcNow;
             }
-            
+
             var response = await _playersContainer.ReplaceItemAsync(
-                player, 
-                id, 
-                new PartitionKey(id));
+                player,
+                id,
+                new PartitionKey(id)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -114,11 +115,9 @@ public class LeagueService
         var query = "SELECT * FROM c";
         var queryDefinition = new QueryDefinition(query);
         var resultSet = _membershipsContainer.GetItemQueryIterator<TeamMembership>(
-            queryDefinition, 
-            requestOptions: new QueryRequestOptions
-            {
-                PartitionKey = new PartitionKey(teamId)
-            });
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(teamId) }
+        );
 
         var memberships = new List<TeamMembership>();
         while (resultSet.HasMoreResults)
@@ -135,7 +134,10 @@ public class LeagueService
         membership.Id = $"m_{membership.TeamId}_{membership.PlayerId}";
         membership.JoinedAt = DateTime.UtcNow;
         membership.Type = "membership";
-        var response = await _membershipsContainer.CreateItemAsync(membership, new PartitionKey(membership.TeamId));
+        var response = await _membershipsContainer.CreateItemAsync(
+            membership,
+            new PartitionKey(membership.TeamId)
+        );
         return response.Resource;
     }
 
@@ -143,7 +145,10 @@ public class LeagueService
     {
         try
         {
-            var response = await _membershipsContainer.ReadItemAsync<TeamMembership>(membershipId, new PartitionKey(teamId));
+            var response = await _membershipsContainer.ReadItemAsync<TeamMembership>(
+                membershipId,
+                new PartitionKey(teamId)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -152,47 +157,55 @@ public class LeagueService
         }
     }
 
-    public async Task<TeamMembership?> UpdateMembershipAsync(string membershipId, string teamId, TeamMembership membership)
+    public async Task<TeamMembership?> UpdateMembershipAsync(
+        string membershipId,
+        string teamId,
+        TeamMembership membership
+    )
     {
         try
         {
             // Get the existing membership to compare skill levels
             var existingMembership = await GetMembershipByIdAsync(membershipId, teamId);
-            
+
             // Explicitly set the ID and type to ensure consistency
             membership.Id = membershipId;
             membership.Type = "membership";
             membership.TeamId = teamId;
-            
+
             // Preserve the division ID from existing membership if not provided
             if (string.IsNullOrEmpty(membership.DivisionId) && existingMembership != null)
             {
                 membership.DivisionId = existingMembership.DivisionId;
             }
-            
+
             // Ensure we have a valid joinedAt timestamp
             if (membership.JoinedAt == default(DateTime))
             {
                 membership.JoinedAt = DateTime.UtcNow;
             }
-            
+
             var response = await _membershipsContainer.ReplaceItemAsync(
-                membership, 
-                membershipId, 
-                new PartitionKey(teamId));
-            
+                membership,
+                membershipId,
+                new PartitionKey(teamId)
+            );
+
             // If skill level changed, update future lineups
-            if (existingMembership != null && 
-                existingMembership.SkillLevel_9b != membership.SkillLevel_9b && 
-                membership.SkillLevel_9b.HasValue &&
-                !string.IsNullOrEmpty(membership.DivisionId))
+            if (
+                existingMembership != null
+                && existingMembership.SkillLevel_9b != membership.SkillLevel_9b
+                && membership.SkillLevel_9b.HasValue
+                && !string.IsNullOrEmpty(membership.DivisionId)
+            )
             {
                 await UpdateFutureLineupsForPlayerSkillChangeAsync(
-                    membership.PlayerId, 
-                    membership.DivisionId, 
-                    membership.SkillLevel_9b.Value);
+                    membership.PlayerId,
+                    membership.DivisionId,
+                    membership.SkillLevel_9b.Value
+                );
             }
-            
+
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -205,7 +218,10 @@ public class LeagueService
     {
         try
         {
-            await _membershipsContainer.DeleteItemAsync<TeamMembership>(membershipId, new PartitionKey(teamId));
+            await _membershipsContainer.DeleteItemAsync<TeamMembership>(
+                membershipId,
+                new PartitionKey(teamId)
+            );
             return true;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -221,7 +237,8 @@ public class LeagueService
         var queryDefinition = new QueryDefinition(query);
         var resultSet = _matchesContainer.GetItemQueryIterator<TeamMatch>(
             queryDefinition,
-            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) });
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
 
         var matches = new List<TeamMatch>();
         while (resultSet.HasMoreResults)
@@ -237,7 +254,10 @@ public class LeagueService
     {
         try
         {
-            var response = await _matchesContainer.ReadItemAsync<TeamMatch>(id, new PartitionKey(divisionId));
+            var response = await _matchesContainer.ReadItemAsync<TeamMatch>(
+                id,
+                new PartitionKey(divisionId)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -246,19 +266,23 @@ public class LeagueService
         }
     }
 
-    public async Task<TeamMatch?> UpdateMatchLineupAsync(string id, string divisionId, LineupPlan lineupPlan)
+    public async Task<TeamMatch?> UpdateMatchLineupAsync(
+        string id,
+        string divisionId,
+        LineupPlan lineupPlan
+    )
     {
         try
         {
             var match = await GetMatchByIdAsync(id, divisionId);
-            if (match == null) 
+            if (match == null)
                 return null;
 
             // Log the match state before update for debugging
-            
+
             // Update only the lineup plan, preserving all other properties
             match.LineupPlan = lineupPlan;
-            
+
             // Ensure all required properties are set correctly - these must be set BEFORE serialization
             if (string.IsNullOrEmpty(match.Id))
             {
@@ -272,14 +296,18 @@ public class LeagueService
             {
                 match.Type = "teamMatch";
             }
-            
+
             // Ensure we have a valid createdAt timestamp
             if (match.CreatedAt == default(DateTime))
             {
                 match.CreatedAt = DateTime.UtcNow;
             }
-            
-            var response = await _matchesContainer.ReplaceItemAsync(match, id, new PartitionKey(divisionId));
+
+            var response = await _matchesContainer.ReplaceItemAsync(
+                match,
+                id,
+                new PartitionKey(divisionId)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -288,7 +316,9 @@ public class LeagueService
         }
         catch (CosmosException ex)
         {
-            Console.WriteLine($"Cosmos exception during lineup update: {ex.StatusCode} - {ex.Message}");
+            Console.WriteLine(
+                $"Cosmos exception during lineup update: {ex.StatusCode} - {ex.Message}"
+            );
             throw;
         }
     }
@@ -302,8 +332,11 @@ public class LeagueService
         }
         match.CreatedAt = DateTime.UtcNow;
         match.Type = "teamMatch";
-        
-        var response = await _matchesContainer.CreateItemAsync(match, new PartitionKey(match.DivisionId));
+
+        var response = await _matchesContainer.CreateItemAsync(
+            match,
+            new PartitionKey(match.DivisionId)
+        );
         return response.Resource;
     }
 
@@ -315,17 +348,18 @@ public class LeagueService
             match.Id = id;
             match.Type = "teamMatch";
             match.DivisionId = divisionId;
-            
+
             // Ensure we have a valid createdAt timestamp
             if (match.CreatedAt == default(DateTime))
             {
                 match.CreatedAt = DateTime.UtcNow;
             }
-            
+
             var response = await _matchesContainer.ReplaceItemAsync(
-                match, 
-                id, 
-                new PartitionKey(divisionId));
+                match,
+                id,
+                new PartitionKey(divisionId)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -347,16 +381,22 @@ public class LeagueService
         }
     }
 
-    public async Task<IEnumerable<TeamMatch>> GetMatchesByDateRangeAsync(string divisionId, DateTime startDate, DateTime endDate)
+    public async Task<IEnumerable<TeamMatch>> GetMatchesByDateRangeAsync(
+        string divisionId,
+        DateTime startDate,
+        DateTime endDate
+    )
     {
-        var query = "SELECT * FROM c WHERE c.scheduledAt >= @startDate AND c.scheduledAt <= @endDate ORDER BY c.scheduledAt";
+        var query =
+            "SELECT * FROM c WHERE c.scheduledAt >= @startDate AND c.scheduledAt <= @endDate ORDER BY c.scheduledAt";
         var queryDefinition = new QueryDefinition(query)
             .WithParameter("@startDate", startDate)
             .WithParameter("@endDate", endDate);
-            
+
         var resultSet = _matchesContainer.GetItemQueryIterator<TeamMatch>(
             queryDefinition,
-            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) });
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
 
         var matches = new List<TeamMatch>();
         while (resultSet.HasMoreResults)
@@ -375,20 +415,32 @@ public class LeagueService
     /// <param name="playerId">The player whose skill level changed</param>
     /// <param name="divisionId">The division the player is in</param>
     /// <param name="newSkillLevel">The new skill level to apply</param>
-    private async Task UpdateFutureLineupsForPlayerSkillChangeAsync(string playerId, string divisionId, int newSkillLevel)
+    private async Task UpdateFutureLineupsForPlayerSkillChangeAsync(
+        string playerId,
+        string divisionId,
+        int newSkillLevel
+    )
     {
         try
         {
-            Console.WriteLine($"Starting skill update for player {playerId} in division {divisionId} to skill level {newSkillLevel}");
-            
+            Console.WriteLine(
+                $"Starting skill update for player {playerId} in division {divisionId} to skill level {newSkillLevel}"
+            );
+
             // Get all matches from today forward for this division
             var today = DateTime.UtcNow.Date;
-            var futureMatches = await GetMatchesByDateRangeAsync(divisionId, today, DateTime.MaxValue.Date);
-            
-            Console.WriteLine($"Found {futureMatches.Count()} future matches for division {divisionId}");
-            
+            var futureMatches = await GetMatchesByDateRangeAsync(
+                divisionId,
+                today,
+                DateTime.MaxValue.Date
+            );
+
+            Console.WriteLine(
+                $"Found {futureMatches.Count()} future matches for division {divisionId}"
+            );
+
             bool anyUpdates = false;
-            
+
             foreach (var match in futureMatches)
             {
                 // Skip matches that don't have lineup plans yet
@@ -397,58 +449,79 @@ public class LeagueService
                     Console.WriteLine($"Skipping match {match.Id} - no lineup plan exists yet");
                     continue;
                 }
-                
+
                 bool matchUpdated = false;
-                
+
                 // Update home team lineup if player is present
-                foreach (var player in match.LineupPlan.Home?.Where(p => p.PlayerId == playerId) ?? Enumerable.Empty<LineupPlayer>())
+                foreach (
+                    var player in match.LineupPlan.Home?.Where(p => p.PlayerId == playerId)
+                        ?? Enumerable.Empty<LineupPlayer>()
+                )
                 {
                     if (player.SkillLevel != newSkillLevel)
                     {
-                        Console.WriteLine($"Updating player {playerId} skill from {player.SkillLevel} to {newSkillLevel} in match {match.Id} home lineup");
+                        Console.WriteLine(
+                            $"Updating player {playerId} skill from {player.SkillLevel} to {newSkillLevel} in match {match.Id} home lineup"
+                        );
                         player.SkillLevel = newSkillLevel;
                         matchUpdated = true;
                     }
                 }
-                
-                // Update away team lineup if player is present  
-                foreach (var player in match.LineupPlan.Away?.Where(p => p.PlayerId == playerId) ?? Enumerable.Empty<LineupPlayer>())
+
+                // Update away team lineup if player is present
+                foreach (
+                    var player in match.LineupPlan.Away?.Where(p => p.PlayerId == playerId)
+                        ?? Enumerable.Empty<LineupPlayer>()
+                )
                 {
                     if (player.SkillLevel != newSkillLevel)
                     {
-                        Console.WriteLine($"Updating player {playerId} skill from {player.SkillLevel} to {newSkillLevel} in match {match.Id} away lineup");
+                        Console.WriteLine(
+                            $"Updating player {playerId} skill from {player.SkillLevel} to {newSkillLevel} in match {match.Id} away lineup"
+                        );
                         player.SkillLevel = newSkillLevel;
                         matchUpdated = true;
                     }
                 }
-                
+
                 // If this match was updated, recalculate totals and save
                 if (matchUpdated)
                 {
                     RecalculateLineupTotals(match.LineupPlan);
-                    
+
                     // Add history entry
-                    match.LineupPlan.History.Add(new LineupHistoryEntry
-                    {
-                        At = DateTime.UtcNow,
-                        By = "System",
-                        Change = $"Updated skill level for player {playerId} to {newSkillLevel} due to membership change"
-                    });
-                    
+                    match.LineupPlan.History.Add(
+                        new LineupHistoryEntry
+                        {
+                            At = DateTime.UtcNow,
+                            By = "System",
+                            Change =
+                                $"Updated skill level for player {playerId} to {newSkillLevel} due to membership change",
+                        }
+                    );
+
                     // Save the updated match
                     Console.WriteLine($"Saving updated match {match.Id} with new skill levels");
-                    await _matchesContainer.ReplaceItemAsync(match, match.Id, new PartitionKey(match.DivisionId));
+                    await _matchesContainer.ReplaceItemAsync(
+                        match,
+                        match.Id,
+                        new PartitionKey(match.DivisionId)
+                    );
                     anyUpdates = true;
                 }
             }
-            
+
             if (anyUpdates)
             {
-                Console.WriteLine($"Successfully updated skill levels for player {playerId} in future lineups for division {divisionId}");
+                Console.WriteLine(
+                    $"Successfully updated skill levels for player {playerId} in future lineups for division {divisionId}"
+                );
             }
             else
             {
-                Console.WriteLine($"No lineup updates needed for player {playerId} in division {divisionId}");
+                Console.WriteLine(
+                    $"No lineup updates needed for player {playerId} in division {divisionId}"
+                );
             }
         }
         catch (Exception ex)
@@ -457,7 +530,7 @@ public class LeagueService
             // Don't throw - we don't want to fail the membership update if lineup updates fail
         }
     }
-    
+
     /// <summary>
     /// Recalculates the skill totals and cap validation for a lineup
     /// </summary>
@@ -465,18 +538,20 @@ public class LeagueService
     private void RecalculateLineupTotals(LineupPlan lineupPlan)
     {
         // Calculate home team skill sum (excluding alternates)
-        lineupPlan.Totals.HomePlannedSkillSum = lineupPlan.Home
-            .Where(p => !p.IsAlternate)
+        lineupPlan.Totals.HomePlannedSkillSum = lineupPlan
+            .Home.Where(p => !p.IsAlternate)
             .Sum(p => p.SkillLevel);
-            
+
         // Calculate away team skill sum (excluding alternates)
-        lineupPlan.Totals.AwayPlannedSkillSum = lineupPlan.Away
-            .Where(p => !p.IsAlternate)
+        lineupPlan.Totals.AwayPlannedSkillSum = lineupPlan
+            .Away.Where(p => !p.IsAlternate)
             .Sum(p => p.SkillLevel);
-            
+
         // Check if teams are within skill cap
-        lineupPlan.Totals.HomeWithinCap = lineupPlan.Totals.HomePlannedSkillSum <= lineupPlan.MaxTeamSkillCap;
-        lineupPlan.Totals.AwayWithinCap = lineupPlan.Totals.AwayPlannedSkillSum <= lineupPlan.MaxTeamSkillCap;
+        lineupPlan.Totals.HomeWithinCap =
+            lineupPlan.Totals.HomePlannedSkillSum <= lineupPlan.MaxTeamSkillCap;
+        lineupPlan.Totals.AwayWithinCap =
+            lineupPlan.Totals.AwayPlannedSkillSum <= lineupPlan.MaxTeamSkillCap;
     }
 
     /// <summary>
@@ -486,7 +561,11 @@ public class LeagueService
     /// <param name="playerId">The player whose skill level should be updated</param>
     /// <param name="divisionId">The division the player is in</param>
     /// <param name="newSkillLevel">The new skill level to apply</param>
-    public async Task UpdateFutureLineupsForPlayerSkillChangePublicAsync(string playerId, string divisionId, int newSkillLevel)
+    public async Task UpdateFutureLineupsForPlayerSkillChangePublicAsync(
+        string playerId,
+        string divisionId,
+        int newSkillLevel
+    )
     {
         await UpdateFutureLineupsForPlayerSkillChangeAsync(playerId, divisionId, newSkillLevel);
     }
@@ -498,10 +577,8 @@ public class LeagueService
         var queryDefinition = new QueryDefinition(query);
         var resultSet = _teamsContainer.GetItemQueryIterator<Team>(
             queryDefinition,
-            requestOptions: new QueryRequestOptions
-            {
-                PartitionKey = new PartitionKey(divisionId)
-            });
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
 
         var teams = new List<Team>();
         while (resultSet.HasMoreResults)
@@ -517,7 +594,10 @@ public class LeagueService
     {
         try
         {
-            var response = await _teamsContainer.ReadItemAsync<Team>(id, new PartitionKey(divisionId));
+            var response = await _teamsContainer.ReadItemAsync<Team>(
+                id,
+                new PartitionKey(divisionId)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -533,12 +613,15 @@ public class LeagueService
         {
             // Create a unique team ID based on division and team name
             var safeName = team.Name.ToLower().Replace(" ", "_").Replace("-", "_");
-            team.Id = $"team_{safeName}_9b"; 
+            team.Id = $"team_{safeName}_9b";
         }
         team.CreatedAt = DateTime.UtcNow;
         team.Type = "team";
-        
-        var response = await _teamsContainer.CreateItemAsync(team, new PartitionKey(team.DivisionId));
+
+        var response = await _teamsContainer.CreateItemAsync(
+            team,
+            new PartitionKey(team.DivisionId)
+        );
         return response.Resource;
     }
 
@@ -550,17 +633,18 @@ public class LeagueService
             team.Id = id;
             team.Type = "team";
             team.DivisionId = divisionId;
-            
+
             // Ensure we have a valid createdAt timestamp
             if (team.CreatedAt == default(DateTime))
             {
                 team.CreatedAt = DateTime.UtcNow;
             }
-            
+
             var response = await _teamsContainer.ReplaceItemAsync(
-                team, 
-                id, 
-                new PartitionKey(divisionId));
+                team,
+                id,
+                new PartitionKey(divisionId)
+            );
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)

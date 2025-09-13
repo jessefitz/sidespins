@@ -211,6 +211,10 @@
     </div>
 
     <script>
+    const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:7071/api' 
+        : 'https://sidespinsapi.azurewebsites.net/api';
+        
     let currentPhoneNumber = '';
 
     function showTab(tabName) {
@@ -285,7 +289,7 @@
             setButtonsEnabled(false);
             currentPhoneNumber = phone;
             
-            const response = await fetch('http://localhost:7071/api/auth/sms/send', {
+            const response = await fetch(`${baseUrl}/auth/sms/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -326,7 +330,7 @@
             showLoading();
             setButtonsEnabled(false);
             
-            const response = await fetch('http://localhost:7071/api/auth/sms/verify', {
+            const response = await fetch(`${baseUrl}/auth/sms/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -383,7 +387,7 @@
             showLoading();
             setButtonsEnabled(false);
             
-            const response = await fetch('http://localhost:7071/api/auth/email/send', {
+            const response = await fetch(`${baseUrl}/auth/email/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -413,7 +417,7 @@
     // Check if user is already authenticated
     async function checkCurrentUser() {
         try {
-            const response = await fetch('http://localhost:7071/api/auth/user', {
+            const response = await fetch(`${baseUrl}/auth/user`, {
                 method: 'GET',
                 credentials: 'include'
             });

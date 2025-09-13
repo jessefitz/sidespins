@@ -39,7 +39,7 @@ public class AuthSmsVerifyRequest
 {
     [Required]
     public string PhoneId { get; set; } = string.Empty;
-    
+
     [Required]
     public string Code { get; set; } = string.Empty;
 }
@@ -87,7 +87,7 @@ public class SignupInitRequest
 {
     [Required]
     public string PhoneNumber { get; set; } = string.Empty;
-    
+
     [Required]
     public string ApaNumber { get; set; } = string.Empty;
 }
@@ -139,7 +139,8 @@ public static class AuthorizationErrorMessages
         string teamId,
         string requiredRole,
         string? userRole,
-        string userId)
+        string userId
+    )
     {
         return new AuthorizationErrorResponse
         {

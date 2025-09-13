@@ -10,7 +10,7 @@ public sealed class RequireTeamRoleAttribute : Attribute
     /// Minimum role required (player, captain, admin)
     /// </summary>
     public string MinimumRole { get; }
-    
+
     /// <summary>
     /// Route parameter name containing the team ID (default: "teamId")
     /// </summary>

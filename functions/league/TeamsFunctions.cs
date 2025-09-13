@@ -31,7 +31,7 @@ public class TeamsFunctions
         try
         {
             var divisionId = req.Query["divisionId"].FirstOrDefault();
-            
+
             if (string.IsNullOrEmpty(divisionId))
             {
                 return new BadRequestObjectResult("divisionId query parameter is required");
@@ -51,7 +51,8 @@ public class TeamsFunctions
     [RequireAuthentication]
     [RequireTeamRole("player")]
     public async Task<IActionResult> GetTeamDetails(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}")]
+            HttpRequest req,
         FunctionContext context,
         string teamId
     )
@@ -76,11 +77,7 @@ public class TeamsFunctions
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(new
-            {
-                team = team,
-                userRole = membership.Role
-            });
+            return new OkObjectResult(new { team = team, userRole = membership.Role });
         }
         catch (Exception ex)
         {
@@ -90,7 +87,7 @@ public class TeamsFunctions
     }
 
     [Function("CreateTeam")]
-   [RequireAuthentication("admin")]
+    [RequireAuthentication("admin")]
     public async Task<IActionResult> CreateTeam(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
         FunctionContext context
@@ -100,7 +97,7 @@ public class TeamsFunctions
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var team = JsonConvert.DeserializeObject<SideSpins.Api.Models.Team>(requestBody);
-            
+
             if (team == null)
             {
                 return new BadRequestObjectResult("Invalid team data");
@@ -133,18 +130,22 @@ public class TeamsFunctions
     [RequireAuthentication]
     [RequireTeamRole("captain")]
     public async Task<IActionResult> UpdateTeam(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "teams/{teamId}")] HttpRequest req, 
-        FunctionContext context, 
-        string teamId)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "teams/{teamId}")]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
     {
         try
         {
             // Extract divisionId from query parameter since we need it for partition key
             var divisionId = req.Query["divisionId"].FirstOrDefault();
-            
+
             if (string.IsNullOrEmpty(divisionId))
             {
-                return new BadRequestObjectResult("divisionId query parameter is required for team updates");
+                return new BadRequestObjectResult(
+                    "divisionId query parameter is required for team updates"
+                );
             }
 
             // Authorization is handled by the RequireTeamRole attribute
@@ -152,7 +153,7 @@ public class TeamsFunctions
 
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var team = JsonConvert.DeserializeObject<SideSpins.Api.Models.Team>(requestBody);
-            
+
             if (team == null || string.IsNullOrEmpty(team.Name))
             {
                 return new BadRequestObjectResult("Invalid team data - name is required");
@@ -175,16 +176,23 @@ public class TeamsFunctions
 
     [Function("DeleteTeam")]
     [RequireAuthentication("admin")]
-    public async Task<IActionResult> DeleteTeam([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "teams/{teamId}")] HttpRequest req, FunctionContext context, string teamId)
+    public async Task<IActionResult> DeleteTeam(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "teams/{teamId}")]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
     {
         try
         {
             // Extract divisionId from query parameter since we need it for partition key
             var divisionId = req.Query["divisionId"].FirstOrDefault();
-            
+
             if (string.IsNullOrEmpty(divisionId))
             {
-                return new BadRequestObjectResult("divisionId query parameter is required for team deletion");
+                return new BadRequestObjectResult(
+                    "divisionId query parameter is required for team deletion"
+                );
             }
 
             var success = await _cosmosService.DeleteTeamAsync(teamId, divisionId);
@@ -206,14 +214,16 @@ public class TeamsFunctions
     [RequireAuthentication]
     [RequireTeamRole("player")]
     public async Task<IActionResult> GetTeam(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}/details")] HttpRequest req, 
-        FunctionContext context, 
-        string teamId)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}/details")]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
     {
         try
         {
             var divisionId = req.Query["divisionId"].FirstOrDefault();
-            
+
             if (string.IsNullOrEmpty(divisionId))
             {
                 return new BadRequestObjectResult("divisionId query parameter is required");
@@ -228,11 +238,7 @@ public class TeamsFunctions
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(new
-            {
-                team = team,
-                userRole = membership?.Role
-            });
+            return new OkObjectResult(new { team = team, userRole = membership?.Role });
         }
         catch (Exception ex)
         {

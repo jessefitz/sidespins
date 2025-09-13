@@ -107,8 +107,9 @@ public class AuthService
             var trustedMetadata = ParseTrustedMetadata(user?.TrustedMetadata);
 
             // Get the primary phone number (first verified one or first one)
-            var phoneNumber = user?.PhoneNumbers?.FirstOrDefault(p => p.Verified)?.PhoneNumber 
-                           ?? user?.PhoneNumbers?.FirstOrDefault()?.PhoneNumber;
+            var phoneNumber =
+                user?.PhoneNumbers?.FirstOrDefault(p => p.Verified)?.PhoneNumber
+                ?? user?.PhoneNumbers?.FirstOrDefault()?.PhoneNumber;
 
             var claims = new AppClaims
             {
@@ -117,7 +118,7 @@ public class AuthService
                 Iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Exp = DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds(),
                 Ver = 1,
-                Jti = Guid.NewGuid().ToString()
+                Jti = Guid.NewGuid().ToString(),
             };
 
             return (true, null, claims, phoneNumber);
@@ -195,11 +196,13 @@ public class AuthService
             var claims = new AppClaims
             {
                 Sub = jwtToken.Claims.First(x => x.Type == "sub").Value,
-                SidespinsRole = jwtToken.Claims.FirstOrDefault(x => x.Type == "sidespins_role")?.Value,
+                SidespinsRole = jwtToken
+                    .Claims.FirstOrDefault(x => x.Type == "sidespins_role")
+                    ?.Value,
                 Iat = long.Parse(jwtToken.Claims.First(x => x.Type == "iat").Value),
                 Exp = ((DateTimeOffset)jwtToken.ValidTo).ToUnixTimeSeconds(),
                 Ver = int.Parse(jwtToken.Claims.FirstOrDefault(x => x.Type == "ver")?.Value ?? "1"),
-                Jti = jwtToken.Claims.FirstOrDefault(x => x.Type == "jti")?.Value
+                Jti = jwtToken.Claims.FirstOrDefault(x => x.Type == "jti")?.Value,
             };
 
             return (true, claims);
@@ -295,11 +298,7 @@ public class AuthService
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var smsResponse = JsonConvert.DeserializeObject<StytchSmsResponse>(responseContent);
 
-                return new AuthResult
-                {
-                    Success = true,
-                    PhoneId = smsResponse?.PhoneId,
-                };
+                return new AuthResult { Success = true, PhoneId = smsResponse?.PhoneId };
             }
             else
             {
@@ -346,11 +345,7 @@ public class AuthService
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var smsResponse = JsonConvert.DeserializeObject<StytchSmsResponse>(responseContent);
 
-                return new AuthResult
-                {
-                    Success = true,
-                    PhoneId = smsResponse?.PhoneId,
-                };
+                return new AuthResult { Success = true, PhoneId = smsResponse?.PhoneId };
             }
             else
             {
@@ -403,9 +398,8 @@ public class AuthService
                 if (authResponse?.SessionJwt != null)
                 {
                     // Validate the session and get claims
-                    var (success, errorMessage, claims, phoneNumber) = await ValidateStytchSessionAsync(
-                        authResponse.SessionJwt
-                    );
+                    var (success, errorMessage, claims, phoneNumber) =
+                        await ValidateStytchSessionAsync(authResponse.SessionJwt);
 
                     if (success && claims != null)
                     {
@@ -417,7 +411,7 @@ public class AuthService
                             Success = true,
                             SessionToken = appJwt,
                             Claims = claims,
-                            PhoneNumber = phoneNumber
+                            PhoneNumber = phoneNumber,
                         };
                     }
 
@@ -426,7 +420,7 @@ public class AuthService
                         Success = success,
                         ErrorMessage = errorMessage,
                         Claims = claims,
-                        PhoneNumber = phoneNumber
+                        PhoneNumber = phoneNumber,
                     };
                 }
                 else
@@ -532,9 +526,8 @@ public class AuthService
                 if (authResponse?.SessionJwt != null)
                 {
                     // Validate the session and get claims
-                    var (success, errorMessage, claims, phoneNumber) = await ValidateStytchSessionAsync(
-                        authResponse.SessionJwt
-                    );
+                    var (success, errorMessage, claims, phoneNumber) =
+                        await ValidateStytchSessionAsync(authResponse.SessionJwt);
 
                     if (success && claims != null)
                     {
@@ -546,7 +539,7 @@ public class AuthService
                             Success = true,
                             SessionToken = appJwt,
                             Claims = claims,
-                            PhoneNumber = phoneNumber
+                            PhoneNumber = phoneNumber,
                         };
                     }
 
@@ -555,7 +548,7 @@ public class AuthService
                         Success = success,
                         ErrorMessage = errorMessage,
                         Claims = claims,
-                        PhoneNumber = phoneNumber
+                        PhoneNumber = phoneNumber,
                     };
                 }
                 else

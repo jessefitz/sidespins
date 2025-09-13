@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using SideSpins.Api.Services;
-using SideSpins.Api.Models;
-using SideSpins.Api.Helpers;
 using Newtonsoft.Json;
+using SideSpins.Api.Helpers;
+using SideSpins.Api.Models;
+using SideSpins.Api.Services;
 using SidesSpins.Functions;
 
 namespace SideSpins.Api;
@@ -23,7 +23,10 @@ public class PlayersFunctions
 
     [Function("GetPlayers")]
     [RequireAuthentication("player")]
-    public async Task<IActionResult> GetPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
+    public async Task<IActionResult> GetPlayers(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req,
+        FunctionContext context
+    )
     {
         try
         {
@@ -40,14 +43,17 @@ public class PlayersFunctions
     }
 
     [Function("CreatePlayer")]
-   [RequireAuthentication("admin")]
-    public async Task<IActionResult> CreatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, FunctionContext context)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> CreatePlayer(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        FunctionContext context
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var player = JsonConvert.DeserializeObject<Player>(requestBody);
-            
+
             if (player == null || string.IsNullOrEmpty(player.FirstName))
             {
                 return new BadRequestObjectResult("Invalid player data");
@@ -64,24 +70,37 @@ public class PlayersFunctions
     }
 
     [Function("UpdatePlayer")]
-   [RequireAuthentication("admin")]
-    public async Task<IActionResult> UpdatePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "players/{id}")] HttpRequest req, FunctionContext context, string id)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> UpdatePlayer(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "players/{id}")]
+            HttpRequest req,
+        FunctionContext context,
+        string id
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            _logger.LogInformation("Updating player {PlayerId} with data: {RequestBody}", id, requestBody);
-            
+            _logger.LogInformation(
+                "Updating player {PlayerId} with data: {RequestBody}",
+                id,
+                requestBody
+            );
+
             var player = JsonConvert.DeserializeObject<Player>(requestBody);
-            
+
             if (player == null)
             {
                 _logger.LogWarning("Failed to deserialize player data for {PlayerId}", id);
                 return new BadRequestObjectResult("Invalid player data");
             }
 
-            _logger.LogInformation("Deserialized player: Id={PlayerId}, FirstName={FirstName}, LastName={LastName}", 
-                player.Id, player.FirstName, player.LastName);
+            _logger.LogInformation(
+                "Deserialized player: Id={PlayerId}, FirstName={FirstName}, LastName={LastName}",
+                player.Id,
+                player.FirstName,
+                player.LastName
+            );
 
             var updatedPlayer = await _cosmosService.UpdatePlayerAsync(id, player);
             if (updatedPlayer == null)
@@ -95,14 +114,24 @@ public class PlayersFunctions
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating player {PlayerId}: {ErrorMessage}", id, ex.Message);
+            _logger.LogError(
+                ex,
+                "Error updating player {PlayerId}: {ErrorMessage}",
+                id,
+                ex.Message
+            );
             return new StatusCodeResult(500);
         }
     }
 
     [Function("DeletePlayer")]
     [RequireAuthentication("admin")]
-    public async Task<IActionResult> DeletePlayer([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "players/{id}")] HttpRequest req, FunctionContext context, string id)
+    public async Task<IActionResult> DeletePlayer(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "players/{id}")]
+            HttpRequest req,
+        FunctionContext context,
+        string id
+    )
     {
         try
         {

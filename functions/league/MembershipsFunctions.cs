@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using SideSpins.Api.Services;
-using SideSpins.Api.Models;
-using SideSpins.Api.Helpers;
 using Newtonsoft.Json;
+using SideSpins.Api.Helpers;
+using SideSpins.Api.Models;
+using SideSpins.Api.Services;
 using SidesSpins.Functions;
 
 namespace SideSpins.Api;
@@ -22,13 +22,16 @@ public class MembershipsFunctions
     }
 
     [Function("GetMemberships")]
-   [RequireAuthentication("admin")]
-    public async Task<IActionResult> GetMemberships([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, FunctionContext context)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> GetMemberships(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req,
+        FunctionContext context
+    )
     {
         try
         {
             var teamId = req.Query["teamId"].FirstOrDefault();
-            
+
             if (string.IsNullOrEmpty(teamId))
             {
                 return new BadRequestObjectResult("teamId query parameter is required");
@@ -45,17 +48,26 @@ public class MembershipsFunctions
     }
 
     [Function("CreateMembership")]
-   [RequireAuthentication("admin")]
-    public async Task<IActionResult> CreateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, FunctionContext context)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> CreateMembership(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        FunctionContext context
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
-            
-            if (membership == null || string.IsNullOrEmpty(membership.TeamId) || string.IsNullOrEmpty(membership.PlayerId))
+
+            if (
+                membership == null
+                || string.IsNullOrEmpty(membership.TeamId)
+                || string.IsNullOrEmpty(membership.PlayerId)
+            )
             {
-                return new BadRequestObjectResult("Invalid membership data - teamId and playerId are required");
+                return new BadRequestObjectResult(
+                    "Invalid membership data - teamId and playerId are required"
+                );
             }
 
             var createdMembership = await _cosmosService.CreateMembershipAsync(membership);
@@ -69,20 +81,35 @@ public class MembershipsFunctions
     }
 
     [Function("UpdateMembership")]
-   [RequireAuthentication("admin")]
-    public async Task<IActionResult> UpdateMembership([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "memberships/{membershipId}")] HttpRequest req, FunctionContext context, string membershipId)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> UpdateMembership(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "memberships/{membershipId}")]
+            HttpRequest req,
+        FunctionContext context,
+        string membershipId
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
-            
-            if (membership == null || string.IsNullOrEmpty(membership.TeamId) || string.IsNullOrEmpty(membership.PlayerId))
+
+            if (
+                membership == null
+                || string.IsNullOrEmpty(membership.TeamId)
+                || string.IsNullOrEmpty(membership.PlayerId)
+            )
             {
-                return new BadRequestObjectResult("Invalid membership data - teamId and playerId are required");
+                return new BadRequestObjectResult(
+                    "Invalid membership data - teamId and playerId are required"
+                );
             }
 
-            var updatedMembership = await _cosmosService.UpdateMembershipAsync(membershipId, membership.TeamId, membership);
+            var updatedMembership = await _cosmosService.UpdateMembershipAsync(
+                membershipId,
+                membership.TeamId,
+                membership
+            );
             if (updatedMembership == null)
             {
                 return new NotFoundResult();
@@ -99,16 +126,23 @@ public class MembershipsFunctions
 
     [Function("DeleteMembership")]
     [RequireAuthentication("admin")]
-    public async Task<IActionResult> DeleteMembership([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "memberships/{membershipId}")] HttpRequest req, FunctionContext context, string membershipId)
+    public async Task<IActionResult> DeleteMembership(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "memberships/{membershipId}")]
+            HttpRequest req,
+        FunctionContext context,
+        string membershipId
+    )
     {
         try
         {
             // Extract teamId from query parameter since we need it for partition key
             var teamId = req.Query["teamId"].FirstOrDefault();
-            
+
             if (string.IsNullOrEmpty(teamId))
             {
-                return new BadRequestObjectResult("teamId query parameter is required for deletion");
+                return new BadRequestObjectResult(
+                    "teamId query parameter is required for deletion"
+                );
             }
 
             var success = await _cosmosService.DeleteMembershipAsync(membershipId, teamId);
@@ -127,27 +161,49 @@ public class MembershipsFunctions
     }
 
     [Function("UpdatePlayerSkillInFutureLineups")]
-   [RequireAuthentication("admin")]
-    public async Task<IActionResult> UpdatePlayerSkillInFutureLineups([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "memberships/update-future-lineups")] HttpRequest req, FunctionContext context)
+    [RequireAuthentication("admin")]
+    public async Task<IActionResult> UpdatePlayerSkillInFutureLineups(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "memberships/update-future-lineups"
+        )]
+            HttpRequest req,
+        FunctionContext context
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var request = JsonConvert.DeserializeObject<UpdateSkillInLineupsRequest>(requestBody);
-            
-            if (request == null || string.IsNullOrEmpty(request.PlayerId) || string.IsNullOrEmpty(request.DivisionId) || request.NewSkillLevel <= 0)
+
+            if (
+                request == null
+                || string.IsNullOrEmpty(request.PlayerId)
+                || string.IsNullOrEmpty(request.DivisionId)
+                || request.NewSkillLevel <= 0
+            )
             {
-                return new BadRequestObjectResult("Invalid request - playerId, divisionId, and newSkillLevel are required");
+                return new BadRequestObjectResult(
+                    "Invalid request - playerId, divisionId, and newSkillLevel are required"
+                );
             }
 
-            await _cosmosService.UpdateFutureLineupsForPlayerSkillChangePublicAsync(request.PlayerId, request.DivisionId, request.NewSkillLevel);
-            
-            return new OkObjectResult(new { 
-                Message = $"Updated skill levels for player {request.PlayerId} in future lineups", 
-                PlayerId = request.PlayerId, 
-                DivisionId = request.DivisionId, 
-                NewSkillLevel = request.NewSkillLevel 
-            });
+            await _cosmosService.UpdateFutureLineupsForPlayerSkillChangePublicAsync(
+                request.PlayerId,
+                request.DivisionId,
+                request.NewSkillLevel
+            );
+
+            return new OkObjectResult(
+                new
+                {
+                    Message = $"Updated skill levels for player {request.PlayerId} in future lineups",
+                    PlayerId = request.PlayerId,
+                    DivisionId = request.DivisionId,
+                    NewSkillLevel = request.NewSkillLevel,
+                }
+            );
         }
         catch (Exception ex)
         {
@@ -162,9 +218,11 @@ public class MembershipsFunctions
     [RequireAuthentication]
     [RequireTeamRole("captain")]
     public async Task<IActionResult> GetTeamMemberships(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}/memberships")] HttpRequest req, 
-        FunctionContext context, 
-        string teamId)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams/{teamId}/memberships")]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
     {
         try
         {
@@ -182,15 +240,17 @@ public class MembershipsFunctions
     [RequireAuthentication]
     [RequireTeamRole("captain")]
     public async Task<IActionResult> CreateTeamMembership(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "teams/{teamId}/memberships")] HttpRequest req, 
-        FunctionContext context, 
-        string teamId)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "teams/{teamId}/memberships")]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
-            
+
             if (membership == null || string.IsNullOrEmpty(membership.PlayerId))
             {
                 return new BadRequestObjectResult("Invalid membership data - playerId is required");
@@ -198,7 +258,7 @@ public class MembershipsFunctions
 
             // Override teamId from route
             membership.TeamId = teamId;
-            
+
             var createdMembership = await _cosmosService.CreateMembershipAsync(membership);
             return new OkObjectResult(createdMembership);
         }
@@ -213,16 +273,22 @@ public class MembershipsFunctions
     [RequireAuthentication]
     [RequireTeamRole("captain")]
     public async Task<IActionResult> UpdateTeamMembership(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "teams/{teamId}/memberships/{membershipId}")] HttpRequest req, 
-        FunctionContext context, 
-        string teamId, 
-        string membershipId)
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "put",
+            Route = "teams/{teamId}/memberships/{membershipId}"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId,
+        string membershipId
+    )
     {
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var membership = JsonConvert.DeserializeObject<TeamMembership>(requestBody);
-            
+
             if (membership == null || string.IsNullOrEmpty(membership.PlayerId))
             {
                 return new BadRequestObjectResult("Invalid membership data - playerId is required");
@@ -231,7 +297,11 @@ public class MembershipsFunctions
             // Override teamId from route
             membership.TeamId = teamId;
 
-            var updatedMembership = await _cosmosService.UpdateMembershipAsync(membershipId, teamId, membership);
+            var updatedMembership = await _cosmosService.UpdateMembershipAsync(
+                membershipId,
+                teamId,
+                membership
+            );
             if (updatedMembership == null)
             {
                 return new NotFoundResult();
@@ -241,7 +311,12 @@ public class MembershipsFunctions
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating membership {MembershipId} for team {TeamId}", membershipId, teamId);
+            _logger.LogError(
+                ex,
+                "Error updating membership {MembershipId} for team {TeamId}",
+                membershipId,
+                teamId
+            );
             return new StatusCodeResult(500);
         }
     }
@@ -250,10 +325,16 @@ public class MembershipsFunctions
     [RequireAuthentication]
     [RequireTeamRole("captain")]
     public async Task<IActionResult> DeleteTeamMembership(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "teams/{teamId}/memberships/{membershipId}")] HttpRequest req, 
-        FunctionContext context, 
-        string teamId, 
-        string membershipId)
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "delete",
+            Route = "teams/{teamId}/memberships/{membershipId}"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId,
+        string membershipId
+    )
     {
         try
         {
@@ -267,7 +348,12 @@ public class MembershipsFunctions
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting membership {MembershipId} for team {TeamId}", membershipId, teamId);
+            _logger.LogError(
+                ex,
+                "Error deleting membership {MembershipId} for team {TeamId}",
+                membershipId,
+                teamId
+            );
             return new StatusCodeResult(500);
         }
     }

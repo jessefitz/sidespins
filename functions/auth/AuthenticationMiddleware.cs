@@ -1,10 +1,10 @@
+using System.Net;
+using System.Reflection;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
-using System.Net;
-using System.Text.Json;
-using System.Reflection;
-using Microsoft.AspNetCore.Http;
 
 namespace SidesSpins.Functions;
 
@@ -15,9 +15,10 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
     private readonly IMembershipService _membershipService;
 
     public AuthenticationMiddleware(
-        ILogger<AuthenticationMiddleware> logger, 
+        ILogger<AuthenticationMiddleware> logger,
         AuthService authService,
-        IMembershipService membershipService)
+        IMembershipService membershipService
+    )
     {
         _logger = logger;
         _authService = authService;
@@ -67,7 +68,10 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
             // If team role is required, validate team membership
             if (teamRoleRequirement != null)
             {
-                var teamId = ExtractTeamIdFromRoute(httpContext.Request, teamRoleRequirement.TeamIdRouteParam);
+                var teamId = ExtractTeamIdFromRoute(
+                    httpContext.Request,
+                    teamRoleRequirement.TeamIdRouteParam
+                );
                 if (string.IsNullOrEmpty(teamId))
                 {
                     _logger.LogWarning("Team ID not found in route for team role requirement");
@@ -79,7 +83,12 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
                 if (IsGlobalAdmin(claims.SidespinsRole))
                 {
                     // Global admin has access to all teams
-                    context.Items["ActiveMembership"] = new UserTeamMembership(claims.Sub, teamId, "admin", true);
+                    context.Items["ActiveMembership"] = new UserTeamMembership(
+                        claims.Sub,
+                        teamId,
+                        "admin",
+                        true
+                    );
                 }
                 else
                 {
@@ -87,19 +96,37 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
                     var membership = await _membershipService.GetAsync(claims.Sub, teamId);
                     if (membership == null || !membership.Active)
                     {
-                        _logger.LogWarning("User {UserId} has no active membership for team {TeamId}", claims.Sub, teamId);
-                        await WriteForbiddenResponse(httpContext.Response, 
-                            AuthorizationErrorMessages.CreateNoMembership(teamId, claims.Sub));
+                        _logger.LogWarning(
+                            "User {UserId} has no active membership for team {TeamId}",
+                            claims.Sub,
+                            teamId
+                        );
+                        await WriteForbiddenResponse(
+                            httpContext.Response,
+                            AuthorizationErrorMessages.CreateNoMembership(teamId, claims.Sub)
+                        );
                         return;
                     }
 
                     // Validate role hierarchy
                     if (!IsAtLeast(membership.Role, teamRoleRequirement.MinimumRole))
                     {
-                        _logger.LogWarning("User {UserId} has insufficient role {UserRole} for team {TeamId}, required: {RequiredRole}", 
-                            claims.Sub, membership.Role, teamId, teamRoleRequirement.MinimumRole);
-                        await WriteForbiddenResponse(httpContext.Response,
-                            AuthorizationErrorMessages.CreateInsufficientRole(teamId, teamRoleRequirement.MinimumRole, membership.Role, claims.Sub));
+                        _logger.LogWarning(
+                            "User {UserId} has insufficient role {UserRole} for team {TeamId}, required: {RequiredRole}",
+                            claims.Sub,
+                            membership.Role,
+                            teamId,
+                            teamRoleRequirement.MinimumRole
+                        );
+                        await WriteForbiddenResponse(
+                            httpContext.Response,
+                            AuthorizationErrorMessages.CreateInsufficientRole(
+                                teamId,
+                                teamRoleRequirement.MinimumRole,
+                                membership.Role,
+                                claims.Sub
+                            )
+                        );
                         return;
                     }
 
@@ -148,16 +175,22 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         {
             // Get the method info from the function definition
             var functionName = context.FunctionDefinition.Name;
-            
+
             // Get all types in the current assembly
             var assembly = Assembly.GetExecutingAssembly();
-            var functionTypes = assembly.GetTypes()
-                .Where(t => t.GetMethods().Any(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName));
+            var functionTypes = assembly
+                .GetTypes()
+                .Where(t =>
+                    t.GetMethods()
+                        .Any(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName)
+                );
 
             foreach (var type in functionTypes)
             {
                 var method = type.GetMethods()
-                    .FirstOrDefault(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName);
+                    .FirstOrDefault(m =>
+                        m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName
+                    );
 
                 if (method != null)
                 {
@@ -175,7 +208,11 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error checking authentication attribute for function {FunctionName}", context.FunctionDefinition.Name);
+            _logger.LogWarning(
+                ex,
+                "Error checking authentication attribute for function {FunctionName}",
+                context.FunctionDefinition.Name
+            );
             return false;
         }
     }
@@ -186,13 +223,19 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         {
             var functionName = context.FunctionDefinition.Name;
             var assembly = Assembly.GetExecutingAssembly();
-            var functionTypes = assembly.GetTypes()
-                .Where(t => t.GetMethods().Any(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName));
+            var functionTypes = assembly
+                .GetTypes()
+                .Where(t =>
+                    t.GetMethods()
+                        .Any(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName)
+                );
 
             foreach (var type in functionTypes)
             {
                 var method = type.GetMethods()
-                    .FirstOrDefault(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName);
+                    .FirstOrDefault(m =>
+                        m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName
+                    );
 
                 if (method != null)
                 {
@@ -204,7 +247,11 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error checking team role attribute for function {FunctionName}", context.FunctionDefinition.Name);
+            _logger.LogWarning(
+                ex,
+                "Error checking team role attribute for function {FunctionName}",
+                context.FunctionDefinition.Name
+            );
             return null;
         }
     }
@@ -221,12 +268,18 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
             }
 
             // Fallback: try to parse from path segments
-            var pathSegments = request.Path.Value?.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var pathSegments = request.Path.Value?.Split(
+                '/',
+                StringSplitOptions.RemoveEmptyEntries
+            );
             if (pathSegments != null)
             {
                 for (int i = 0; i < pathSegments.Length - 1; i++)
                 {
-                    if (pathSegments[i].Equals("teams", StringComparison.OrdinalIgnoreCase) && i + 1 < pathSegments.Length)
+                    if (
+                        pathSegments[i].Equals("teams", StringComparison.OrdinalIgnoreCase)
+                        && i + 1 < pathSegments.Length
+                    )
                     {
                         return pathSegments[i + 1];
                     }
@@ -254,32 +307,41 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
             ["player"] = 1,
             ["captain"] = 2,
             ["manager"] = 2, // captain and manager are equivalent
-            ["admin"] = 3
+            ["admin"] = 3,
         };
 
-        return roleHierarchy.GetValueOrDefault(userRole ?? "", 0) >= 
-               roleHierarchy.GetValueOrDefault(requiredRole, int.MaxValue);
+        return roleHierarchy.GetValueOrDefault(userRole ?? "", 0)
+            >= roleHierarchy.GetValueOrDefault(requiredRole, int.MaxValue);
     }
 
     private async Task WriteUnauthorizedResponse(HttpResponse response)
     {
         response.StatusCode = (int)HttpStatusCode.Unauthorized;
         response.ContentType = "application/json";
-        
-        var errorResponse = new { error = "Unauthorized", message = "Valid authentication token required" };
+
+        var errorResponse = new
+        {
+            error = "Unauthorized",
+            message = "Valid authentication token required",
+        };
         await response.WriteAsync(JsonSerializer.Serialize(errorResponse));
     }
 
-    private async Task WriteForbiddenResponse(HttpResponse response, AuthorizationErrorResponse? errorResponse = null)
+    private async Task WriteForbiddenResponse(
+        HttpResponse response,
+        AuthorizationErrorResponse? errorResponse = null
+    )
     {
         response.StatusCode = (int)HttpStatusCode.Forbidden;
         response.ContentType = "application/json";
-        
-        var responseObject = errorResponse ?? new AuthorizationErrorResponse
-        {
-            Message = "Insufficient permissions for this operation"
-        };
-        
+
+        var responseObject =
+            errorResponse
+            ?? new AuthorizationErrorResponse
+            {
+                Message = "Insufficient permissions for this operation",
+            };
+
         await response.WriteAsync(JsonSerializer.Serialize(responseObject));
     }
 }

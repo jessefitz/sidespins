@@ -192,24 +192,24 @@
                 <h1>Sign In to SideSpins</h1>
                 
                 <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem;">
-                    <h4 style="margin: 0 0 0.75rem 0; color: #495057; font-size: 1rem; font-weight: 600;">Quick Note</h4>
                     <p style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5;">
-                        Since the site's getting bigger and covering more teams, lineups are now private to each team. To get started, you'll need your APA member number (find it in the APA app under your profile) and phone number for verification. Super simple!
+                        Hey Team 👋 </br>
+                        SideSpins now requires login to keep our lineups private and get ready for inviting other teams to use the site with us. </br></br>
+                        <strong>First time:</strong> register with your APA member number (get it from the APA app) and mobilephone number. </br>
+                        <strong>Next time:</strong> just use your phone number and the SMS code. </br></br>
+                        No passwords, just a few taps and you're in!
                     </p>
                 </div>
                 
                 <!-- New Member Sign Up (Default View) -->
                 <div id="new-member-view" class="view-section active">
-                    <h3>New League Member</h3>
-                    <p class="description">
-                        Only verified APA league members can create accounts. You'll need your APA member number (find it in the APA app under your profile) to get started.
-                    </p>
+                    <h3>First Time User</h3>
                     
                     <div id="apa-input-section">
                         <label for="apa-number">APA Member Number:</label>
                         <input type="text" id="apa-number" placeholder="12345" />
                         
-                        <label for="phone">Phone Number:</label>
+                        <label for="phone">Mobile Phone Number:</label>
                         <input type="tel" id="phone" placeholder="+1 (555) 123-4567" />
                         
                         <button id="signup-init-btn">Verify & Send Code</button>
@@ -224,7 +224,7 @@
                     
                     <div class="toggle-link">
                         <a href="#" id="show-existing-member">Already have an account? Sign in →</a>
-                    </div>
+                    </div>                   
                 </div>
                 
                 <!-- Existing Member Sign In -->
@@ -250,7 +250,12 @@
                     <div class="toggle-link">
                         <a href="#" id="show-new-member">← New to SideSpins? Create an account</a>
                     </div>
+                
+                    
                 </div>
+                <p class="description">
+                        By continuing, you agree to receive SMS messages for login and verification. Message and data rates may apply
+                    </p>
             </div>
             
             <div id="error-message" style="display:none;"></div>

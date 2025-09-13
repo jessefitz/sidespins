@@ -1,40 +1,223 @@
-// Admin Panel JavaScript for SideSpins API Management
+// Admin Panel JavaScript for SideSpins API Management.
 class SideSpinsAdmin {
     constructor() {
-        this.apiSecret = '';
         // Use environment-appropriate URL
         this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:7071/api' 
             : 'https://sidespinsapi.azurewebsites.net/api';
         this.authenticated = false;
+        this.authManager = new AuthManager(this.apiBaseUrl.replace('/api', '/api/auth'));
+        this.currentUser = null;
+        this.authToken = null; // Store JWT token for API requests
     }
 
-    // Authentication
-    setApiSecret(secret) {
-        this.apiSecret = secret;
-        this.authenticated = !!secret;
+    // Enhanced logout function with comprehensive cleanup
+    logout() {
+        try {
+            // Clear the stored JWT token
+            this.authToken = null;
+            
+            // Clear localStorage
+            localStorage.removeItem('admin_auth_token');
+            
+            // Clear sessionStorage (just in case anything was stored there)
+            sessionStorage.clear();
+            
+            // Clear all cookies for this domain (more thorough cleanup)
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            // Log the logout action
+            console.log('User logged out - all client-side tokens cleared');
+            
+            // Reset UI to unauthenticated state
+            this.resetToLoginState();
+            
+        } catch (error) {
+            console.error('Error during logout:', error);
+            // Even if there's an error, still try to reset the state
+            this.resetToLoginState();
+        }
     }
 
-    // Generic API request method
+    // Helper method to reset UI to login state
+    resetToLoginState() {
+        // Clear authentication state
+        this.authenticated = false;
+        this.currentUser = null;
+        
+        // Hide authenticated content and show login section
+        const adminPanel = document.getElementById('admin-panel');
+        const authSection = document.getElementById('auth-section');
+        
+        if (adminPanel) {
+            adminPanel.style.display = 'none';
+        }
+        
+        if (authSection) {
+            authSection.style.display = 'block';
+        }
+        
+        // Clear any form data (except login forms)
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            if (form.id !== 'login-form' && form.id !== 'sms-form') {
+                form.reset();
+            }
+        });
+        
+        // Clear any displayed data
+        const dataContainers = [
+            'players-list',
+            'teams-list', 
+            'memberships-list',
+            'matches-list'
+        ];
+        
+        dataContainers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+        
+        // Reset authentication flow to initial state
+        this.resetAuthFlow();
+        
+        // Show status message
+        this.showStatus('Logged out successfully', 'success');
+    }
+
+    // Enhanced method to check if user is authenticated
+    isAuthenticated() {
+        return this.authToken !== null && this.authToken !== '';
+    }
+
+    // Method to show status messages (enhanced version)
+    showStatus(message, type = 'info') {
+        const statusDiv = document.getElementById('auth-status');
+        if (statusDiv) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message ${type}`;
+            
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.textContent = '';
+                    statusDiv.className = 'status-message';
+                }, 3000);
+            }
+        }
+        
+        // Also use the global showStatus function if available
+        if (typeof showStatus === 'function') {
+            showStatus(message, type);
+        }
+    }
+
+    // Helper method to reset authentication flow
+    resetAuthFlow() {
+        // Reset to phone number step
+        const phoneStep = document.getElementById('phone-step');
+        const codeStep = document.getElementById('code-step');
+        const userInfo = document.getElementById('user-info');
+        
+        if (phoneStep) phoneStep.style.display = 'block';
+        if (codeStep) codeStep.style.display = 'none';
+        if (userInfo) userInfo.style.display = 'none';
+        
+        // Clear inputs
+        const phoneInput = document.getElementById('phone-number');
+        const codeInput = document.getElementById('sms-code');
+        
+        if (phoneInput) phoneInput.value = '';
+        if (codeInput) codeInput.value = '';
+        
+        // Focus on phone input
+        if (phoneInput) phoneInput.focus();
+    }
+
+    // Set the auth token for API requests
+    setAuthToken(token) {
+        this.authToken = token;
+        // Store in localStorage for persistence across page reloads
+        if (token) {
+            localStorage.setItem('admin_auth_token', token);
+        } else {
+            localStorage.removeItem('admin_auth_token');
+        }
+    }
+
+    // Get the stored auth token
+    getAuthToken() {
+        if (!this.authToken) {
+            this.authToken = localStorage.getItem('admin_auth_token');
+        }
+        return this.authToken;
+    }
+
+    // Check if user is authenticated and has admin role
+    async checkAdminAuth() {
+        try {
+            const isAuth = await this.authManager.checkAuth();
+            if (isAuth && this.authManager.currentUser) {
+                // Check if user has admin role
+                if (this.authManager.currentUser.teamRole === 'admin') {
+                    this.authenticated = true;
+                    this.currentUser = this.authManager.currentUser;
+                    return true;
+                } else {
+                    throw new Error('Admin role required');
+                }
+            }
+            this.authenticated = false;
+            return false;
+        } catch (error) {
+            console.error('Admin auth check failed:', error);
+            this.authenticated = false;
+            return false;
+        }
+    }
+
+    // Generic API request method using JWT authentication
     async apiRequest(endpoint, options = {}) {
         if (!this.authenticated) {
             throw new Error('Not authenticated');
         }
 
         const url = `${this.apiBaseUrl}${endpoint}`;
+        
+        // Prepare headers with Authorization
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        // Add Authorization header if we have a token
+        const token = this.getAuthToken();
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const config = {
-            headers: {
-                'x-api-secret': this.apiSecret,
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
+            headers,
+            credentials: 'include', // Still include cookies as fallback
             ...options
         };
 
         const response = await fetch(url, config);
         
         if (response.status === 401) {
-            throw new Error('Invalid API secret');
+            // Token expired or invalid - redirect to re-authenticate
+            this.authenticated = false;
+            await this.authManager.logout();
+            showAuthSection();
+            throw new Error('Authentication expired. Please log in again.');
+        }
+        
+        if (response.status === 403) {
+            throw new Error('Access denied. Admin role required.');
         }
         
         if (!response.ok) {
@@ -276,36 +459,164 @@ function clearForm(formId) {
 }
 
 // Authentication functions
-async function authenticate() {
-    const secretInput = document.getElementById('api-secret');
-    const secret = secretInput.value.trim();
+async function sendSmsCode() {
+    const phoneInput = document.getElementById('phone-number');
+    const phoneNumber = phoneInput.value.trim();
     
-    if (!secret) {
-        showStatus('Please enter an API secret', 'error');
+    if (!phoneNumber) {
+        showStatus('Please enter a phone number', 'error');
         return;
     }
     
-    adminApi.setApiSecret(secret);
+    try {
+        showStatus('Sending SMS code...', 'info');
+        
+        // Format and send SMS
+        const e164Phone = adminApi.authManager.toE164(phoneNumber);
+        const result = await adminApi.authManager.sendSmsCode(e164Phone);
+        
+        if (result.ok) {
+            // Show code input step
+            document.getElementById('phone-step').style.display = 'none';
+            document.getElementById('code-step').style.display = 'block';
+            showStatus('SMS code sent! Check your phone.', 'success');
+            
+            // Focus on code input
+            document.getElementById('sms-code').focus();
+        } else {
+            showStatus(`Failed to send SMS: ${result.message}`, 'error');
+        }
+    } catch (error) {
+        showStatus(`Error sending SMS: ${error.message}`, 'error');
+    }
+}
+
+async function verifySmsCode() {
+    const codeInput = document.getElementById('sms-code');
+    const code = codeInput.value.trim();
+    
+    if (!code || code.length !== 6) {
+        showStatus('Please enter the 6-digit verification code', 'error');
+        return;
+    }
     
     try {
-        // Test the authentication by trying to get players
-        await adminApi.getPlayers();
+        showStatus('Verifying code...', 'info');
         
-        // Success - hide auth section and show admin panel
-        document.getElementById('auth-section').style.display = 'none';
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('auth-status').innerHTML = '<div class="status-success">✅ Authenticated successfully</div>';
+        const result = await adminApi.authManager.verifySmsCode(code);
         
-        showStatus('Authentication successful!', 'success');
-        
-        // Load initial data
-        loadPlayers();
-        loadMemberships(); // Load memberships for the default team
-        
+        if (result.ok) {
+            // Extract and store the JWT token if provided
+            if (result.sessionToken) {
+                adminApi.setAuthToken(result.sessionToken);
+            }
+            
+            // Check if user has admin role
+            const hasAdminAuth = await adminApi.checkAdminAuth();
+            
+            if (hasAdminAuth) {
+                // Success - show admin panel
+                showAuthenticatedState();
+                showStatus('Authentication successful!', 'success');
+                
+                // Load initial data
+                loadPlayers();
+                loadMemberships();
+            } else {
+                showStatus('Access denied. Admin role required.', 'error');
+                await adminApi.authManager.logout();
+                resetAuthFlow();
+            }
+        } else {
+            showStatus(`Verification failed: ${result.message}`, 'error');
+        }
     } catch (error) {
-        showStatus(`Authentication failed: ${error.message}`, 'error');
-        adminApi.setApiSecret('');
+        showStatus(`Error verifying code: ${error.message}`, 'error');
     }
+}
+
+async function logout() {
+    try {
+        // Use the enhanced logout from the admin API
+        if (adminApi) {
+            adminApi.logout();
+        } else {
+            // Fallback if adminApi isn't available
+            localStorage.removeItem('admin_auth_token');
+            sessionStorage.clear();
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        // Fallback cleanup
+        localStorage.removeItem('admin_auth_token');
+        sessionStorage.clear();
+        showAuthSection();
+        showStatus('Logged out', 'info');
+    }
+}
+
+function resetAuthFlow() {
+    // Reset to phone number step
+    document.getElementById('phone-step').style.display = 'block';
+    document.getElementById('code-step').style.display = 'none';
+    document.getElementById('user-info').style.display = 'none';
+    
+    // Clear inputs
+    document.getElementById('phone-number').value = '';
+    document.getElementById('sms-code').value = '';
+    
+    // Focus on phone input
+    document.getElementById('phone-number').focus();
+}
+
+function showAuthenticatedState() {
+    // Hide auth forms and show user info
+    document.getElementById('phone-step').style.display = 'none';
+    document.getElementById('code-step').style.display = 'none';
+    document.getElementById('user-info').style.display = 'block';
+    
+    // Show user info in both locations
+    const userDisplay = document.getElementById('user-display');
+    const adminUserDisplay = document.getElementById('admin-user-display');
+    
+    if (adminApi.currentUser) {
+        const userText = `${adminApi.currentUser.userId} (${adminApi.currentUser.teamRole})`;
+        if (userDisplay) userDisplay.textContent = userText;
+        if (adminUserDisplay) adminUserDisplay.textContent = userText;
+    }
+    
+    // Show admin panel
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+}
+
+function showAuthSection() {
+    // Hide admin panel and show auth
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('auth-section').style.display = 'block';
+    resetAuthFlow();
+}
+
+// Helper function for UI state management
+function showLoginState() {
+    const adminPanel = document.getElementById('admin-panel');
+    const authSection = document.getElementById('auth-section');
+    
+    if (adminPanel) {
+        adminPanel.style.display = 'none';
+    }
+    
+    if (authSection) {
+        authSection.style.display = 'block';
+    }
+}
+
+// Authentication functions
+async function authenticate() {
+    // This function is now replaced by the SMS authentication flow
+    // But we keep it for backward compatibility during transition
+    showStatus('Please use SMS authentication', 'info');
 }
 
 // Tab management
@@ -1490,14 +1801,83 @@ function escapeHtml(text) {
 }
 
 // Initialize the admin panel when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up Enter key for auth
-    document.getElementById('api-secret').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            authenticate();
-        }
+document.addEventListener('DOMContentLoaded', async function() {
+    // Restore auth token from localStorage if available
+    const savedToken = localStorage.getItem('admin_auth_token');
+    if (savedToken) {
+        adminApi.setAuthToken(savedToken);
+    }
+    
+    // Set up Enter key handlers for inputs
+    const phoneInput = document.getElementById('phone-number');
+    const codeInput = document.getElementById('sms-code');
+    
+    if (phoneInput) {
+        phoneInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendSmsCode();
+            }
+        });
+        
+        // Format phone number as user types
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+            } else if (value.length >= 3) {
+                value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+            }
+            e.target.value = value;
+        });
+    }
+    
+    if (codeInput) {
+        codeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifySmsCode();
+            }
+        });
+        
+        // Only allow digits and limit to 6 characters
+        codeInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+        });
+    }
+    
+    // Add logout button functionality
+    const logoutButtons = document.querySelectorAll('button[onclick="logout()"]');
+    logoutButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Confirm logout action
+            if (confirm('Are you sure you want to log out?')) {
+                logout();
+            }
+        });
     });
     
-    // Focus on the API secret input
-    document.getElementById('api-secret').focus();
+    // Check authentication state on page load
+    if (savedToken) {
+        adminApi.setAuthToken(savedToken);
+        
+        // Verify token is still valid by making a simple API call
+        try {
+            await adminApi.apiRequest('/GetPlayers?limit=1');
+            // Token is valid, show authenticated state
+            showAuthenticatedState();
+            showStatus('Already authenticated', 'success');
+            // Load initial data
+            loadPlayers();
+            loadMemberships();
+        } catch (error) {
+            // Token is invalid, clear it and show login
+            console.log('Stored token is invalid, clearing and showing login');
+            adminApi.logout();
+        }
+    } else {
+        // No token, ensure we're showing login state
+        showLoginState();
+        if (phoneInput) phoneInput.focus();
+    }
 });

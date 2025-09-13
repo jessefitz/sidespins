@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SideSpins App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e1e5e9;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007cba;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .team-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-switcher label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .team-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .team-select:focus {
+            outline: none;
+            border-color: #007cba;
+        }
+
+        .role-indicator {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+
+        .role-manager {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .role-captain {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .role-admin {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .user-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .dashboard {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .dashboard h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .team-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .team-info h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+
+        .team-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007cba;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+        }
+
+        .role-manager {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .role-player {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .role-admin {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #007cba;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #005a87;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .team-details {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">SideSpins</div>
+            <div class="team-switcher" id="team-switcher" style="display:none;">
+                <label for="team-select">Team:</label>
+                <select id="team-select" class="team-select">
+                    <option value="">Select a team...</option>
+                </select>
+                <span id="role-indicator" class="role-indicator">Player</span>
+            </div>
+            <div class="user-info">
+                <div class="user-details" id="user-summary" style="display:none;"></div>
+                <button class="logout-btn" id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your dashboard...</p>
+        </div>
+
+        <div id="error-container" style="display:none;">
+            <div class="error" id="error-message"></div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/login.html" class="btn btn-primary">Back to Login</a>
+            </div>
+        </div>
+
+        <div id="dashboard-container" style="display:none;">
+            <div class="dashboard">
+                <h1>Welcome to SideSpins! 🏓</h1>
+                <p>You're successfully authenticated and ready to manage your table tennis activities.</p>
+
+                <div class="team-info" id="team-info">
+                    <h3>Your Team Information</h3>
+                    <div class="team-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Team ID</div>
+                            <div class="detail-value" id="team-id-display">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Your Role</div>
+                            <div class="detail-value" id="team-role-display">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">User ID</div>
+                            <div class="detail-value" id="user-id-display">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Session Status</div>
+                            <div class="detail-value">Active ✅</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions" id="role-actions">
+                    <!-- Actions will be populated based on user role -->
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <h2>Coming Soon</h2>
+                <p>We're working on exciting features for SideSpins:</p>
+                <ul>
+                    <li><strong>Team Management</strong> - Add and remove players from your team</li>
+                    <li><strong>Match Tracking</strong> - Record and track game results</li>
+                    <li><strong>Player Statistics</strong> - View performance analytics</li>
+                    <li><strong>Tournament Organization</strong> - Create and manage tournaments</li>
+                    <li><strong>Scheduling</strong> - Coordinate practice sessions and matches</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const authManager = new AuthManager();
+        window.authManager = authManager; // Make globally available
+        
+        // Setup UI permissions
+        UIPermissions.setAuthManager(authManager);
+        UIPermissions.setupTeamChangeListener();
+        
+        const loading = document.getElementById('loading');
+        const errorContainer = document.getElementById('error-container');
+        const errorMessage = document.getElementById('error-message');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const userSummary = document.getElementById('user-summary');
+        const teamIdDisplay = document.getElementById('team-id-display');
+        const teamRoleDisplay = document.getElementById('team-role-display');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const roleActions = document.getElementById('role-actions');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        // Team switcher elements
+        const teamSwitcher = document.getElementById('team-switcher');
+        const teamSelect = document.getElementById('team-select');
+        const roleIndicator = document.getElementById('role-indicator');
+
+        function showError(message) {
+            loading.style.display = 'none';
+            dashboardContainer.style.display = 'none';
+            errorMessage.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        function showDashboard() {
+            loading.style.display = 'none';
+            errorContainer.style.display = 'none';
+            dashboardContainer.style.display = 'block';
+        }
+
+        function getRoleBadge(role) {
+            const className = `role-${role}`;
+            return `<span class="role-badge ${className}">${role}</span>`;
+        }
+
+        function updateRoleIndicator(role) {
+            roleIndicator.textContent = role ? role.charAt(0).toUpperCase() + role.slice(1) : 'No Role';
+            roleIndicator.className = 'role-indicator';
+            if (role) {
+                roleIndicator.classList.add(`role-${role}`);
+            }
+        }
+
+        function populateTeamSwitcher(memberships) {
+            teamSelect.innerHTML = '<option value="">Select a team...</option>';
+            
+            if (memberships && memberships.length > 0) {
+                memberships.forEach(membership => {
+                    const option = document.createElement('option');
+                    option.value = membership.teamId;
+                    option.textContent = membership.teamName || membership.teamId;
+                    option.dataset.role = membership.role;
+                    teamSelect.appendChild(option);
+                });
+                
+                teamSwitcher.style.display = 'flex';
+                
+                // Set current active team
+                if (authManager.activeTeamId) {
+                    teamSelect.value = authManager.activeTeamId;
+                    const selectedOption = teamSelect.selectedOptions[0];
+                    if (selectedOption) {
+                        updateRoleIndicator(selectedOption.dataset.role);
+                    }
+                }
+            } else {
+                teamSwitcher.style.display = 'none';
+            }
+        }
+
+        function populateRoleActions(role) {
+            let actions = '';
+            
+            if (!role) {
+                actions = `<p style="text-align: center; color: #666;">Select a team to view available actions</p>`;
+                roleActions.innerHTML = actions;
+                return;
+            }
+            
+            switch(role.toLowerCase()) {
+                case 'admin':
+                    actions = `
+                        <a href="/admin/" class="btn btn-primary">🔧 Admin Panel</a>
+                        <a href="/team-admin/" class="btn btn-primary">👥 Team Administration</a>
+                        <a href="/lineup-explorer.html" class="btn btn-secondary">📋 Manage Lineup</a>
+                        <a href="/schedule.html" class="btn btn-secondary">📅 View Schedule</a>
+                        <button class="btn btn-secondary" onclick="showComingSoon('Player Statistics')">📊 View Statistics</button>
+                    `;
+                    break;
+                case 'captain':
+                case 'manager':
+                    actions = `
+                        <a href="/team-admin/" class="btn btn-primary">👥 Team Administration</a>
+                        <a href="/lineup-explorer.html" class="btn btn-primary">📋 Manage Lineup</a>
+                        <a href="/schedule.html" class="btn btn-secondary">📅 View Schedule</a>
+                        <button class="btn btn-secondary" onclick="showComingSoon('Player Statistics')">📊 View Statistics</button>
+                    `;
+                    break;
+                case 'player':
+                    actions = `
+                        <a href="/lineup-explorer.html" class="btn btn-secondary">👁️ View Lineup</a>
+                        <a href="/schedule.html" class="btn btn-secondary">📅 View Schedule</a>
+                        <button class="btn btn-secondary" onclick="showComingSoon('Player Statistics')">📊 View Statistics</button>
+                        <button class="btn btn-secondary" onclick="showComingSoon('Availability')">✅ Update Availability</button>
+                    `;
+                    break;
+                default:
+                    actions = `
+                        <a href="/schedule.html" class="btn btn-secondary">📅 View Schedule</a>
+                        <button class="btn btn-secondary" onclick="showComingSoon('Match Results')">🏓 View Matches</button>
+                    `;
+            }
+            
+            roleActions.innerHTML = actions;
+        }
+
+        function showComingSoon(feature) {
+            alert(`${feature} feature is coming soon! This will be available in a future update.`);
+        }
+
+        // Team switcher change handler
+        teamSelect.addEventListener('change', function() {
+            const selectedTeamId = this.value;
+            const selectedOption = this.selectedOptions[0];
+            
+            if (selectedTeamId && selectedOption) {
+                authManager.setActiveTeam(selectedTeamId);
+                const role = selectedOption.dataset.role;
+                updateRoleIndicator(role);
+                populateRoleActions(role);
+                updateTeamDisplay(selectedTeamId, role);
+            } else {
+                updateRoleIndicator('');
+                populateRoleActions('');
+                updateTeamDisplay('', '');
+            }
+        });
+
+        // Listen for team change events
+        window.addEventListener('teamChanged', function(event) {
+            const { teamId, membership } = event.detail;
+            updateTeamDisplay(teamId, membership?.role || '');
+            populateRoleActions(membership?.role || '');
+        });
+
+        function updateTeamDisplay(teamId, role) {
+            teamIdDisplay.textContent = teamId || '-';
+            teamRoleDisplay.innerHTML = role ? `${role}${getRoleBadge(role)}` : '-';
+        }
+
+        // Logout handler
+        logoutBtn.addEventListener('click', async function() {
+            try {
+                await authManager.logout();
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                // Force redirect even if logout fails
+                window.location.href = '/login.html';
+            }
+        });
+
+        // Initialize the app
+        try {
+            const isAuthenticated = await authManager.requireAuth();
+            
+            if (isAuthenticated) {
+                // Load user profile and memberships
+                try {
+                    const profile = await authManager.getUserProfile();
+                    userIdDisplay.textContent = profile.userId || '-';
+                    userSummary.textContent = `Welcome, User ${profile.userId}`;
+                    userSummary.style.display = 'block';
+                } catch (error) {
+                    console.warn('Could not load user profile:', error);
+                }
+
+                // Load memberships for team switcher
+                const memberships = await authManager.loadUserMemberships();
+                populateTeamSwitcher(memberships);
+
+                // Set initial team display if we have an active team
+                const activeMembership = authManager.getActiveMembership();
+                if (activeMembership) {
+                    updateTeamDisplay(activeMembership.teamId, activeMembership.role);
+                    populateRoleActions(activeMembership.role);
+                }
+
+                showDashboard();
+                
+                // Apply conditional UI based on permissions
+                UIPermissions.applyConditionalUI();
+            }
+        } catch (error) {
+            console.error('App initialization failed:', error);
+            showError('Failed to load dashboard. Please try logging in again.');
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SideSpins - Authentication</title>
+</head>
+<body>
+    <div style="text-align: center; padding: 2rem;">
+        <h2>Completing your sign-in...</h2>
+        <p id="status">Processing authentication...</p>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusElement = document.getElementById('status');
+            const authManager = new AuthManager();
+
+            async function handleMagicLinkCallback() {
+                try {
+                    // Get the token from the URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const token = urlParams.get('token');
+                    
+                    if (!token) {
+                        statusElement.textContent = 'No authentication token found.';
+                        statusElement.style.color = 'red';
+                        setTimeout(() => {
+                            window.location.href = '/login.html';
+                        }, 2000);
+                        return;
+                    }
+
+                    const result = await authManager.authenticateMagicLink(token);
+
+                    if (result.ok) {
+                        statusElement.textContent = 'Login successful! Redirecting...';
+                        statusElement.style.color = 'green';
+                        setTimeout(() => {
+                            window.location.href = '/app.html';
+                        }, 1000);
+                    } else {
+                        statusElement.textContent = result.message || 'Authentication failed. Please try again.';
+                        statusElement.style.color = 'red';
+                        setTimeout(() => {
+                            window.location.href = '/login.html';
+                        }, 3000);
+                    }
+                } catch (error) {
+                    console.error('Magic link authentication error:', error);
+                    statusElement.textContent = 'Authentication failed. Please try again.';
+                    statusElement.style.color = 'red';
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 3000);
+                }
+            }
+
+            // Start the authentication process
+            handleMagicLinkCallback();
+        });
+    </script>
+</body>
+</html>

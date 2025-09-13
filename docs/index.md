@@ -3,13 +3,31 @@ layout: default
 title: Home
 ---
 
-# Break of Dawn 9-Ball Stuff
+# SideSpins - APA Pool League Management
 
-This is where we share schedule, match results, and other resources for our 9-Ball team.  
+<div id="loading" style="text-align: center; padding: 2rem;">
+    <p>Checking authentication...</p>
+</div>
 
-## Quick Links
-- [📅 Player Schedule](/schedule.html):  Where we track who's scheduled to play vs. who actually played.
-- [🎯 Lineup Explorer](/lineup-explorer.html):  Experiment with different player combinations and see how they stack up against the 23-point skill cap.
-- [📊 Availability Update](/availability.html):  How to let us know about your availability to play.
-
----
+<script src="/assets/auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const authManager = new AuthManager();
+    
+    try {
+        const isAuthenticated = await authManager.checkAuth();
+        
+        if (isAuthenticated) {
+            // Redirect authenticated users to the dashboard
+            window.location.href = '/app.html';
+        } else {
+            // Redirect unauthenticated users to login page
+            window.location.href = '/login.html';
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        // Fallback to redirecting to login if auth check fails
+        window.location.href = '/login.html';
+    }
+});
+</script>

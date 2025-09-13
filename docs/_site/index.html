@@ -17,23 +17,41 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/">Home</a><a class="page-link" href="/schedule.html">Schedule</a><a class="page-link" href="/lineup-explorer.html">Lineup Explorer</a><a class="page-link" href="/availability.html">Availability</a></div>
+        <div class="trigger"><a class="page-link" href="/">Home</a><a class="page-link" href="/availability.html">Availability</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <h1 id="break-of-dawn-9-ball-stuff">Break of Dawn 9-Ball Stuff</h1>
+        <h1 id="sidespins---apa-pool-league-management">SideSpins - APA Pool League Management</h1>
 
-<p>This is where we share schedule, match results, and other resources for our 9-Ball team.</p>
+<div id="loading" style="text-align: center; padding: 2rem;">
+    <p>Checking authentication...</p>
+</div>
 
-<h2 id="quick-links">Quick Links</h2>
-<ul>
-  <li><a href="/schedule.html">📅 Player Schedule</a>:  Where we track who’s scheduled to play vs. who actually played.</li>
-  <li><a href="/lineup-explorer.html">🎯 Lineup Explorer</a>:  Experiment with different player combinations and see how they stack up against the 23-point skill cap.</li>
-  <li><a href="/availability.html">📊 Availability Update</a>:  How to let us know about your availability to play.</li>
-</ul>
+<script src="/assets/auth.js"></script>
 
-<hr />
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const authManager = new AuthManager();
+    
+    try {
+        const isAuthenticated = await authManager.checkAuth();
+        
+        if (isAuthenticated) {
+            // Redirect authenticated users to the dashboard
+            window.location.href = '/app.html';
+        } else {
+            // Redirect unauthenticated users to login page
+            window.location.href = '/login.html';
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        // Fallback to redirecting to login if auth check fails
+        window.location.href = '/login.html';
+    }
+});
+</script>
+
 
       </div>
     </main><footer class="site-footer h-card">

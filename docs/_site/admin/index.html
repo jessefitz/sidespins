@@ -12,17 +12,43 @@
   
   <!-- Authentication Section -->
   <div class="auth-section" id="auth-section">
-    <h2>Authentication</h2>
-    <div class="form-group">
-      <label for="api-secret">API Secret:</label>
-      <input type="password" id="api-secret" placeholder="Enter API secret">
-      <button onclick="authenticate()" class="btn-primary">Connect</button>
+    <h2>Admin Authentication</h2>
+    <div class="sms-auth-step" id="phone-step">
+      <div class="form-group">
+        <label for="phone-number">Phone Number:</label>
+        <input type="tel" id="phone-number" placeholder="(555) 123-4567" maxlength="14">
+        <button onclick="sendSmsCode()" class="btn-primary">Send SMS Code</button>
+      </div>
     </div>
+    
+    <div class="sms-auth-step" id="code-step" style="display: none;">
+      <div class="form-group">
+        <label for="sms-code">Verification Code:</label>
+        <input type="text" id="sms-code" placeholder="6-digit code" maxlength="6">
+        <button onclick="verifySmsCode()" class="btn-primary">Verify & Login</button>
+        <button onclick="resetAuthFlow()" class="btn-secondary">Use Different Number</button>
+      </div>
+    </div>
+    
+    <div class="authenticated-user" id="user-info" style="display: none;">
+      <p>Logged in as: <span id="user-display"></span></p>
+      <button onclick="logout()" class="btn-secondary">Logout</button>
+    </div>
+    
     <div id="auth-status" class="status-message"></div>
   </div>
 
   <!-- Main Admin Panel (hidden until authenticated) -->
   <div class="admin-panel" id="admin-panel" style="display: none;">
+    
+    <!-- Admin Panel Header -->
+    <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
+      <div class="admin-user-info">
+        <span style="font-weight: bold;">Logged in as: </span>
+        <span id="admin-user-display"></span>
+      </div>
+      <button onclick="logout()" class="btn-secondary" id="admin-logout-button">Logout</button>
+    </div>
     
     <!-- Navigation Tabs -->
     <div class="tab-container">
@@ -259,6 +285,24 @@
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
+}
+
+.sms-auth-step {
+  margin-bottom: 1rem;
+}
+
+.authenticated-user {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.authenticated-user p {
+  margin: 0 0 0.5rem 0;
+  color: #155724;
+  font-weight: 500;
 }
 
 .admin-panel {
@@ -796,6 +840,7 @@
 }
 </style>
 
+<script src="../assets/auth.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>

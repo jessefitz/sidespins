@@ -130,6 +130,7 @@ builder.Services.AddScoped<AuthService>(serviceProvider =>
 
     var projectId = Environment.GetEnvironmentVariable("STYTCH_PROJECT_ID");
     var secret = Environment.GetEnvironmentVariable("STYTCH_SECRET");
+    var apiUrl = Environment.GetEnvironmentVariable("STYTCH_API_URL");
     var jwtSigningKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
     var logger = serviceProvider.GetRequiredService<ILogger<AuthService>>();
 
@@ -140,12 +141,17 @@ builder.Services.AddScoped<AuthService>(serviceProvider =>
         );
     }
 
+    if (string.IsNullOrEmpty(apiUrl))
+    {
+        throw new InvalidOperationException("STYTCH_API_URL must be configured");
+    }
+
     if (string.IsNullOrEmpty(jwtSigningKey))
     {
         throw new InvalidOperationException("JWT_SIGNING_KEY must be configured");
     }
 
-    return new AuthService(httpClient, projectId, secret, jwtSigningKey, logger);
+    return new AuthService(httpClient, projectId, secret, apiUrl, jwtSigningKey, logger);
 });
 
 // Build and run the application

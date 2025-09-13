@@ -14,6 +14,7 @@ public class AuthService
     private readonly HttpClient _httpClient;
     private readonly string _stytchProjectId;
     private readonly string _stytchSecret;
+    private readonly string _stytchApiUrl;
     private readonly string _jwtSigningKey;
     private readonly ILogger<AuthService> _logger;
 
@@ -21,6 +22,7 @@ public class AuthService
         HttpClient httpClient,
         string stytchProjectId,
         string stytchSecret,
+        string stytchApiUrl,
         string jwtSigningKey,
         ILogger<AuthService> logger
     )
@@ -28,11 +30,12 @@ public class AuthService
         _httpClient = httpClient;
         _stytchProjectId = stytchProjectId;
         _stytchSecret = stytchSecret;
+        _stytchApiUrl = stytchApiUrl;
         _jwtSigningKey = jwtSigningKey;
         _logger = logger;
 
         // Set up HTTP client for Stytch API
-        _httpClient.BaseAddress = new Uri("https://test.stytch.com/v1/");
+        _httpClient.BaseAddress = new Uri(_stytchApiUrl);
         var authValue = Convert.ToBase64String(
             Encoding.UTF8.GetBytes($"{_stytchProjectId}:{_stytchSecret}")
         );

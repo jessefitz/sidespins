@@ -147,6 +147,7 @@ public class AuthFunctions
                 new
                 {
                     userId = claims.Sub,
+                    playerId = claims.PlayerId,
                     sidespinsRole = claims.SidespinsRole,
                     authenticated = true,
                 }

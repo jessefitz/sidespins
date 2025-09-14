@@ -133,6 +133,7 @@ builder.Services.AddScoped<AuthService>(serviceProvider =>
     var apiUrl = Environment.GetEnvironmentVariable("STYTCH_API_URL");
     var jwtSigningKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
     var logger = serviceProvider.GetRequiredService<ILogger<AuthService>>();
+    var playerService = serviceProvider.GetRequiredService<IPlayerService>();
 
     if (string.IsNullOrEmpty(projectId) || string.IsNullOrEmpty(secret))
     {
@@ -151,7 +152,15 @@ builder.Services.AddScoped<AuthService>(serviceProvider =>
         throw new InvalidOperationException("JWT_SIGNING_KEY must be configured");
     }
 
-    return new AuthService(httpClient, projectId, secret, apiUrl, jwtSigningKey, logger);
+    return new AuthService(
+        httpClient,
+        projectId,
+        secret,
+        apiUrl,
+        jwtSigningKey,
+        logger,
+        playerService
+    );
 });
 
 // Build and run the application

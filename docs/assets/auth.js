@@ -698,7 +698,7 @@ class UIPermissions {
     }
 
     static canManageTeam() {
-        return this.hasMinimumRole('admin');
+        return this.hasMinimumRole('captain');
     }
 
     static canEditSchedule() {
@@ -747,6 +747,21 @@ class UIPermissions {
         document.querySelectorAll('[data-team-name]').forEach(element => {
             element.textContent = activeTeam?.teamName || 'No Team Selected';
         });
+
+        // Handle navigation visibility
+        this.updateNavigationVisibility();
+    }
+
+    /**
+     * Update navigation visibility based on roles
+     */
+    static updateNavigationVisibility() {
+        // Team Admin link should only show for captains and managers
+        const teamAdminLinks = document.querySelectorAll('.nav-team-admin');
+        const showTeamAdmin = this.canManageTeam();
+        teamAdminLinks.forEach(link => {
+            link.style.display = showTeamAdmin ? '' : 'none';
+        });
     }
 
     /**
@@ -759,10 +774,157 @@ class UIPermissions {
     }
 }
 
+/**
+ * Mobile Navigation Handler
+ * Manages responsive hamburger navigation menu
+ */
+class MobileNavigation {
+    constructor() {
+        this.isOpen = false;
+        this.overlay = null;
+        this.menu = null;
+        this.hamburgerButton = null;
+        this.closeButton = null;
+    }
+
+    /**
+     * Initialize mobile navigation
+     */
+    init() {
+        this.setupElements();
+        this.setupEventListeners();
+        this.syncTeamSelectors();
+    }
+
+    /**
+     * Setup DOM elements
+     */
+    setupElements() {
+        this.hamburgerButton = document.getElementById('hamburger-menu');
+        this.overlay = document.getElementById('mobile-nav-overlay');
+        this.menu = document.getElementById('mobile-nav-menu');
+        this.closeButton = document.getElementById('mobile-nav-close');
+    }
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        if (this.hamburgerButton) {
+            this.hamburgerButton.addEventListener('click', () => this.open());
+        }
+
+        if (this.closeButton) {
+            this.closeButton.addEventListener('click', () => this.close());
+        }
+
+        if (this.overlay) {
+            this.overlay.addEventListener('click', (e) => {
+                if (e.target === this.overlay) {
+                    this.close();
+                }
+            });
+        }
+
+        // Handle escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.close();
+            }
+        });
+
+        // Sync team selectors
+        const desktopTeamSelect = document.getElementById('team-select');
+        const mobileTeamSelect = document.getElementById('mobile-team-select');
+
+        if (desktopTeamSelect && mobileTeamSelect) {
+            desktopTeamSelect.addEventListener('change', (e) => {
+                mobileTeamSelect.value = e.target.value;
+            });
+
+            mobileTeamSelect.addEventListener('change', (e) => {
+                desktopTeamSelect.value = e.target.value;
+                // Trigger change event on desktop selector
+                const event = new Event('change', { bubbles: true });
+                desktopTeamSelect.dispatchEvent(event);
+            });
+        }
+
+        // Handle mobile logout
+        const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.addEventListener('click', () => {
+                const desktopLogoutBtn = document.getElementById('logout-btn');
+                if (desktopLogoutBtn) {
+                    desktopLogoutBtn.click();
+                }
+            });
+        }
+    }
+
+    /**
+     * Open mobile navigation
+     */
+    open() {
+        this.isOpen = true;
+        if (this.overlay) this.overlay.classList.add('show');
+        if (this.menu) this.menu.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Close mobile navigation
+     */
+    close() {
+        this.isOpen = false;
+        if (this.overlay) this.overlay.classList.remove('show');
+        if (this.menu) this.menu.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    /**
+     * Sync team selector options
+     */
+    syncTeamSelectors() {
+        const desktopSelect = document.getElementById('team-select');
+        const mobileSelect = document.getElementById('mobile-team-select');
+
+        if (desktopSelect && mobileSelect) {
+            // Copy options from desktop to mobile
+            mobileSelect.innerHTML = desktopSelect.innerHTML;
+            mobileSelect.value = desktopSelect.value;
+        }
+    }
+
+    /**
+     * Update team options in both selectors
+     * @param {Array} teams - Array of team objects
+     * @param {string} selectedTeamId - Currently selected team ID
+     */
+    updateTeamOptions(teams, selectedTeamId = null) {
+        const desktopSelect = document.getElementById('team-select');
+        const mobileSelect = document.getElementById('mobile-team-select');
+
+        const optionsHtml = teams.map(team => 
+            `<option value="${team.teamId}" ${team.teamId === selectedTeamId ? 'selected' : ''}>
+                ${team.teamName || team.teamId || 'Unknown Team'}
+            </option>`
+        ).join('');
+
+        if (desktopSelect) {
+            desktopSelect.innerHTML = '<option value="">Select a team...</option>' + optionsHtml;
+        }
+        if (mobileSelect) {
+            mobileSelect.innerHTML = '<option value="">Select a team...</option>' + optionsHtml;
+        }
+    }
+}
+
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { AuthManager, UIPermissions };
+    module.exports = { AuthManager, UIPermissions, MobileNavigation };
 } else if (typeof window !== 'undefined') {
     window.AuthManager = AuthManager;
     window.UIPermissions = UIPermissions;
+    window.MobileNavigation = MobileNavigation;
 }

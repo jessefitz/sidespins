@@ -371,26 +371,167 @@
             background-color: #545b62;
         }
 
+        /* Hamburger menu button - hidden by default */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #f8f9fa;
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background-color: #666;
+            margin: 2px 0;
+            transition: 0.3s;
+            border-radius: 1px;
+        }
+
+        /* Mobile navigation overlay */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .mobile-nav-overlay.show {
+            display: block;
+        }
+
+        .mobile-nav-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 2rem 0;
+        }
+
+        .mobile-nav-menu.show {
+            right: 0;
+        }
+
+        .mobile-nav-header {
+            padding: 0 1.5rem 1rem;
+            border-bottom: 1px solid #e1e5e9;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-nav-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .mobile-nav-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .mobile-nav-close:hover {
+            background-color: #f8f9fa;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-nav-links a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.2s;
+        }
+
+        .mobile-nav-links a:hover {
+            background-color: #f8f9fa;
+        }
+
+        .mobile-nav-links a.active {
+            background-color: #007cba;
+            color: white;
+        }
+
+        .mobile-team-switcher {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .mobile-team-switcher label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-team-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .mobile-user-info {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e1e5e9;
+            margin-top: auto;
+        }
+
         @media (max-width: 768px) {
             .header-content {
-                flex-direction: column;
-                gap: 1rem;
+                padding: 0 1rem;
             }
-
+            
+            /* Hide desktop navigation on mobile */
             .nav-links {
-                order: -1;
-                width: 100%;
-                justify-content: center;
+                display: none;
             }
-
+            
+            /* Show hamburger menu on mobile */
+            .hamburger-menu {
+                display: flex;
+            }
+            
+            /* Hide desktop team switcher on mobile */
             .team-switcher {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.25rem;
+                display: none !important;
             }
-
-            .team-select {
-                min-width: 150px;
+            
+            /* Keep user avatar but hide dropdown on mobile (handled by hamburger menu) */
+            .user-avatar-container .user-dropdown {
+                display: none;
             }
 
             .team-details {
@@ -432,13 +573,16 @@
         <div class="header-content">
             <div class="logo">SideSpins</div>
             
+            <!-- Desktop Navigation -->
             <div class="nav-links">
                 <a href="/app.html" class="active">Dashboard</a>
                 <a href="/schedule-new.html">Schedule</a>
                 <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+                <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
             </div>
 
             <div class="user-info">
+                <!-- Desktop Team Switcher -->
                 <div class="team-switcher" id="team-switcher" style="display:none;">
                     <label for="team-select">Team:</label>
                     <select id="team-select" class="team-select">
@@ -453,6 +597,41 @@
                         <button class="user-dropdown-item logout" id="logout-btn">Logout</button>
                     </div>
                 </div>
+
+                <!-- Mobile Hamburger Menu -->
+                <button class="hamburger-menu" id="hamburger-menu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay">
+        <div class="mobile-nav-menu" id="mobile-nav-menu">
+            <div class="mobile-nav-header">
+                <div class="mobile-nav-title">Menu</div>
+                <button class="mobile-nav-close" id="mobile-nav-close">&times;</button>
+            </div>
+            
+            <div class="mobile-team-switcher">
+                <label for="mobile-team-select">Team:</label>
+                <select id="mobile-team-select" class="mobile-team-select">
+                    <option value="">Select a team...</option>
+                </select>
+            </div>
+            
+            <div class="mobile-nav-links">
+                <a href="/app.html" class="active">Dashboard</a>
+                <a href="/schedule-new.html">Schedule</a>
+                <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+                <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
+            </div>
+            
+            <div class="mobile-user-info">
+                <button class="user-dropdown-item logout" id="mobile-logout-btn">Logout</button>
             </div>
         </div>
     </div>
@@ -473,30 +652,8 @@
         <div id="dashboard-container" style="display:none;">
             <div class="dashboard">
                 <h1>Welcome to SideSpins</h1>
-                <div id="user-summary">
-                    <p>Loading user information...</p>
-                </div>
+                <p>Plan and experiment with different lineups. Share lineups with your team, and more to come...</p>
                 
-                <div class="team-info">
-                    <h3>Active Team Information</h3>
-                    <div class="team-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Team ID</div>
-                            <div class="detail-value" id="team-id-display">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Your Role</div>
-                            <div class="detail-value" id="team-role-display">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">User ID</div>
-                            <div class="detail-value" id="user-id-display">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard">
                 <h2>Quick Actions</h2>
                 <div id="role-actions">
                     <p>Loading available actions...</p>
@@ -514,15 +671,15 @@
         // Setup UI permissions
         UIPermissions.setAuthManager(authManager);
         UIPermissions.setupTeamChangeListener();
+
+        // Initialize mobile navigation
+        const mobileNav = new MobileNavigation();
+        mobileNav.init();
         
         const loading = document.getElementById('loading');
         const errorContainer = document.getElementById('error-container');
         const errorMessage = document.getElementById('error-message');
         const dashboardContainer = document.getElementById('dashboard-container');
-        const userSummary = document.getElementById('user-summary');
-        const teamIdDisplay = document.getElementById('team-id-display');
-        const teamRoleDisplay = document.getElementById('team-role-display');
-        const userIdDisplay = document.getElementById('user-id-display');
         const roleActions = document.getElementById('role-actions');
         const logoutBtn = document.getElementById('logout-btn');
         
@@ -604,15 +761,30 @@
         }
 
         function populateTeamSwitcher(memberships) {
+            const mobileTeamSelect = document.getElementById('mobile-team-select');
+            
             teamSelect.innerHTML = '<option value="">Select a team...</option>';
+            if (mobileTeamSelect) {
+                mobileTeamSelect.innerHTML = '<option value="">Select a team...</option>';
+            }
             
             if (memberships && memberships.length > 0) {
                 memberships.forEach(membership => {
+                    // Desktop option
                     const option = document.createElement('option');
                     option.value = membership.teamId;
                     option.textContent = membership.teamName || membership.teamId;
                     option.dataset.role = membership.role;
                     teamSelect.appendChild(option);
+
+                    // Mobile option
+                    if (mobileTeamSelect) {
+                        const mobileOption = document.createElement('option');
+                        mobileOption.value = membership.teamId;
+                        mobileOption.textContent = membership.teamName || membership.teamId;
+                        mobileOption.dataset.role = membership.role;
+                        mobileTeamSelect.appendChild(mobileOption);
+                    }
                 });
                 
                 teamSwitcher.style.display = 'flex';
@@ -620,6 +792,9 @@
                 // Set current active team and update captain badge
                 if (authManager.activeTeamId) {
                     teamSelect.value = authManager.activeTeamId;
+                    if (mobileTeamSelect) {
+                        mobileTeamSelect.value = authManager.activeTeamId;
+                    }
                     const selectedOption = teamSelect.selectedOptions[0];
                     if (selectedOption) {
                         updateCaptainBadge(selectedOption.dataset.role);
@@ -780,8 +955,7 @@
         });
 
         function updateTeamDisplay(teamId, role) {
-            teamIdDisplay.textContent = teamId || '-';
-            teamRoleDisplay.innerHTML = role ? `${role}${getRoleBadge(role)}` : '-';
+            // Team display functionality removed - keeping for compatibility
         }
 
         // Logout handler
@@ -804,9 +978,6 @@
                 // Load user profile and memberships
                 try {
                     const profile = await authManager.getUserProfile();
-                    userIdDisplay.textContent = profile.userId || '-';
-                    userSummary.textContent = `Welcome, User ${profile.userId}`;
-                    userSummary.style.display = 'block';
                     
                     // Update user avatar with initials
                     updateUserAvatar(profile);

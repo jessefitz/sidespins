@@ -17,6 +17,7 @@ public class AuthService
     private readonly string _stytchApiUrl;
     private readonly string _jwtSigningKey;
     private readonly ILogger<AuthService> _logger;
+    private readonly IPlayerService _playerService;
 
     public AuthService(
         HttpClient httpClient,
@@ -24,7 +25,8 @@ public class AuthService
         string stytchSecret,
         string stytchApiUrl,
         string jwtSigningKey,
-        ILogger<AuthService> logger
+        ILogger<AuthService> logger,
+        IPlayerService playerService
     )
     {
         _httpClient = httpClient;
@@ -33,6 +35,7 @@ public class AuthService
         _stytchApiUrl = stytchApiUrl;
         _jwtSigningKey = jwtSigningKey;
         _logger = logger;
+        _playerService = playerService;
 
         // Set up HTTP client for Stytch API
         _httpClient.BaseAddress = new Uri(_stytchApiUrl);
@@ -114,12 +117,37 @@ public class AuthService
                 user?.PhoneNumbers?.FirstOrDefault(p => p.Verified)?.PhoneNumber
                 ?? user?.PhoneNumbers?.FirstOrDefault()?.PhoneNumber;
 
+            // Lookup player by auth user ID to get the player ID
+            string? playerId = null;
+            try
+            {
+                var player = await _playerService.GetPlayerByAuthUserIdAsync(
+                    sessionResponse.Session.UserId
+                );
+                playerId = player?.Id;
+                _logger.LogInformation(
+                    "Found player {PlayerId} for auth user {AuthUserId}",
+                    playerId,
+                    sessionResponse.Session.UserId
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Failed to lookup player for auth user {AuthUserId}",
+                    sessionResponse.Session.UserId
+                );
+                // Continue without player ID - this isn't a fatal error
+            }
+
             var claims = new AppClaims
             {
                 Sub = sessionResponse.Session.UserId,
+                PlayerId = playerId,
                 SidespinsRole = trustedMetadata?.SidespinsRole ?? "member", // Default to member if not specified
                 Iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                Exp = DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeSeconds(),
+                Exp = DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds(),
                 Ver = 1,
                 Jti = Guid.NewGuid().ToString(),
             };
@@ -145,6 +173,11 @@ public class AuthService
         };
 
         // Add optional claims
+        if (!string.IsNullOrEmpty(claims.PlayerId))
+        {
+            claimsList.Add(new("player_id", claims.PlayerId));
+        }
+
         if (!string.IsNullOrEmpty(claims.SidespinsRole))
         {
             claimsList.Add(new("sidespins_role", claims.SidespinsRole));
@@ -199,6 +232,7 @@ public class AuthService
             var claims = new AppClaims
             {
                 Sub = jwtToken.Claims.First(x => x.Type == "sub").Value,
+                PlayerId = jwtToken.Claims.FirstOrDefault(x => x.Type == "player_id")?.Value,
                 SidespinsRole = jwtToken
                     .Claims.FirstOrDefault(x => x.Type == "sidespins_role")
                     ?.Value,

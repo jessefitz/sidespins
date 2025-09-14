@@ -63,6 +63,7 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
 
             // Store identity in context
             context.Items["UserId"] = claims.Sub;
+            context.Items["UserClaims"] = claims; // Store the full claims object
             context.Items["SidespinsRole"] = claims.SidespinsRole ?? string.Empty;
 
             // If team role is required, validate team membership

@@ -233,6 +233,7 @@ public class LeagueService
     // Match operations (partition key: /divisionId)
     public async Task<IEnumerable<TeamMatch>> GetMatchesByDivisionIdAsync(string divisionId)
     {
+        // Get matches
         var query = "SELECT * FROM c";
         var queryDefinition = new QueryDefinition(query);
         var resultSet = _matchesContainer.GetItemQueryIterator<TeamMatch>(
@@ -245,6 +246,30 @@ public class LeagueService
         {
             var response = await resultSet.ReadNextAsync();
             matches.AddRange(response.ToList());
+        }
+
+        // Get teams for this division to populate team names
+        var teams = await GetTeamsByDivisionIdAsync(divisionId);
+        var teamLookup = teams.ToDictionary(t => t.Id, t => t.Name);
+
+        // Populate team names
+        foreach (var match in matches)
+        {
+            if (
+                match.HomeTeamId != null
+                && teamLookup.TryGetValue(match.HomeTeamId, out var homeTeamName)
+            )
+            {
+                match.HomeTeamName = homeTeamName;
+            }
+
+            if (
+                match.AwayTeamId != null
+                && teamLookup.TryGetValue(match.AwayTeamId, out var awayTeamName)
+            )
+            {
+                match.AwayTeamName = awayTeamName;
+            }
         }
 
         return matches;
@@ -403,6 +428,30 @@ public class LeagueService
         {
             var response = await resultSet.ReadNextAsync();
             matches.AddRange(response.ToList());
+        }
+
+        // Get teams for this division to populate team names
+        var teams = await GetTeamsByDivisionIdAsync(divisionId);
+        var teamLookup = teams.ToDictionary(t => t.Id, t => t.Name);
+
+        // Populate team names
+        foreach (var match in matches)
+        {
+            if (
+                match.HomeTeamId != null
+                && teamLookup.TryGetValue(match.HomeTeamId, out var homeTeamName)
+            )
+            {
+                match.HomeTeamName = homeTeamName;
+            }
+
+            if (
+                match.AwayTeamId != null
+                && teamLookup.TryGetValue(match.AwayTeamId, out var awayTeamName)
+            )
+            {
+                match.AwayTeamName = awayTeamName;
+            }
         }
 
         return matches;

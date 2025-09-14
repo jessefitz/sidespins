@@ -118,6 +118,9 @@ public class LineupPlayer
 
     [JsonProperty("notes")]
     public string? Notes { get; set; }
+
+    [JsonProperty("availability")]
+    public string? Availability { get; set; } // "available", "unavailable", or null
 }
 
 public class LineupHistoryEntry
@@ -218,8 +221,14 @@ public class TeamMatch
     [JsonProperty("homeTeamId")]
     public string? HomeTeamId { get; set; }
 
+    [JsonProperty("homeTeamName")]
+    public string? HomeTeamName { get; set; }
+
     [JsonProperty("awayTeamId")]
     public string? AwayTeamId { get; set; }
+
+    [JsonProperty("awayTeamName")]
+    public string? AwayTeamName { get; set; }
 
     [JsonProperty("status")]
     public string Status { get; set; } = string.Empty;
@@ -235,4 +244,10 @@ public class TeamMatch
 
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
+}
+
+public class UpdateAvailabilityRequest
+{
+    [JsonProperty("availability")]
+    public string Availability { get; set; } = string.Empty; // "available" or "unavailable"
 }

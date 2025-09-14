@@ -65,6 +65,7 @@ public class StytchUserTrustedMetadata
 public class AppClaims
 {
     public string Sub { get; set; } = string.Empty;
+    public string? PlayerId { get; set; }
     public string? SidespinsRole { get; set; }
     public long Iat { get; set; }
     public long Exp { get; set; }

@@ -6,7 +6,7 @@ class AuthManager {
     constructor(baseUrl = null) {
         this.baseUrl = baseUrl || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:7071/api' 
-            : 'https://sidespinsapi.azurewebsites.net/api');
+            : 'https://api.sidespins.com/api');
         this.isAuthenticated = false;
         this.currentUser = null;
         this.currentPhoneId = null; // Store phone ID for SMS verification

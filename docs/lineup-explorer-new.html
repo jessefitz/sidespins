@@ -1195,7 +1195,7 @@
                 // Set up authManager with correct base URL
                 const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
                     ? 'http://localhost:7071/api' 
-                    : 'https://sidespinsapi.azurewebsites.net/api';
+                    : 'https://api.sidespins.com/api';
                 this.authManager = new AuthManager(baseUrl);
                 this.teamId = null;
                 this.divisionId = null;

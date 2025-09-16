@@ -201,6 +201,10 @@
                     </p>
                 </div>
                 
+                <div id="already-have-account-toggle" class="toggle-link">
+                    <a href="#" id="show-existing-member">Already have an account? Sign in →</a>
+                </div>
+                
                 <!-- New Member Sign Up (Default View) -->
                 <div id="new-member-view" class="view-section active">
                     <h3>First Time User</h3>
@@ -221,10 +225,6 @@
                         <button id="verify-sms-btn">Verify Code</button>
                         <button id="back-to-signup-btn" class="secondary">Back</button>
                     </div>
-                    
-                    <div class="toggle-link">
-                        <a href="#" id="show-existing-member">Already have an account? Sign in →</a>
-                    </div>                   
                 </div>
                 
                 <!-- Existing Member Sign In -->
@@ -273,6 +273,7 @@
         const newMemberView = document.getElementById('new-member-view');
         const showNewMemberLink = document.getElementById('show-new-member');
         const showExistingMemberLink = document.getElementById('show-existing-member');
+        const alreadyHaveAccountToggle = document.getElementById('already-have-account-toggle');
         
         // Elements for new member signup
         const apaNumberInput = document.getElementById('apa-number');
@@ -303,12 +304,14 @@
         function showNewMemberView() {
             existingMemberView.classList.remove('active');
             newMemberView.classList.add('active');
+            alreadyHaveAccountToggle.style.display = 'block';
             resetForms();
         }
         
         function showExistingMemberView() {
             newMemberView.classList.remove('active');
             existingMemberView.classList.add('active');
+            alreadyHaveAccountToggle.style.display = 'none';
             resetForms();
         }
         

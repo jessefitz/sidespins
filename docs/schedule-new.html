@@ -68,53 +68,97 @@
             font-size: 1rem;
         }
 
-        .lineup-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .player-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .lineup-table th,
-        .lineup-table td {
-            padding: 0.75rem 0.5rem;
-            border-bottom: 1px solid #e9ecef;
+        .player-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .player-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-color: #007cba;
+        }
+
+        .player-card.alternate-player {
+            background: #fff8e1;
+            border-color: #ffcc02;
+        }
+
+        .player-card.alternate-player:hover {
+            background: #fff3c4;
+        }
+
+        .player-name-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            white-space: nowrap;
+            min-height: 1.5rem;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .player-role {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        .player-availability-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+            min-height: 1.5rem;
+        }
+
+        .availability-status-text {
+            font-size: 0.9rem;
+            color: #666;
+            flex: 1;
             text-align: left;
         }
 
-        .lineup-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #e9ecef;
+        .edit-availability-btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
         }
 
-        .lineup-table tbody tr:hover {
-            background: #f8f9fa;
+        .edit-availability-btn:hover {
+            background: #005a87;
         }
 
-        .lineup-table tr.alternate-player {
-            background: #fff3cd;
-        }
-
-        .lineup-table tr.alternate-player:hover {
-            background: #ffeaa7;
-        }
-
-        .lineup-table td:first-child,
-        .lineup-table th:first-child {
-            text-align: center;
-            width: 120px;
-            font-weight: 600;
-        }
-
-        .lineup-table td:last-child,
-        .lineup-table th:last-child {
-            text-align: center;
-            width: 70px;
+        .edit-availability-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
 
         .skill-total {
@@ -626,6 +670,50 @@
             background-color: #f0f0f0;
         }
 
+        .availability-controls-inline {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .availability-controls-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .save-availability-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .save-availability-btn:hover {
+            background: #218838;
+        }
+
+        .cancel-availability-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .cancel-availability-btn:hover {
+            background: #5a6268;
+        }
+
         .skill-total {
             text-align: center;
             padding-top: 1rem;
@@ -859,6 +947,37 @@
             .match-header {
                 flex-direction: column;
                 gap: 0.5rem;
+            }
+
+            .player-card {
+                padding: 0.75rem;
+                text-align: center;
+            }
+
+            .player-name-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.25rem;
+                text-align: center;
+            }
+
+            .player-name {
+                text-align: center;
+            }
+
+            .player-availability-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .availability-status-text {
+                text-align: center;
+            }
+
+            .edit-availability-btn {
+                margin-left: 0;
             }
         }
     </style>
@@ -1497,7 +1616,7 @@
                 }
 
                 let totalSkill = 0;
-                let tableRows = '';
+                let playerCards = '';
                 const isFutureMatch = this.isFutureMatch(match);
                 
                 lineup.forEach((lineupPlayer, index) => {
@@ -1525,49 +1644,58 @@
                         this.currentUserRole === 'manager' // Manager can edit anyone's
                     );
                     
-                    // Determine availability status and emoji
-                    let availabilityDisplay = '❓'; // Default: no availability data
+                    // Determine availability status text
+                    let availabilityText = '🟡 Unconfirmed';
                     if (isFutureMatch && lineupPlayer.availability) {
                         if (lineupPlayer.availability === 'available') {
-                            availabilityDisplay = '✅'; // Green checkmark for available
+                            availabilityText = '✅ Available';
                         } else if (lineupPlayer.availability === 'unavailable') {
-                            availabilityDisplay = '❌'; // Red X for unavailable
+                            availabilityText = '❌ Unavailable';
                         }
                     }
                     
-                    // Add edit icon if user can edit (separate from availability display)
-                    let editIcon = '';
+                    // Create edit button if user can edit
+                    let editButton = '';
                     if (canEdit) {
-                        const tooltipText = isCurrentUser ? 'Click to edit your availability' : 'Click to edit availability';
-                        editIcon = `<span class="edit-availability-icon" title="${tooltipText}" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">✏️</span>`;
+                        const tooltipText = isCurrentUser ? 'Edit your availability' : 'Edit availability';
+                        editButton = `<button class="edit-availability-btn" title="${tooltipText}" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">Edit</button>`;
                     }
                     
-                    // Create hidden availability controls (will be shown when edit icon is clicked)
+                    // Create hidden availability controls (will be shown when edit button is clicked)
                     let availabilityControls = '';
                     if (canEdit) {
                         const currentAvailability = lineupPlayer.availability || '';
                         availabilityControls = `
-                            <div class="availability-controls" style="display: none;" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">
+                            <div class="availability-controls-inline" style="display: none;" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">
                                 <select class="availability-select" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">
-                                    <option value="">Set availability...</option>
+                                    <option value="">Select availability...</option>
                                     <option value="available" ${currentAvailability === 'available' ? 'selected' : ''}>✅ Available</option>
                                     <option value="unavailable" ${currentAvailability === 'unavailable' ? 'selected' : ''}>❌ Unavailable</option>
                                 </select>
+                                <div class="availability-controls-buttons">
+                                    <button class="save-availability-btn" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">Save</button>
+                                    <button class="cancel-availability-btn" data-player-id="${lineupPlayer.playerId}" data-match-id="${match.id}">Cancel</button>
+                                </div>
                             </div>
                         `;
                     }
                     
-                    tableRows += `
-                        <tr ${lineupPlayer.isAlternate ? 'class="alternate-player"' : ''}>
-                            <td class="availability-cell">
-                                ${availabilityDisplay} ${editIcon}
-                                ${availabilityControls}
-                            </td>
-                            <td>
-                                ${playerName}${isAlternateText}${currentUserMarker}
-                            </td>
-                            <td>${skill}</td>
-                        </tr>
+                    const cardClass = lineupPlayer.isAlternate ? 'player-card alternate-player' : 'player-card';
+                    
+                    playerCards += `
+                        <div class="${cardClass}">
+                            <div class="player-name-row">
+                                <div class="player-name">
+                                    ${playerName} (${skill})${currentUserMarker}
+                                </div>
+                            </div>
+                            ${isAlternateText ? `<div class="player-role">${isAlternateText}</div>` : ''}
+                            <div class="player-availability-row">
+                                <div class="availability-status-text">${availabilityText}</div>
+                                ${editButton}
+                            </div>
+                            ${availabilityControls}
+                        </div>
                     `;
                 });
 
@@ -1581,18 +1709,9 @@
                 }
 
                 return `
-                    <table class="lineup-table">
-                        <thead>
-                            <tr>
-                                <th>Availability</th>
-                                <th>Player</th>
-                                <th>Skill</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
+                    <div class="player-cards">
+                        ${playerCards}
+                    </div>
                     ${isOurTeam ? `<div class="skill-total">Total Skill: ${totalSkill}</div>` : ''}
                     ${skillWarning}
                 `;
@@ -1606,17 +1725,19 @@
             }
 
             setupAvailabilityEventListeners() {
-                // Handle edit icon clicks
-                const editIcons = document.querySelectorAll('.edit-availability-icon');
-                editIcons.forEach(icon => {
-                    icon.addEventListener('click', (event) => {
+                // Handle edit button clicks
+                const editButtons = document.querySelectorAll('.edit-availability-btn');
+                editButtons.forEach(button => {
+                    button.addEventListener('click', (event) => {
                         const playerId = event.target.dataset.playerId;
                         const matchId = event.target.dataset.matchId;
                         
                         // Find and show the corresponding availability controls
-                        const controls = document.querySelector(`.availability-controls[data-player-id="${playerId}"][data-match-id="${matchId}"]`);
+                        const controls = document.querySelector(`.availability-controls-inline[data-player-id="${playerId}"][data-match-id="${matchId}"]`);
                         if (controls) {
                             controls.style.display = 'block';
+                            // Hide the edit button while editing
+                            event.target.style.display = 'none';
                             // Focus on the select to make it easier to use
                             const select = controls.querySelector('.availability-select');
                             if (select) {
@@ -1626,32 +1747,33 @@
                     });
                 });
 
-                // Handle availability selection changes
-                const availabilitySelects = document.querySelectorAll('.availability-select');
-                availabilitySelects.forEach(select => {
-                    select.addEventListener('change', async (event) => {
+                // Handle save button clicks
+                const saveButtons = document.querySelectorAll('.save-availability-btn');
+                saveButtons.forEach(button => {
+                    button.addEventListener('click', async (event) => {
                         const playerId = event.target.dataset.playerId;
                         const matchId = event.target.dataset.matchId;
-                        const availability = event.target.value;
+                        
+                        // Get the selected availability
+                        const controls = event.target.closest('.availability-controls-inline');
+                        const select = controls.querySelector('.availability-select');
+                        const availability = select.value;
 
                         if (!availability) {
-                            // Hide controls if "Set availability..." is selected
-                            const controls = event.target.closest('.availability-controls');
-                            if (controls) {
-                                controls.style.display = 'none';
-                            }
+                            this.showAvailabilityUpdateStatus('error', 'Please select an availability option');
                             return;
                         }
 
                         try {
                             await this.updatePlayerAvailability(matchId, playerId, availability);
                             // Show a brief success message
-                            this.showAvailabilityUpdateStatus('success', `Availability updated to ${availability}`);
+                            this.showAvailabilityUpdateStatus('success', `Availability updated to ${availability === 'available' ? 'Available' : 'Unavailable'}`);
                             
-                            // Hide the controls after successful update
-                            const controls = event.target.closest('.availability-controls');
-                            if (controls) {
-                                controls.style.display = 'none';
+                            // Hide the controls and show the edit button again
+                            controls.style.display = 'none';
+                            const editButton = document.querySelector(`.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`);
+                            if (editButton) {
+                                editButton.style.display = 'block';
                             }
                             
                             // Reload the schedule to show updated indicators
@@ -1661,9 +1783,29 @@
                         } catch (error) {
                             console.error('Error updating availability:', error);
                             this.showAvailabilityUpdateStatus('error', 'Failed to update availability');
-                            // Reset the select to its previous value
-                            event.target.value = '';
                         }
+                    });
+                });
+
+                // Handle cancel button clicks
+                const cancelButtons = document.querySelectorAll('.cancel-availability-btn');
+                cancelButtons.forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const playerId = event.target.dataset.playerId;
+                        const matchId = event.target.dataset.matchId;
+                        
+                        // Hide the controls and show the edit button again
+                        const controls = event.target.closest('.availability-controls-inline');
+                        controls.style.display = 'none';
+                        
+                        const editButton = document.querySelector(`.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`);
+                        if (editButton) {
+                            editButton.style.display = 'block';
+                        }
+                        
+                        // Reset the select to its original value
+                        const select = controls.querySelector('.availability-select');
+                        select.selectedIndex = 0;
                     });
                 });
             }

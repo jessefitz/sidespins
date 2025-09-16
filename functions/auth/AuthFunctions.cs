@@ -309,6 +309,27 @@ public class AuthFunctions
                 )
                 {
                     await LinkAuthUserIdToPlayerAsync(result.Claims.Sub, result.PhoneNumber);
+
+                    // CRITICAL FIX: Regenerate JWT after player linking to include player_id claim
+                    var updatedResult = await _authService.RegenerateJwtWithPlayerClaimsAsync(
+                        result.Claims.Sub
+                    );
+                    if (updatedResult != null && updatedResult.Success)
+                    {
+                        _logger.LogInformation(
+                            "Successfully regenerated JWT with player claims for authUserId: {AuthUserId}",
+                            result.Claims.Sub
+                        );
+                        result = updatedResult; // Use the updated result with player_id claim
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "Failed to regenerate JWT with player claims for authUserId: {AuthUserId}, using original JWT",
+                            result.Claims.Sub
+                        );
+                        // Continue with original JWT - better than failing completely
+                    }
                 }
 
                 var cookieOptions = new CookieOptions

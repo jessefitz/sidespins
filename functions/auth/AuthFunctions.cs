@@ -311,13 +311,40 @@ public class AuthFunctions
                     await LinkAuthUserIdToPlayerAsync(result.Claims.Sub, result.PhoneNumber);
                 }
 
+                var reqHttp = req.HttpContext.Request;
+
+                bool isLocalhost =
+                    string.Equals(
+                        reqHttp.Host.Host,
+                        "localhost",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                    || reqHttp.Host.Host.EndsWith(".localhost", StringComparison.OrdinalIgnoreCase);
+
+                bool isSidespinsSite = reqHttp.Host.Host.EndsWith(
+                    "sidespins.com",
+                    StringComparison.OrdinalIgnoreCase
+                );
+
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
+                    // Secure only if the current request is HTTPS (so http://localhost still works)
+                    Secure = string.Equals(
+                        reqHttp.Scheme,
+                        "https",
+                        StringComparison.OrdinalIgnoreCase
+                    ),
+                    SameSite = SameSiteMode.Lax, // same-site between app.sidespins.com and api.sidespins.com
+                    Path = "/",
                     Expires = DateTimeOffset.UtcNow.AddHours(24),
                 };
+
+                // Share across subdomains in prod; keep host-only locally
+                if (isSidespinsSite)
+                {
+                    cookieOptions.Domain = ".sidespins.com";
+                }
 
                 // Set the session cookie
                 req.HttpContext.Response.Cookies.Append("ssid", result.SessionToken, cookieOptions);

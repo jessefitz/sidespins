@@ -4,7 +4,7 @@ class SideSpinsAdmin {
         // Use environment-appropriate URL
         this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:7071/api' 
-            : 'https://sidespinsapi.azurewebsites.net/api';
+            : 'https://api.sidespins.com/api';
         this.authenticated = false;
         this.authManager = new AuthManager(this.apiBaseUrl.replace('/api', '/api/auth'));
         this.currentUser = null;

@@ -626,6 +626,70 @@ public class AuthService
             };
         }
     }
+
+    /// <summary>
+    /// Regenerates the JWT token after player linking to include the player_id claim
+    /// </summary>
+    public async Task<AuthResult?> RegenerateJwtWithPlayerClaimsAsync(string authUserId)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Regenerating JWT with player claims for authUserId: {AuthUserId}",
+                authUserId
+            );
+
+            // Look up the player by authUserId
+            var player = await _playerService.GetPlayerByAuthUserIdAsync(authUserId);
+
+            if (player == null)
+            {
+                _logger.LogWarning(
+                    "Cannot regenerate JWT - no player found with authUserId: {AuthUserId}",
+                    authUserId
+                );
+                return null;
+            }
+
+            // Create new AppClaims with player information
+            var claims = new AppClaims
+            {
+                Sub = authUserId,
+                PlayerId = player.Id,
+                SidespinsRole = "player", // Default role
+                Iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Exp = DateTimeOffset.UtcNow.AddHours(24).ToUnixTimeSeconds(),
+                Ver = 1,
+                Jti = Guid.NewGuid().ToString(),
+            };
+
+            // Generate new JWT with player claims
+            var newJwt = GenerateAppJwt(claims);
+
+            _logger.LogInformation(
+                "Successfully regenerated JWT with player_id: {PlayerId} for authUserId: {AuthUserId}",
+                player.Id,
+                authUserId
+            );
+
+            return new AuthResult
+            {
+                Success = true,
+                SessionToken = newJwt,
+                Claims = claims,
+                PhoneNumber = null, // Not needed for regenerated JWT
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error regenerating JWT with player claims for authUserId: {AuthUserId}",
+                authUserId
+            );
+            return null;
+        }
+    }
 }
 
 // Stytch API response models

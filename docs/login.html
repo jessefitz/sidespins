@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <script src="/assets/auth.js"></script>
+    <script src="/assets/auth.js?v=20250916002"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const authManager = new AuthManager();
@@ -467,13 +467,22 @@
                         if (returnUrl) {
                             try {
                                 const decodedUrl = decodeURIComponent(returnUrl);
-                                window.location.href = decodedUrl;
+                                // Use safeRedirect if available, fallback to window.location.href
+                                if (typeof authManager.safeRedirect === 'function') {
+                                    authManager.safeRedirect(decodedUrl);
+                                } else {
+                                    window.location.href = decodedUrl.startsWith('/') ? window.location.origin + decodedUrl : decodedUrl;
+                                }
                                 return;
                             } catch (error) {
                                 console.warn('Invalid return URL:', error);
                             }
                         }
-                        window.location.href = '/app.html';
+                        if (typeof authManager.safeRedirect === 'function') {
+                            authManager.safeRedirect('/app.html');
+                        } else {
+                            window.location.href = window.location.origin + '/app.html';
+                        }
                     }, 1500);
                 } else {
                     showError(response.message || 'Invalid code. Please try again.');
@@ -554,13 +563,22 @@
                         if (returnUrl) {
                             try {
                                 const decodedUrl = decodeURIComponent(returnUrl);
-                                window.location.href = decodedUrl;
+                                // Use safeRedirect if available, fallback to window.location.href
+                                if (typeof authManager.safeRedirect === 'function') {
+                                    authManager.safeRedirect(decodedUrl);
+                                } else {
+                                    window.location.href = decodedUrl.startsWith('/') ? window.location.origin + decodedUrl : decodedUrl;
+                                }
                                 return;
                             } catch (error) {
                                 console.warn('Invalid return URL:', error);
                             }
                         }
-                        window.location.href = '/app.html';
+                        if (typeof authManager.safeRedirect === 'function') {
+                            authManager.safeRedirect('/app.html');
+                        } else {
+                            window.location.href = window.location.origin + '/app.html';
+                        }
                     }, 1500);
                 } else {
                     showError(response.message || 'Invalid code. Please try again.');
@@ -603,7 +621,12 @@
                 if (returnUrl) {
                     try {
                         const decodedUrl = decodeURIComponent(returnUrl);
-                        window.location.href = decodedUrl;
+                        // Use safeRedirect if available, fallback to window.location.href
+                        if (typeof authManager.safeRedirect === 'function') {
+                            authManager.safeRedirect(decodedUrl);
+                        } else {
+                            window.location.href = decodedUrl.startsWith('/') ? window.location.origin + decodedUrl : decodedUrl;
+                        }
                         return;
                     } catch (error) {
                         console.warn('Invalid return URL:', error);
@@ -611,7 +634,11 @@
                 }
                 
                 // Default redirect
-                window.location.href = '/app.html';
+                if (typeof authManager.safeRedirect === 'function') {
+                    authManager.safeRedirect('/app.html');
+                } else {
+                    window.location.href = window.location.origin + '/app.html';
+                }
             }
         }
         

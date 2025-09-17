@@ -19,22 +19,35 @@ class AuthManager {
      * @returns {Promise<boolean>} True if authenticated
      */
     async checkAuth() {
+        const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+        
         try {
+            console.log('Checking authentication status...');
+            console.log('Is iOS Safari:', isIOSSafari);
+            
             const response = await fetch(`${this.baseUrl}/auth/user`, {
-                credentials: 'include'
+                credentials: 'include',
+                // For iOS Safari, ensure we don't cache the request
+                cache: 'no-cache'
             });
+            
+            console.log('Auth check response status:', response.status);
+            console.log('Auth check response ok:', response.ok);
             
             if (response.ok) {
                 this.currentUser = await response.json();
                 this.isAuthenticated = this.currentUser.authenticated || false;
+                console.log('Authentication status:', this.isAuthenticated);
+                console.log('Current user:', this.currentUser);
                 return this.isAuthenticated;
             } else {
+                console.log('Auth check failed - response not ok');
                 this.isAuthenticated = false;
                 this.currentUser = null;
                 return false;
             }
         } catch (error) {
-            console.error('Auth check failed:', error);
+            console.error('Auth check failed with error:', error);
             this.isAuthenticated = false;
             this.currentUser = null;
             return false;
@@ -476,33 +489,176 @@ class AuthManager {
      * @returns {Promise<Object>} API response
      */
     async logout() {
+        console.log('Starting logout process...');
+        
+        const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+        
+        if (isIOSSafari) {
+            return this.logoutIOSSafari();
+        }
+        
         try {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            console.log('Making logout request to:', `${this.baseUrl}/auth/logout`);
+            
             const response = await fetch(`${this.baseUrl}/auth/logout`, {
                 method: 'POST',
-                credentials: 'include'
+                credentials: 'include',
+                headers: headers,
+                cache: 'no-cache'
             });
             
-            const result = await response.json();
+            console.log('Logout response status:', response.status);
+            console.log('Logout response ok:', response.ok);
             
-            if (response.ok) {
-                this.isAuthenticated = false;
-                this.currentUser = null;
-                this.userMemberships = null;
-                this.activeTeamId = null;
-                localStorage.removeItem('activeTeamId');
+            let result;
+            try {
+                result = await response.json();
+                console.log('Logout response body:', result);
+            } catch (jsonError) {
+                console.warn('Failed to parse logout response as JSON:', jsonError);
+                result = { success: response.ok, message: 'Logout request completed' };
             }
+            
+            // Clear local state
+            console.log('Clearing local authentication state...');
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.userMemberships = null;
+            this.activeTeamId = null;
+            localStorage.removeItem('activeTeamId');
             
             return result;
         } catch (error) {
-            console.error('Logout failed:', error);
+            console.error('Logout failed with error:', error);
             // Even if logout fails, clear local state
             this.isAuthenticated = false;
             this.currentUser = null;
             this.userMemberships = null;
             this.activeTeamId = null;
             localStorage.removeItem('activeTeamId');
+            
             throw new Error('Failed to logout');
         }
+    }
+
+    /**
+     * Special logout handling for iOS Safari
+     * @returns {Promise<Object>} API response
+     */
+    async logoutIOSSafari() {
+        console.log('Starting iOS Safari logout process...');
+        
+        // Method 1: Try the standard logout first
+        try {
+            console.log('Attempting standard logout for iOS Safari...');
+            
+            const response = await fetch(`${this.baseUrl}/auth/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                },
+                cache: 'no-cache'
+            });
+            
+            console.log('iOS Safari logout response status:', response.status);
+            
+            let result = { success: true, message: 'Logout completed' };
+            if (response.ok) {
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    console.warn('Could not parse JSON response, but logout appears successful');
+                }
+            }
+            
+            // Always clear local state for iOS Safari
+            this.clearAllAuthData();
+            
+            return result;
+            
+        } catch (error) {
+            console.warn('Standard logout failed on iOS Safari, trying alternative method:', error);
+            
+            // Method 2: Try without waiting for response
+            try {
+                // Fire and forget request
+                fetch(`${this.baseUrl}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-cache'
+                }).catch(e => console.log('Fire-and-forget logout request completed'));
+                
+                // Clear local state immediately
+                this.clearAllAuthData();
+                
+                return { success: true, message: 'iOS Safari logout completed' };
+                
+            } catch (altError) {
+                console.error('All logout methods failed on iOS Safari:', altError);
+                
+                // Last resort: just clear local state
+                this.clearAllAuthData();
+                
+                return { success: false, message: 'Local logout completed' };
+            }
+        }
+    }
+
+    /**
+     * Clear all authentication-related data (iOS Safari compatible)
+     */
+    clearAllAuthData() {
+        console.log('Clearing all authentication data...');
+        
+        // Clear instance variables
+        this.isAuthenticated = false;
+        this.currentUser = null;
+        this.userMemberships = null;
+        this.activeTeamId = null;
+        
+        // Clear localStorage
+        try {
+            localStorage.removeItem('activeTeamId');
+            localStorage.clear(); // Clear everything to be safe
+        } catch (e) {
+            console.warn('Error clearing localStorage:', e);
+        }
+        
+        // Clear sessionStorage
+        try {
+            sessionStorage.removeItem('userProfile');
+            sessionStorage.removeItem('userMemberships');
+            sessionStorage.removeItem('activeTeamId');
+            sessionStorage.clear(); // Clear everything to be safe
+        } catch (e) {
+            console.warn('Error clearing sessionStorage:', e);
+        }
+        
+        // Try to clear cookies (iOS Safari specific)
+        try {
+            // Get all cookies and expire them
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            // Also try with domain
+            const domain = window.location.hostname;
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/;domain=" + domain); 
+            });
+        } catch (e) {
+            console.warn('Error clearing cookies:', e);
+        }
+        
+        console.log('Authentication data cleared');
     }
 
     /**

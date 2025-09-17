@@ -678,7 +678,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916001"></script>
+    <script src="/assets/auth.js?v=20250916002"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         const authManager = new AuthManager();
@@ -988,22 +988,40 @@
 
         // Logout handler
         logoutBtn.addEventListener("click", async function () {
+          // Disable the button to prevent double-clicks
+          logoutBtn.disabled = true;
+          logoutBtn.textContent = "Logging out...";
+
           try {
+            console.log("User clicked logout button");
             await authManager.logout();
-            // Use safeRedirect if available, fallback to window.location.href
-            if (typeof authManager.safeRedirect === "function") {
-              authManager.safeRedirect("/login.html");
-            } else {
-              window.location.href = window.location.origin + "/login.html";
-            }
+            console.log("Logout completed, redirecting...");
+
+            // Add a small delay for iOS Safari to process the logout
+            setTimeout(() => {
+              // Use safeRedirect if available, fallback to window.location.href
+              if (typeof authManager.safeRedirect === "function") {
+                authManager.safeRedirect("/login.html");
+              } else {
+                window.location.href = window.location.origin + "/login.html";
+              }
+            }, 100);
           } catch (error) {
             console.error("Logout failed:", error);
             // Force redirect even if logout fails
-            if (typeof authManager.safeRedirect === "function") {
-              authManager.safeRedirect("/login.html");
-            } else {
-              window.location.href = window.location.origin + "/login.html";
-            }
+            setTimeout(() => {
+              if (typeof authManager.safeRedirect === "function") {
+                authManager.safeRedirect("/login.html");
+              } else {
+                window.location.href = window.location.origin + "/login.html";
+              }
+            }, 100);
+          } finally {
+            // Re-enable button in case redirect fails
+            setTimeout(() => {
+              logoutBtn.disabled = false;
+              logoutBtn.textContent = "Logout";
+            }, 2000);
           }
         });
 

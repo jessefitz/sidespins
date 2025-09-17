@@ -1105,7 +1105,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916002"></script>
+    <script src="/assets/auth.js?v=202509170629"></script>
     <script>
       class ScheduleApp {
         constructor() {
@@ -1251,6 +1251,9 @@
 
             // Listen for team changes
             this.setupTeamChangeListener();
+
+            // Apply conditional UI based on permissions
+            UIPermissions.applyConditionalUI();
           } catch (error) {
             console.error("Schedule app initialization failed:", error);
             this.showError("Failed to initialize schedule. Please try again.");

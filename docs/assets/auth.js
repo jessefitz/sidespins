@@ -451,6 +451,27 @@ class AuthManager {
     }
 
     /**
+     * Safe redirect method that works reliably across all browsers including iOS Safari
+     * @param {string} url - URL to redirect to
+     */
+    safeRedirect(url) {
+        // Convert relative URLs to absolute URLs to prevent iOS Safari issues
+        let absoluteUrl = url;
+        if (url.startsWith('/')) {
+            absoluteUrl = window.location.origin + url;
+        }
+        
+        // Use window.location.assign() which is more reliable on iOS Safari
+        // than setting window.location.href directly
+        try {
+            window.location.assign(absoluteUrl);
+        } catch (error) {
+            // Fallback to setting href if assign fails
+            window.location.href = absoluteUrl;
+        }
+    }
+
+    /**
      * Logout current user
      * @returns {Promise<Object>} API response
      */
@@ -493,7 +514,7 @@ class AuthManager {
         const isAuthenticated = await this.checkAuth();
         
         if (!isAuthenticated) {
-            window.location.href = loginUrl;
+            this.safeRedirect(loginUrl);
             return false;
         }
         

@@ -1,673 +1,689 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SideSpins App</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            line-height: 1.6;
-        }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        line-height: 1.6;
+      }
 
-        .header {
-            background: white;
-            border-bottom: 1px solid #e1e5e9;
-            padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+      .header {
+        background: white;
+        border-bottom: 1px solid #e1e5e9;
+        padding: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007cba;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: #666;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+      }
+
+      .nav-links a:hover {
+        background-color: #f8f9fa;
+      }
+
+      .nav-links a.active {
+        background-color: #007cba;
+        color: white;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .team-switcher {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .team-switcher label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .team-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        min-width: 200px;
+      }
+
+      .team-select:focus {
+        outline: none;
+        border-color: #007cba;
+      }
+
+      .role-indicator {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+      }
+
+      .role-manager {
+        background: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+      }
+
+      .role-captain {
+        background: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+      }
+
+      .role-admin {
+        background: #fff3cd;
+        color: #856404;
+        border-color: #ffeaa7;
+      }
+
+      .user-avatar-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .captain-badge {
+        background: #ffc107;
+        color: #212529;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid #ffd60a;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #007cba;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+      }
+
+      .user-avatar:hover {
+        background: #005a87;
+        border-color: #007cba;
+      }
+
+      .user-dropdown {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 150px;
+        z-index: 1000;
+        display: none;
+      }
+
+      .user-dropdown.show {
+        display: block;
+      }
+
+      .user-dropdown-item {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: #333;
+        text-decoration: none;
+        transition: background-color 0.2s;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+
+      .user-dropdown-item:hover {
+        background-color: #f8f9fa;
+      }
+
+      .user-dropdown-item:first-child {
+        border-radius: 8px 8px 0 0;
+      }
+
+      .user-dropdown-item:last-child {
+        border-radius: 0 0 8px 8px;
+      }
+
+      .user-dropdown-item.logout {
+        color: #dc3545;
+        border-top: 1px solid #e1e5e9;
+      }
+
+      .user-dropdown-item.logout:hover {
+        background-color: #f8d7da;
+      }
+
+      .user-details {
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      .dashboard {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .dashboard h1 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .team-info {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+      }
+
+      .team-info h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+
+      .team-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .detail-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+      }
+
+      .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .detail-value {
+        font-size: 1.1rem;
+        color: #495057;
+        margin-top: 0.25rem;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 3rem;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007cba;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+
+      .role-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 12px;
+        margin-left: 0.5rem;
+      }
+
+      .role-manager {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .role-player {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .role-admin {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      .actions {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background-color: #007cba;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #005a87;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background-color: #545b62;
+      }
+
+      /* Hamburger menu button - hidden by default */
+      .hamburger-menu {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        padding: 0.5rem;
+        background: none;
+        border: none;
+        border-radius: 4px;
+      }
+
+      .hamburger-menu:hover {
+        background-color: #f8f9fa;
+      }
+
+      .hamburger-line {
+        width: 20px;
+        height: 2px;
+        background-color: #666;
+        margin: 2px 0;
+        transition: 0.3s;
+        border-radius: 1px;
+      }
+
+      /* Mobile navigation overlay */
+      .mobile-nav-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+
+      .mobile-nav-overlay.show {
+        display: block;
+      }
+
+      .mobile-nav-menu {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 250px;
+        height: 100%;
+        background: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 1000;
+        padding: 2rem 0;
+      }
+
+      .mobile-nav-menu.show {
+        right: 0;
+      }
+
+      .mobile-nav-header {
+        padding: 0 1.5rem 1rem;
+        border-bottom: 1px solid #e1e5e9;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .mobile-nav-title {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .mobile-nav-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #666;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 4px;
+      }
+
+      .mobile-nav-close:hover {
+        background-color: #f8f9fa;
+      }
+
+      .mobile-nav-links {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+      }
+
+      .mobile-nav-links a {
+        display: block;
+        padding: 1rem 1.5rem;
+        color: #666;
+        text-decoration: none;
+        border-bottom: 1px solid #f1f3f4;
+        transition: background-color 0.2s;
+      }
+
+      .mobile-nav-links a:hover {
+        background-color: #f8f9fa;
+      }
+
+      .mobile-nav-links a.active {
+        background-color: #007cba;
+        color: white;
+      }
+
+      .mobile-team-switcher {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f3f4;
+      }
+
+      .mobile-team-switcher label {
+        display: block;
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      .mobile-team-select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.9rem;
+      }
+
+      .mobile-user-info {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e1e5e9;
+        margin-top: auto;
+      }
+
+      @media (max-width: 768px) {
         .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+          padding: 0 1rem;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #007cba;
-        }
-
+        /* Hide desktop navigation on mobile */
         .nav-links {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
+          display: none;
         }
 
-        .nav-links a {
-            color: #666;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            transition: background-color 0.2s;
+        /* Show hamburger menu on mobile */
+        .hamburger-menu {
+          display: flex;
         }
 
-        .nav-links a:hover {
-            background-color: #f8f9fa;
-        }
-
-        .nav-links a.active {
-            background-color: #007cba;
-            color: white;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
+        /* Hide desktop team switcher on mobile */
         .team-switcher {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+          display: none !important;
         }
 
-        .team-switcher label {
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .team-select {
-            padding: 0.5rem 1rem;
-            border: 1px solid #e1e5e9;
-            border-radius: 6px;
-            background: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            min-width: 200px;
-        }
-
-        .team-select:focus {
-            outline: none;
-            border-color: #007cba;
-        }
-
-        .role-indicator {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            background: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #e9ecef;
-        }
-
-        .role-manager {
-            background: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-        }
-
-        .role-captain {
-            background: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-        }
-
-        .role-admin {
-            background: #fff3cd;
-            color: #856404;
-            border-color: #ffeaa7;
-        }
-
-        .user-avatar-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .captain-badge {
-            background: #ffc107;
-            color: #212529;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid #ffd60a;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #007cba;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
-
-        .user-avatar:hover {
-            background: #005a87;
-            border-color: #007cba;
-        }
-
-        .user-dropdown {
-            position: absolute;
-            top: calc(100% + 0.5rem);
-            right: 0;
-            background: white;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            min-width: 150px;
-            z-index: 1000;
-            display: none;
-        }
-
-        .user-dropdown.show {
-            display: block;
-        }
-
-        .user-dropdown-item {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: #333;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        .user-dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .user-dropdown-item:first-child {
-            border-radius: 8px 8px 0 0;
-        }
-
-        .user-dropdown-item:last-child {
-            border-radius: 0 0 8px 8px;
-        }
-
-        .user-dropdown-item.logout {
-            color: #dc3545;
-            border-top: 1px solid #e1e5e9;
-        }
-
-        .user-dropdown-item.logout:hover {
-            background-color: #f8d7da;
-        }
-
-        .user-details {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .dashboard {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .dashboard h1 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        .team-info {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .team-info h3 {
-            margin-top: 0;
-            color: #495057;
+        /* Keep user avatar but hide dropdown on mobile (handled by hamburger menu) */
+        .user-avatar-container .user-dropdown {
+          display: none;
         }
 
         .team-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .detail-item {
-            background: white;
-            padding: 1rem;
-            border-radius: 6px;
-            border: 1px solid #dee2e6;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #6c757d;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-value {
-            font-size: 1.1rem;
-            color: #495057;
-            margin-top: 0.25rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #007cba;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-        }
-
-        .role-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 12px;
-            margin-left: 0.5rem;
-        }
-
-        .role-manager {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .role-player {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .role-admin {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+          grid-template-columns: 1fr;
         }
 
         .actions {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+          flex-direction: column;
         }
+      }
 
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
+      .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
 
-        .btn-primary {
-            background-color: #007cba;
-            color: white;
-        }
+      .action-card {
+        display: block;
+        padding: 1.5rem;
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
-        .btn-primary:hover {
-            background-color: #005a87;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-
-        /* Hamburger menu button - hidden by default */
-        .hamburger-menu {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 0.5rem;
-            background: none;
-            border: none;
-            border-radius: 4px;
-        }
-
-        .hamburger-menu:hover {
-            background-color: #f8f9fa;
-        }
-
-        .hamburger-line {
-            width: 20px;
-            height: 2px;
-            background-color: #666;
-            margin: 2px 0;
-            transition: 0.3s;
-            border-radius: 1px;
-        }
-
-        /* Mobile navigation overlay */
-        .mobile-nav-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
-        .mobile-nav-overlay.show {
-            display: block;
-        }
-
-        .mobile-nav-menu {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 250px;
-            height: 100%;
-            background: white;
-            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s ease;
-            z-index: 1000;
-            padding: 2rem 0;
-        }
-
-        .mobile-nav-menu.show {
-            right: 0;
-        }
-
-        .mobile-nav-header {
-            padding: 0 1.5rem 1rem;
-            border-bottom: 1px solid #e1e5e9;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .mobile-nav-title {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .mobile-nav-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #666;
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 4px;
-        }
-
-        .mobile-nav-close:hover {
-            background-color: #f8f9fa;
-        }
-
-        .mobile-nav-links {
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            margin: 0;
-        }
-
-        .mobile-nav-links a {
-            display: block;
-            padding: 1rem 1.5rem;
-            color: #666;
-            text-decoration: none;
-            border-bottom: 1px solid #f1f3f4;
-            transition: background-color 0.2s;
-        }
-
-        .mobile-nav-links a:hover {
-            background-color: #f8f9fa;
-        }
-
-        .mobile-nav-links a.active {
-            background-color: #007cba;
-            color: white;
-        }
-
-        .mobile-team-switcher {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .mobile-team-switcher label {
-            display: block;
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .mobile-team-select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #e1e5e9;
-            border-radius: 6px;
-            background: white;
-            font-size: 0.9rem;
-        }
-
-        .mobile-user-info {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e1e5e9;
-            margin-top: auto;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                padding: 0 1rem;
-            }
-            
-            /* Hide desktop navigation on mobile */
-            .nav-links {
-                display: none;
-            }
-            
-            /* Show hamburger menu on mobile */
-            .hamburger-menu {
-                display: flex;
-            }
-            
-            /* Hide desktop team switcher on mobile */
-            .team-switcher {
-                display: none !important;
-            }
-            
-            /* Keep user avatar but hide dropdown on mobile (handled by hamburger menu) */
-            .user-avatar-container .user-dropdown {
-                display: none;
-            }
-
-            .team-details {
-                grid-template-columns: 1fr;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .action-card {
-            display: block;
-            padding: 1.5rem;
-            background: white;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .action-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
+      .action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <div class="header-content">
-            <div class="logo">SideSpins</div>
-            
-            <!-- Desktop Navigation -->
-            <div class="nav-links">
-                <a href="/app.html" class="active">Dashboard</a>
-                <a href="/schedule-new.html">Schedule</a>
-                <a href="/lineup-explorer-new.html">Lineup Explorer</a>
-                <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
-            </div>
+      <div class="header-content">
+        <div class="logo">SideSpins</div>
 
-            <div class="user-info">
-                <!-- Desktop Team Switcher -->
-                <div class="team-switcher" id="team-switcher" style="display:none;">
-                    <label for="team-select">Team:</label>
-                    <select id="team-select" class="team-select">
-                        <option value="">Select a team...</option>
-                    </select>
-                </div>
-                
-                <div class="user-avatar-container">
-                    <div id="captain-badge" class="captain-badge" style="display:none;">Captain</div>
-                    <div class="user-avatar" id="user-avatar">?</div>
-                    <div class="user-dropdown" id="user-dropdown">
-                        <button class="user-dropdown-item logout" id="logout-btn">Logout</button>
-                    </div>
-                </div>
-
-                <!-- Mobile Hamburger Menu -->
-                <button class="hamburger-menu" id="hamburger-menu">
-                    <div class="hamburger-line"></div>
-                    <div class="hamburger-line"></div>
-                    <div class="hamburger-line"></div>
-                </button>
-            </div>
+        <!-- Desktop Navigation -->
+        <div class="nav-links">
+          <a href="/app.html" class="active">Dashboard</a>
+          <a href="/schedule-new.html">Schedule</a>
+          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
+
+        <div class="user-info">
+          <!-- Desktop Team Switcher -->
+          <div class="team-switcher" id="team-switcher" style="display: none">
+            <label for="team-select">Team:</label>
+            <select id="team-select" class="team-select">
+              <option value="">Select a team...</option>
+            </select>
+          </div>
+
+          <div class="user-avatar-container">
+            <div id="captain-badge" class="captain-badge" style="display: none">
+              Captain
+            </div>
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div class="user-dropdown" id="user-dropdown">
+              <button class="user-dropdown-item logout" id="logout-btn">
+                Logout
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Hamburger Menu -->
+          <button class="hamburger-menu" id="hamburger-menu">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Mobile Navigation Overlay -->
     <div class="mobile-nav-overlay" id="mobile-nav-overlay">
-        <div class="mobile-nav-menu" id="mobile-nav-menu">
-            <div class="mobile-nav-header">
-                <div class="mobile-nav-title">Menu</div>
-                <button class="mobile-nav-close" id="mobile-nav-close">&times;</button>
-            </div>
-            
-            <div class="mobile-team-switcher">
-                <label for="mobile-team-select">Team:</label>
-                <select id="mobile-team-select" class="mobile-team-select">
-                    <option value="">Select a team...</option>
-                </select>
-            </div>
-            
-            <div class="mobile-nav-links">
-                <a href="/app.html" class="active">Dashboard</a>
-                <a href="/schedule-new.html">Schedule</a>
-                <a href="/lineup-explorer-new.html">Lineup Explorer</a>
-                <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
-            </div>
-            
-            <div class="mobile-user-info">
-                <button class="user-dropdown-item logout" id="mobile-logout-btn">Logout</button>
-            </div>
+      <div class="mobile-nav-menu" id="mobile-nav-menu">
+        <div class="mobile-nav-header">
+          <div class="mobile-nav-title">Menu</div>
+          <button class="mobile-nav-close" id="mobile-nav-close">
+            &times;
+          </button>
         </div>
+
+        <div class="mobile-team-switcher">
+          <label for="mobile-team-select">Team:</label>
+          <select id="mobile-team-select" class="mobile-team-select">
+            <option value="">Select a team...</option>
+          </select>
+        </div>
+
+        <div class="mobile-nav-links">
+          <a href="/app.html" class="active">Dashboard</a>
+          <a href="/schedule-new.html">Schedule</a>
+          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
+        </div>
+
+        <div class="mobile-user-info">
+          <button class="user-dropdown-item logout" id="mobile-logout-btn">
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="container">
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p>Loading your dashboard...</p>
-        </div>
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading your dashboard...</p>
+      </div>
 
-        <div id="error-container" style="display:none;">
-            <div class="error" id="error-message"></div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <a href="/login.html" class="btn btn-primary">Back to Login</a>
-            </div>
+      <div id="error-container" style="display: none">
+        <div class="error" id="error-message"></div>
+        <div style="text-align: center; margin-top: 2rem">
+          <a href="/login.html" class="btn btn-primary">Back to Login</a>
         </div>
+      </div>
 
-        <div id="dashboard-container" style="display:none;">
-            <div class="dashboard">
-                <h1>Welcome to SideSpins</h1>
-                <p>Plan and experiment with different lineups. Share lineups with your team, and more to come...</p>
-                
-                <h2>Quick Actions</h2>
-                <div id="role-actions">
-                    <p>Loading available actions...</p>
-                </div>
-            </div>
+      <div id="dashboard-container" style="display: none">
+        <div class="dashboard">
+          <h1>Welcome to SideSpins</h1>
+          <p>
+            Plan and experiment with different lineups. Share lineups with your
+            team, and more to come...
+          </p>
+
+          <h2>Quick Actions</h2>
+          <div id="role-actions">
+            <p>Loading available actions...</p>
+          </div>
         </div>
+      </div>
     </div>
 
-    <script src="/assets/auth.js"></script>
+    <script src="/assets/auth.js?v=20250916001"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', async function() {
+      document.addEventListener("DOMContentLoaded", async function () {
         const authManager = new AuthManager();
         window.authManager = authManager; // Make globally available
-        
+
         // Setup UI permissions
         UIPermissions.setAuthManager(authManager);
         UIPermissions.setupTeamChangeListener();
@@ -675,216 +691,226 @@
         // Initialize mobile navigation
         const mobileNav = new MobileNavigation();
         mobileNav.init();
-        
-        const loading = document.getElementById('loading');
-        const errorContainer = document.getElementById('error-container');
-        const errorMessage = document.getElementById('error-message');
-        const dashboardContainer = document.getElementById('dashboard-container');
-        const roleActions = document.getElementById('role-actions');
-        const logoutBtn = document.getElementById('logout-btn');
-        
+
+        const loading = document.getElementById("loading");
+        const errorContainer = document.getElementById("error-container");
+        const errorMessage = document.getElementById("error-message");
+        const dashboardContainer = document.getElementById(
+          "dashboard-container"
+        );
+        const roleActions = document.getElementById("role-actions");
+        const logoutBtn = document.getElementById("logout-btn");
+
         // Team switcher elements
-        const teamSwitcher = document.getElementById('team-switcher');
-        const teamSelect = document.getElementById('team-select');
-        
+        const teamSwitcher = document.getElementById("team-switcher");
+        const teamSelect = document.getElementById("team-select");
+
         // Avatar elements
-        const userAvatar = document.getElementById('user-avatar');
-        const userDropdown = document.getElementById('user-dropdown');
-        const captainBadge = document.getElementById('captain-badge');
+        const userAvatar = document.getElementById("user-avatar");
+        const userDropdown = document.getElementById("user-dropdown");
+        const captainBadge = document.getElementById("captain-badge");
 
         // Avatar dropdown functionality
-        userAvatar.addEventListener('click', function(e) {
-            e.stopPropagation();
-            userDropdown.classList.toggle('show');
+        userAvatar.addEventListener("click", function (e) {
+          e.stopPropagation();
+          userDropdown.classList.toggle("show");
         });
 
         // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-            userDropdown.classList.remove('show');
+        document.addEventListener("click", function () {
+          userDropdown.classList.remove("show");
         });
 
         function updateUserAvatar(profile) {
-            console.log('Updating avatar with profile:', profile); // Debug log
-            
-            let firstName = '';
-            let lastName = '';
-            
-            // Try different profile structures
-            if (profile && profile.debug && profile.debug.playerInfo) {
-                firstName = profile.debug.playerInfo.firstName || '';
-                lastName = profile.debug.playerInfo.lastName || '';
-            } else if (profile && profile.playerInfo) {
-                firstName = profile.playerInfo.firstName || '';
-                lastName = profile.playerInfo.lastName || '';
-            } else if (profile && profile.firstName) {
-                firstName = profile.firstName || '';
-                lastName = profile.lastName || '';
-            }
-            
-            const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-            const displayInitials = initials || '?';
-            
-            console.log('Setting avatar initials:', displayInitials); // Debug log
-            userAvatar.textContent = displayInitials;
+          console.log("Updating avatar with profile:", profile); // Debug log
+
+          let firstName = "";
+          let lastName = "";
+
+          // Try different profile structures
+          if (profile && profile.debug && profile.debug.playerInfo) {
+            firstName = profile.debug.playerInfo.firstName || "";
+            lastName = profile.debug.playerInfo.lastName || "";
+          } else if (profile && profile.playerInfo) {
+            firstName = profile.playerInfo.firstName || "";
+            lastName = profile.playerInfo.lastName || "";
+          } else if (profile && profile.firstName) {
+            firstName = profile.firstName || "";
+            lastName = profile.lastName || "";
+          }
+
+          const initials = (
+            firstName.charAt(0) + lastName.charAt(0)
+          ).toUpperCase();
+          const displayInitials = initials || "?";
+
+          console.log("Setting avatar initials:", displayInitials); // Debug log
+          userAvatar.textContent = displayInitials;
         }
 
         function updateCaptainBadge(role) {
-            if (role === 'captain' || role === 'manager') {
-                captainBadge.style.display = 'block';
-                captainBadge.textContent = role === 'manager' ? 'Manager' : 'Captain';
-            } else {
-                captainBadge.style.display = 'none';
-            }
+          if (role === "captain" || role === "manager") {
+            captainBadge.style.display = "block";
+            captainBadge.textContent =
+              role === "manager" ? "Manager" : "Captain";
+          } else {
+            captainBadge.style.display = "none";
+          }
         }
 
         function showError(message) {
-            loading.style.display = 'none';
-            dashboardContainer.style.display = 'none';
-            errorMessage.textContent = message;
-            errorContainer.style.display = 'block';
+          loading.style.display = "none";
+          dashboardContainer.style.display = "none";
+          errorMessage.textContent = message;
+          errorContainer.style.display = "block";
         }
 
         function showDashboard() {
-            loading.style.display = 'none';
-            errorContainer.style.display = 'none';
-            dashboardContainer.style.display = 'block';
+          loading.style.display = "none";
+          errorContainer.style.display = "none";
+          dashboardContainer.style.display = "block";
         }
 
         function getRoleBadge(role) {
-            const className = `role-${role}`;
-            return `<span class="role-badge ${className}">${role}</span>`;
+          const className = `role-${role}`;
+          return `<span class="role-badge ${className}">${role}</span>`;
         }
 
         function updateRoleIndicator(role) {
-            // Update captain badge (role indicator removed from team switcher)
-            updateCaptainBadge(role);
+          // Update captain badge (role indicator removed from team switcher)
+          updateCaptainBadge(role);
         }
 
         function populateTeamSwitcher(memberships) {
-            const mobileTeamSelect = document.getElementById('mobile-team-select');
-            
-            teamSelect.innerHTML = '<option value="">Select a team...</option>';
-            if (mobileTeamSelect) {
-                mobileTeamSelect.innerHTML = '<option value="">Select a team...</option>';
-            }
-            
-            if (memberships && memberships.length > 0) {
-                memberships.forEach(membership => {
-                    // Desktop option
-                    const option = document.createElement('option');
-                    option.value = membership.teamId;
-                    option.textContent = membership.teamName || membership.teamId;
-                    option.dataset.role = membership.role;
-                    teamSelect.appendChild(option);
+          const mobileTeamSelect =
+            document.getElementById("mobile-team-select");
 
-                    // Mobile option
-                    if (mobileTeamSelect) {
-                        const mobileOption = document.createElement('option');
-                        mobileOption.value = membership.teamId;
-                        mobileOption.textContent = membership.teamName || membership.teamId;
-                        mobileOption.dataset.role = membership.role;
-                        mobileTeamSelect.appendChild(mobileOption);
-                    }
-                });
-                
-                teamSwitcher.style.display = 'flex';
-                
-                // Set current active team and update captain badge
-                if (authManager.activeTeamId) {
-                    teamSelect.value = authManager.activeTeamId;
-                    if (mobileTeamSelect) {
-                        mobileTeamSelect.value = authManager.activeTeamId;
-                    }
-                    const selectedOption = teamSelect.selectedOptions[0];
-                    if (selectedOption) {
-                        updateCaptainBadge(selectedOption.dataset.role);
-                    }
-                }
-            } else {
-                teamSwitcher.style.display = 'none';
+          teamSelect.innerHTML = '<option value="">Select a team...</option>';
+          if (mobileTeamSelect) {
+            mobileTeamSelect.innerHTML =
+              '<option value="">Select a team...</option>';
+          }
+
+          if (memberships && memberships.length > 0) {
+            memberships.forEach((membership) => {
+              // Desktop option
+              const option = document.createElement("option");
+              option.value = membership.teamId;
+              option.textContent = membership.teamName || membership.teamId;
+              option.dataset.role = membership.role;
+              teamSelect.appendChild(option);
+
+              // Mobile option
+              if (mobileTeamSelect) {
+                const mobileOption = document.createElement("option");
+                mobileOption.value = membership.teamId;
+                mobileOption.textContent =
+                  membership.teamName || membership.teamId;
+                mobileOption.dataset.role = membership.role;
+                mobileTeamSelect.appendChild(mobileOption);
+              }
+            });
+
+            teamSwitcher.style.display = "flex";
+
+            // Set current active team and update captain badge
+            if (authManager.activeTeamId) {
+              teamSelect.value = authManager.activeTeamId;
+              if (mobileTeamSelect) {
+                mobileTeamSelect.value = authManager.activeTeamId;
+              }
+              const selectedOption = teamSelect.selectedOptions[0];
+              if (selectedOption) {
+                updateCaptainBadge(selectedOption.dataset.role);
+              }
             }
+          } else {
+            teamSwitcher.style.display = "none";
+          }
         }
 
         function populateRoleActions(role) {
-            const container = document.getElementById('role-actions');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (!role) {
-                container.innerHTML = '<p class="text-muted">No role assigned for this team.</p>';
-                return;
-            }
-            
-            // Common actions for all team members
-            const commonActions = [
-                { 
-                    text: 'Schedule', 
-                    href: '/schedule-new.html',
-                    description: 'View team schedule and match results',
-                    icon: '📅'
-                },
-                { 
-                    text: 'Lineup Explorer', 
-                    href: '/lineup-explorer-new.html',
-                    description: 'Explore different player combinations',
-                    icon: '🎯'
-                }
-            ];
-            
-            // Role-specific actions
-            const roleActions = {
-                'admin': [
-                    ...commonActions,
-                    { 
-                        text: 'Admin Panel', 
-                        href: '/admin/',
-                        description: 'Manage users, teams, and system settings',
-                        icon: '⚙️'
-                    }
-                ],
-                'manager': [
-                    ...commonActions,
-                    { 
-                        text: 'Team Management', 
-                        href: '/team-admin.html',
-                        description: 'Manage team roster and settings',
-                        icon: '👥'
-                    }
-                ],
-                'captain': [
-                    ...commonActions,
-                    { 
-                        text: 'Team Management', 
-                        href: '/team-admin.html',
-                        description: 'Manage team roster and settings',
-                        icon: '👥'
-                    }
-                ],
-                'player': commonActions
-            };
-            
-            const actions = roleActions[role] || commonActions;
-            
-            if (actions.length === 0) {
-                container.innerHTML = '<p class="text-muted">No actions available for your role.</p>';
-                return;
-            }
-            
-            const actionsGrid = document.createElement('div');
-            actionsGrid.className = 'actions-grid';
-            actionsGrid.style.cssText = `
+          const container = document.getElementById("role-actions");
+          if (!container) return;
+
+          container.innerHTML = "";
+
+          if (!role) {
+            container.innerHTML =
+              '<p class="text-muted">No role assigned for this team.</p>';
+            return;
+          }
+
+          // Common actions for all team members
+          const commonActions = [
+            {
+              text: "Schedule",
+              href: "/schedule-new.html",
+              description: "View team schedule and match results",
+              icon: "📅",
+            },
+            {
+              text: "Lineup Explorer",
+              href: "/lineup-explorer-new.html",
+              description: "Explore different player combinations",
+              icon: "🎯",
+            },
+          ];
+
+          // Role-specific actions
+          const roleActions = {
+            admin: [
+              ...commonActions,
+              {
+                text: "Admin Panel",
+                href: "/admin/",
+                description: "Manage users, teams, and system settings",
+                icon: "⚙️",
+              },
+            ],
+            manager: [
+              ...commonActions,
+              {
+                text: "Team Management",
+                href: "/team-admin.html",
+                description: "Manage team roster and settings",
+                icon: "👥",
+              },
+            ],
+            captain: [
+              ...commonActions,
+              {
+                text: "Team Management",
+                href: "/team-admin.html",
+                description: "Manage team roster and settings",
+                icon: "👥",
+              },
+            ],
+            player: commonActions,
+          };
+
+          const actions = roleActions[role] || commonActions;
+
+          if (actions.length === 0) {
+            container.innerHTML =
+              '<p class="text-muted">No actions available for your role.</p>';
+            return;
+          }
+
+          const actionsGrid = document.createElement("div");
+          actionsGrid.className = "actions-grid";
+          actionsGrid.style.cssText = `
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                 gap: 1rem;
                 margin-top: 1rem;
             `;
-            
-            actions.forEach(action => {
-                const actionCard = document.createElement('a');
-                actionCard.href = action.href;
-                actionCard.className = 'action-card';
-                actionCard.style.cssText = `
+
+          actions.forEach((action) => {
+            const actionCard = document.createElement("a");
+            actionCard.href = action.href;
+            actionCard.className = "action-card";
+            actionCard.style.cssText = `
                     display: block;
                     padding: 1.5rem;
                     background: white;
@@ -895,8 +921,8 @@
                     transition: all 0.2s;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 `;
-                
-                actionCard.innerHTML = `
+
+            actionCard.innerHTML = `
                     <div style="display: flex; align-items: flex-start; gap: 1rem;">
                         <span style="font-size: 2rem;">${action.icon}</span>
                         <div>
@@ -905,108 +931,119 @@
                         </div>
                     </div>
                 `;
-                
-                // Add hover effect
-                actionCard.addEventListener('mouseenter', () => {
-                    actionCard.style.transform = 'translateY(-2px)';
-                    actionCard.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                });
-                
-                actionCard.addEventListener('mouseleave', () => {
-                    actionCard.style.transform = 'translateY(0)';
-                    actionCard.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                });
-                
-                actionsGrid.appendChild(actionCard);
+
+            // Add hover effect
+            actionCard.addEventListener("mouseenter", () => {
+              actionCard.style.transform = "translateY(-2px)";
+              actionCard.style.boxShadow = "0 4px 8px rgba(0,0,0,0.15)";
             });
-            
-            container.appendChild(actionsGrid);
+
+            actionCard.addEventListener("mouseleave", () => {
+              actionCard.style.transform = "translateY(0)";
+              actionCard.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+            });
+
+            actionsGrid.appendChild(actionCard);
+          });
+
+          container.appendChild(actionsGrid);
         }
 
         function showComingSoon(feature) {
-            alert(`${feature} feature is coming soon! This will be available in a future update.`);
+          alert(
+            `${feature} feature is coming soon! This will be available in a future update.`
+          );
         }
 
         // Team switcher change handler
-        teamSelect.addEventListener('change', function() {
-            const selectedTeamId = this.value;
-            const selectedOption = this.selectedOptions[0];
-            
-            if (selectedTeamId && selectedOption) {
-                authManager.setActiveTeam(selectedTeamId);
-                const role = selectedOption.dataset.role;
-                updateRoleIndicator(role);
-                populateRoleActions(role);
-                updateTeamDisplay(selectedTeamId, role);
-            } else {
-                updateRoleIndicator('');
-                populateRoleActions('');
-                updateTeamDisplay('', '');
-            }
+        teamSelect.addEventListener("change", function () {
+          const selectedTeamId = this.value;
+          const selectedOption = this.selectedOptions[0];
+
+          if (selectedTeamId && selectedOption) {
+            authManager.setActiveTeam(selectedTeamId);
+            const role = selectedOption.dataset.role;
+            updateRoleIndicator(role);
+            populateRoleActions(role);
+            updateTeamDisplay(selectedTeamId, role);
+          } else {
+            updateRoleIndicator("");
+            populateRoleActions("");
+            updateTeamDisplay("", "");
+          }
         });
 
         // Listen for team change events
-        window.addEventListener('teamChanged', function(event) {
-            const membership = event.detail;
-            if (membership) {
-                updateTeamDisplay(membership.teamId, membership.role);
-                populateRoleActions(membership.role);
-            }
+        window.addEventListener("teamChanged", function (event) {
+          const membership = event.detail;
+          if (membership) {
+            updateTeamDisplay(membership.teamId, membership.role);
+            populateRoleActions(membership.role);
+          }
         });
 
         function updateTeamDisplay(teamId, role) {
-            // Team display functionality removed - keeping for compatibility
+          // Team display functionality removed - keeping for compatibility
         }
 
         // Logout handler
-        logoutBtn.addEventListener('click', async function() {
-            try {
-                await authManager.logout();
-                window.location.href = '/login.html';
-            } catch (error) {
-                console.error('Logout failed:', error);
-                // Force redirect even if logout fails
-                window.location.href = '/login.html';
+        logoutBtn.addEventListener("click", async function () {
+          try {
+            await authManager.logout();
+            // Use safeRedirect if available, fallback to window.location.href
+            if (typeof authManager.safeRedirect === "function") {
+              authManager.safeRedirect("/login.html");
+            } else {
+              window.location.href = window.location.origin + "/login.html";
             }
+          } catch (error) {
+            console.error("Logout failed:", error);
+            // Force redirect even if logout fails
+            if (typeof authManager.safeRedirect === "function") {
+              authManager.safeRedirect("/login.html");
+            } else {
+              window.location.href = window.location.origin + "/login.html";
+            }
+          }
         });
 
         // Initialize the app
         try {
-            const isAuthenticated = await authManager.requireAuth();
-            
-            if (isAuthenticated) {
-                // Load user profile and memberships
-                try {
-                    const profile = await authManager.getUserProfile();
-                    
-                    // Update user avatar with initials
-                    updateUserAvatar(profile);
-                } catch (error) {
-                    console.warn('Could not load user profile:', error);
-                }
+          const isAuthenticated = await authManager.requireAuth();
 
-                // Load memberships for team switcher
-                const memberships = await authManager.loadUserMemberships();
-                populateTeamSwitcher(memberships);
+          if (isAuthenticated) {
+            // Load user profile and memberships
+            try {
+              const profile = await authManager.getUserProfile();
 
-                // Set initial team display if we have an active team
-                const activeMembership = authManager.getActiveMembership();
-                if (activeMembership) {
-                    updateTeamDisplay(activeMembership.teamId, activeMembership.role);
-                    populateRoleActions(activeMembership.role);
-                    updateRoleIndicator(activeMembership.role);
-                }
-
-                showDashboard();
-                
-                // Apply conditional UI based on permissions
-                UIPermissions.applyConditionalUI();
+              // Update user avatar with initials
+              updateUserAvatar(profile);
+            } catch (error) {
+              console.warn("Could not load user profile:", error);
             }
+
+            // Load memberships for team switcher
+            const memberships = await authManager.loadUserMemberships();
+            populateTeamSwitcher(memberships);
+
+            // Set initial team display if we have an active team
+            const activeMembership = authManager.getActiveMembership();
+            if (activeMembership) {
+              updateTeamDisplay(activeMembership.teamId, activeMembership.role);
+              populateRoleActions(activeMembership.role);
+              updateRoleIndicator(activeMembership.role);
+            }
+
+            showDashboard();
+
+            // Apply conditional UI based on permissions
+            UIPermissions.applyConditionalUI();
+          }
         } catch (error) {
-            console.error('App initialization failed:', error);
-            showError('Failed to load dashboard. Please try logging in again.');
+          console.error("App initialization failed:", error);
+          showError("Failed to load dashboard. Please try logging in again.");
         }
-    });
+      });
     </script>
-</body>
+  </body>
 </html>

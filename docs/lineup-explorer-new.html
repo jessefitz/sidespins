@@ -1227,7 +1227,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916002"></script>
+    <script src="/assets/auth.js?v=202509170629"></script>
     <script>
       class LineupExplorerApp {
         constructor() {
@@ -1362,6 +1362,8 @@
             this.setupTeamChangeListener();
 
             // Apply conditional UI based on permissions
+            UIPermissions.applyConditionalUI();
+            
             this.showMainContent();
           } catch (error) {
             console.error("Lineup explorer initialization failed:", error);
@@ -2168,14 +2170,13 @@
             const lineupData = this.buildLineupData();
 
             // Make API call to save lineup
-            const response = await fetch(
+            const response = await this.authManager.makeAuthenticatedRequest(
               `${this.authManager.baseUrl}/teams/${this.teamId}/matches/${this.currentMatch.id}/lineup?divisionId=${this.divisionId}`,
               {
                 method: "PATCH",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                credentials: "include",
                 body: JSON.stringify(lineupData),
               }
             );

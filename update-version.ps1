@@ -20,6 +20,7 @@ $files = @(
     "docs/schedule-new.html", 
     "docs/lineup-explorer-new.html",
     "docs/login.html",
+    "docs/login-new.html",
     "docs/team-admin.html"
 )
 

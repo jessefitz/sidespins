@@ -185,6 +185,41 @@
         gap: 0.5rem;
       }
 
+      .volunteer-alternate-container {
+        margin-top: 1rem;
+        text-align: center;
+        padding-top: 0.75rem;
+        border-top: 2px solid #e9ecef;
+      }
+
+      .volunteer-alternate-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .volunteer-alternate-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      }
+
+      .volunteer-alternate-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
       .lineup-placeholder,
       .lineup-empty {
         text-align: center;
@@ -1546,6 +1581,9 @@
 
           // Add event listeners for availability controls
           this.setupAvailabilityEventListeners();
+
+          // Add event listeners for volunteer alternate buttons
+          this.setupVolunteerEventListeners();
         }
 
         createDayElement(dateKey, dayData, playerSkills) {
@@ -1829,6 +1867,28 @@
                     `;
           }
 
+          // Check if current user can volunteer as alternate for this team
+          let volunteerButton = "";
+          if (
+            isOurTeam &&
+            this.isFutureMatch(match) &&
+            this.currentUserPlayerId
+          ) {
+            const userInLineup = lineup.some(
+              (p) => p.playerId === this.currentUserPlayerId
+            );
+            if (!userInLineup) {
+              const teamIdForButton = isOurTeam ? this.teamId : "";
+              volunteerButton = `
+                        <div class="volunteer-alternate-container">
+                            <button class="volunteer-alternate-btn" data-match-id="${match.id}" data-team-id="${teamIdForButton}">
+                                🙋‍♂️ Volunteer as Alternate
+                            </button>
+                        </div>
+                    `;
+            }
+          }
+
           return `
                     <div class="player-cards">
                         ${playerCards}
@@ -1839,6 +1899,7 @@
                         : ""
                     }
                     ${skillWarning}
+                    ${volunteerButton}
                 `;
         }
 
@@ -2046,6 +2107,68 @@
               }, 100);
             }
           }
+        }
+
+        setupVolunteerEventListeners() {
+          const volunteerButtons = document.querySelectorAll(
+            ".volunteer-alternate-btn"
+          );
+          volunteerButtons.forEach((button) => {
+            button.addEventListener("click", async (event) => {
+              const matchId = event.target.dataset.matchId;
+              const teamId = event.target.dataset.teamId;
+
+              // Disable the button to prevent double-clicks
+              button.disabled = true;
+              button.textContent = "Volunteering...";
+
+              try {
+                await this.volunteerAsAlternate(matchId, teamId);
+
+                // Show success message
+                this.showAvailabilityUpdateStatus(
+                  "success",
+                  "Successfully volunteered as alternate!"
+                );
+
+                // Reload the schedule to show the updated lineup
+                setTimeout(() => {
+                  this.loadSchedule();
+                }, 1000);
+              } catch (error) {
+                console.error("Error volunteering as alternate:", error);
+                this.showAvailabilityUpdateStatus(
+                  "error",
+                  "Failed to volunteer as alternate. Please try again."
+                );
+
+                // Re-enable the button
+                button.disabled = false;
+                button.textContent = "🙋‍♂️ Volunteer as Alternate";
+              }
+            });
+          });
+        }
+
+        async volunteerAsAlternate(matchId, teamId) {
+          const url = `${this.authManager.baseUrl}/matches/${matchId}/volunteer-alternate?divisionId=${this.divisionId}&teamId=${teamId}`;
+
+          const response = await this.authManager.makeAuthenticatedRequest(
+            url,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`Failed to volunteer as alternate: ${errorData}`);
+          }
+
+          return response.json();
         }
       }
 

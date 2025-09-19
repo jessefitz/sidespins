@@ -654,10 +654,13 @@
 
       .player-actions {
         margin-left: 1rem;
+        display: flex;
+        gap: 0.5rem;
       }
 
       .player-actions .add-btn,
-      .player-actions .remove-btn {
+      .player-actions .remove-btn,
+      .player-actions .volunteer-alt-btn {
         background: #007cba;
         color: white;
         border: none;
@@ -679,6 +682,44 @@
 
       .player-actions .remove-btn:hover {
         background: #c82333;
+      }
+
+      .player-actions .volunteer-alt-btn {
+        background: #28a745;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+
+      .player-actions .volunteer-alt-btn:hover {
+        background: #218838;
+      }
+
+      .player-actions .remove-alt-btn {
+        background: #ffc107;
+        color: #212529;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+
+      .player-actions .remove-alt-btn:hover {
+        background: #e0a800;
+      }
+
+      .alternate-badge {
+        background: #17a2b8;
+        color: white;
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 3px;
+        font-weight: bold;
+        margin-left: 0.5rem;
+      }
+
+      .alternate-status {
+        color: #17a2b8;
+        font-size: 0.75rem;
+        font-weight: 500;
+        font-style: italic;
       }
 
       .skill-summary {
@@ -1238,6 +1279,12 @@
               ? "http://localhost:7071/api"
               : "https://api.sidespins.com/api";
           this.authManager = new AuthManager(baseUrl);
+          this.apiUrl =
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+              ? "http://localhost:7071"
+              : "https://api.sidespins.com";
+          this.apiSecret = this.authManager.apiSecret;
           this.teamId = null;
           this.divisionId = null;
           this.teamName = null;
@@ -1355,7 +1402,7 @@
 
             // Load data and setup UI
             await this.loadData();
-            this.setupUI();
+            await this.setupUI();
 
             // Setup event handlers
             this.setupLogoutHandler();
@@ -1363,7 +1410,7 @@
 
             // Apply conditional UI based on permissions
             UIPermissions.applyConditionalUI();
-            
+
             this.showMainContent();
           } catch (error) {
             console.error("Lineup explorer initialization failed:", error);
@@ -1569,7 +1616,7 @@
           }
         }
 
-        setupUI() {
+        async setupUI() {
           this.renderSlots();
           this.renderPlayerList();
           this.populateMatches();
@@ -1594,9 +1641,16 @@
               captainRadio.checked = true;
             }
 
-            // Trigger change event to load the match
-            const event = new Event("change");
-            matchSelect.dispatchEvent(event);
+            // Load the match directly instead of using change event
+            await this.loadMatchLineup(matchId);
+
+            // Show start state container since match is selected
+            const startStateContainer = document.getElementById(
+              "start-state-container"
+            );
+            if (startStateContainer) {
+              startStateContainer.style.display = "block";
+            }
           }
         }
 
@@ -1650,7 +1704,34 @@
             return;
           }
 
+          // Debug logging for alternate detection
+          console.log("renderPlayerList - Current match:", this.currentMatch);
+          if (this.currentMatch?.lineupPlan) {
+            console.log("Lineup plan exists:", this.currentMatch.lineupPlan);
+            const isHomeTeam = this.currentMatch.homeTeamId === this.teamId;
+            const lineup = isHomeTeam
+              ? this.currentMatch.lineupPlan.home
+              : this.currentMatch.lineupPlan.away;
+            console.log(
+              `Team is ${isHomeTeam ? "home" : "away"}, lineup:`,
+              lineup
+            );
+            const alternates = lineup?.filter((p) => p.isAlternate) || [];
+            console.log("Found alternates:", alternates);
+          } else {
+            console.log(
+              "No match selected or no lineup plan - alternate detection disabled"
+            );
+          }
+
           playerList.innerHTML = "";
+
+          // Show message if no match is selected
+          if (!this.currentMatch) {
+            playerList.innerHTML =
+              '<li style="text-align: center; color: #666; padding: 1rem; font-style: italic;">Select a match above to see alternate status and manage alternates</li>';
+            return;
+          }
 
           if (!this.players || this.players.length === 0) {
             playerList.innerHTML =
@@ -1668,9 +1749,32 @@
               (p) => p && p.id === player.id
             );
 
+            // Check if player is an alternate in the current match
+            let isAlternate = false;
+            if (this.currentMatch?.lineupPlan) {
+              const isHomeTeam = this.currentMatch.homeTeamId === this.teamId;
+              const lineup = isHomeTeam
+                ? this.currentMatch.lineupPlan.home
+                : this.currentMatch.lineupPlan.away;
+              isAlternate =
+                lineup?.some(
+                  (p) => p.playerId === player.id && p.isAlternate
+                ) || false;
+
+              // Debug logging
+              if (isAlternate) {
+                console.log(`Player ${player.name} is marked as alternate`);
+              }
+            }
+
+            const isCaptain =
+              this.authManager && this.authManager.hasTeamRole("captain");
+
             li.innerHTML = `
                         <div class="player-info">
-                            <div class="player-name">${player.name}</div>
+                            <div class="player-name">${player.name}${
+              isAlternate ? ' <span class="alternate-badge">ALT</span>' : ""
+            }</div>
                             <span class="player-skill">Skill: ${
                               player.skill
                             }</span>
@@ -1679,7 +1783,18 @@
                             ${
                               isInLineup
                                 ? `<button class="remove-btn" data-player-id="${player.id}">Remove</button>`
-                                : `<button class="add-btn" data-player-id="${player.id}">Add</button>`
+                                : isAlternate
+                                ? isCaptain
+                                  ? `<button class="remove-alt-btn" data-player-id="${player.id}">Remove Alternate</button>`
+                                  : '<span class="alternate-status">Set as Alternate</span>'
+                                : `<button class="add-btn" data-player-id="${
+                                    player.id
+                                  }">Add</button>
+                                     ${
+                                       isCaptain
+                                         ? `<button class="volunteer-alt-btn" data-player-id="${player.id}">Set as Alternate</button>`
+                                         : ""
+                                     }`
                             }
                         </div>
                     `;
@@ -1702,6 +1817,12 @@
             } else if (e.target.classList.contains("remove-btn")) {
               const playerId = e.target.dataset.playerId;
               this.removePlayerFromLineup(playerId);
+            } else if (e.target.classList.contains("volunteer-alt-btn")) {
+              const playerId = e.target.dataset.playerId;
+              this.volunteerPlayerAsAlternate(playerId);
+            } else if (e.target.classList.contains("remove-alt-btn")) {
+              const playerId = e.target.dataset.playerId;
+              this.removePlayerAsAlternate(playerId);
             }
           };
 
@@ -1886,6 +2007,150 @@
               this.updateSkillSummary();
               break;
             }
+          }
+        }
+
+        async volunteerPlayerAsAlternate(playerId) {
+          if (!this.currentMatch) {
+            this.showError("Please select a match first.");
+            return;
+          }
+
+          if (!this.authManager || !this.authManager.hasTeamRole("captain")) {
+            this.showError(
+              "Only team captains can volunteer players as alternates."
+            );
+            return;
+          }
+
+          const player = this.players.find((p) => p.id === playerId);
+          if (!player) {
+            this.showError("Player not found.");
+            return;
+          }
+
+          try {
+            const url = `${this.authManager.baseUrl}/matches/${this.currentMatch.id}/volunteer-player-alternate?divisionId=${this.currentMatch.divisionId}&teamId=${this.teamId}&playerId=${playerId}`;
+
+            const response = await this.authManager.makeAuthenticatedRequest(
+              url,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            if (response.ok) {
+              try {
+                const result = await response.json();
+                this.showSuccess(
+                  `Successfully volunteered ${player.name} as an alternate.`
+                );
+
+                // Refresh the match data to show the updated lineup
+                if (result.match) {
+                  this.currentMatch = result.match;
+                  this.renderPlayerList();
+                }
+              } catch (jsonError) {
+                console.warn(
+                  "Response was successful but not valid JSON:",
+                  jsonError
+                );
+                this.showSuccess(
+                  `Successfully volunteered ${player.name} as an alternate.`
+                );
+                // Still refresh the player list
+                this.renderPlayerList();
+              }
+            } else {
+              let errorText;
+              try {
+                errorText = await response.text();
+              } catch (textError) {
+                errorText = "Failed to set player as alternate.";
+              }
+              this.showError(errorText || "Failed to set player as alternate.");
+            }
+          } catch (error) {
+            console.error("Error setting player as alternate:", error);
+            this.showError(
+              "An error occurred while setting the player as alternate."
+            );
+          }
+        }
+
+        async removePlayerAsAlternate(playerId) {
+          if (!this.currentMatch) {
+            this.showError("Please select a match first.");
+            return;
+          }
+
+          if (!this.authManager || !this.authManager.hasTeamRole("captain")) {
+            this.showError("Only team captains can remove alternates.");
+            return;
+          }
+
+          const player = this.players.find((p) => p.id === playerId);
+          if (!player) {
+            this.showError("Player not found.");
+            return;
+          }
+
+          try {
+            const url = `${this.authManager.baseUrl}/matches/${this.currentMatch.id}/remove-alternate?divisionId=${this.currentMatch.divisionId}&teamId=${this.teamId}&playerId=${playerId}`;
+
+            const response = await this.authManager.makeAuthenticatedRequest(
+              url,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            if (response.ok) {
+              try {
+                const result = await response.json();
+                this.showSuccess(
+                  `Successfully removed ${player.name} as an alternate.`
+                );
+
+                // Refresh the match data to show the updated lineup
+                if (result.match) {
+                  this.currentMatch = result.match;
+                  this.renderPlayerList();
+                }
+              } catch (jsonError) {
+                console.warn(
+                  "Response was successful but not valid JSON:",
+                  jsonError
+                );
+                this.showSuccess(
+                  `Successfully removed ${player.name} as an alternate.`
+                );
+                // Still refresh the player list
+                this.renderPlayerList();
+              }
+            } else {
+              let errorText;
+              try {
+                errorText = await response.text();
+              } catch (textError) {
+                errorText = "Failed to remove player as alternate.";
+              }
+              this.showError(
+                errorText || "Failed to remove player as alternate."
+              );
+            }
+          } catch (error) {
+            console.error("Error removing player as alternate:", error);
+            this.showError(
+              "An error occurred while removing the player as alternate."
+            );
           }
         }
 
@@ -2084,6 +2349,9 @@
             }
 
             this.currentMatch = match;
+
+            // Refresh player list to show alternate status
+            this.renderPlayerList();
 
             // Check if start state is set to captain lineup
             const startStateRadio = document.querySelector(

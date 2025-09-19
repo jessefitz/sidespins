@@ -148,7 +148,7 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
 
     private string? ExtractJwtFromRequest(HttpRequest request)
     {
-        // Check Authorization header
+        // Prioritize Authorization header (new approach)
         if (request.Headers.TryGetValue("Authorization", out var authHeader))
         {
             var token = authHeader.FirstOrDefault()?.Replace("Bearer ", "");
@@ -156,7 +156,7 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
                 return token;
         }
 
-        // Check cookies - first try "ssid" (session ID), then fallback to "auth_token"
+        // Fallback to cookies for backward compatibility (can be removed later)
         if (request.Cookies.TryGetValue("ssid", out var sessionToken))
         {
             return sessionToken;

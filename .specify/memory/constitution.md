@@ -1,82 +1,50 @@
-<!--
-Sync Impact Report:
-- Version change: Initial → 1.0.0
-- Principles added: Mobile-First UX, Three-Tier Architecture, RESTful API Design, Secure Authentication, Testing & Validation
-- Templates requiring updates: ✅ Ready for validation phase
-- No deferred TODOs
--->
-
-# SideSpins Constitution
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### I. Mobile-First User Experience (NON-NEGOTIABLE)
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-The frontend interface MUST be designed for mobile users first, with desktop as a progressive enhancement. All user interactions must be simple, intuitive, and accessible to a wide spectrum of users browsing from mobile phones. Navigation patterns must be touch-friendly with clear visual hierarchy and minimal cognitive load.
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
 
-**Rationale**: The majority of SideSpins users access the application from mobile devices. Complex interfaces create barriers to adoption and daily usage for pool league teams.
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### II. Three-Tier Architecture Integrity
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-System MUST maintain clear separation between frontend (Jekyll static site), backend (Azure Functions API), and database (Cosmos DB). Each tier has distinct responsibilities and communication occurs only through defined interfaces (CORS-enabled REST API with authentication).
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
-**Rationale**: This architecture ensures scalability, maintainability, and allows independent deployment of each tier while maintaining security boundaries.
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
-### III. RESTful API Design Standards
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
-Backend API MUST follow RESTful conventions with consistent response formats, proper HTTP status codes, and camelCase JSON serialization. All endpoints require authentication (JWT tokens) and support CORS for frontend integration.
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-**Rationale**: Standardized API design ensures predictable behavior, easier testing, and seamless frontend-backend integration while maintaining security requirements.
-
-### IV. Secure Authentication by Default
-
-All API endpoints MUST implement authentication using `[RequiresUserAuth]` attributes. JWT middleware validates user tokens, and sensitive operations require proper authorization levels. No functionality exposed without authentication.
-
-**Rationale**: Pool league data is sensitive team information requiring protection. Security-by-default prevents accidental exposure of data or functionality.
-
-### V. Testing & Validation Standards
-
-All features MUST include automated testing strategies appropriate to their tier: API testing via PowerShell/bash scripts, frontend validation through browser testing, and database operations verified through seed data. Authentication flows require dedicated test scripts.
-
-**Rationale**: APA pool league operations have zero tolerance for errors during live matches. Comprehensive testing prevents disruptions during critical team activities.
-
-## Technology Constraints
-
-All technology choices MUST align with the established stack:
-
-- **Frontend**: Jekyll (Ruby) with responsive CSS and JavaScript for GitHub Pages deployment
-- **Backend**: .NET 8 Azure Functions with Application Insights integration
-- **Database**: Azure Cosmos DB with Python tooling for migrations
-- **Authentication**: Stytch integration with JWT tokens
-- **Deployment**: GitHub Actions for CI/CD, Azure for backend hosting
-
-## Development Workflow
-
-### Code Organization Standards
-
-- **Azure Functions**: `{Domain}Functions.cs` pattern (e.g., `PlayersFunctions.cs`)
-- **Data Models**: Singular nouns with `JsonProperty` attributes for camelCase API serialization
-- **API Endpoints**: `/api/{plural-resource}` convention (e.g., `/api/players`)
-- **Documentation**: Maintain API documentation alongside implementation
-
-### Quality Gates
-
-- All authentication changes MUST pass dedicated test script validation
-- Frontend changes MUST be tested on mobile viewports before deployment
-- API modifications MUST maintain backward compatibility or include migration strategy
-- Database schema changes MUST include corresponding seed data updates
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-This constitution supersedes all other development practices and guides all technical decisions. All pull requests and code reviews MUST verify compliance with these principles, particularly mobile-first UX and security requirements.
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
 
-Amendments require:
-
-1. Documentation of the change rationale
-2. Impact assessment on existing templates and guidance
-3. Migration plan for affected components
-4. Version bump following semantic versioning
-
-For runtime development guidance, refer to `.github/copilot-instructions.md` which provides implementation-specific direction while adhering to constitutional principles.
-
-**Version**: 1.0.0 | **Ratified**: 2025-09-19 | **Last Amended**: 2025-09-19
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->

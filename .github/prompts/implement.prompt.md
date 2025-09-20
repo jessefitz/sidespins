@@ -4,7 +4,7 @@ description: Execute the implementation plan by processing and executing all tas
 
 Given the current feature context, do this:
 
-1. Run `.specify/scripts/bash/check-implementation-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
+1. Run `.specify/scripts/powershell/check-implementation-prerequisites.ps1 -Json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
 
 2. Load and analyze the implementation context:
    - **REQUIRED**: Read tasks.md for the complete task list and execution plan

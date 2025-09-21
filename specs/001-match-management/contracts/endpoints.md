@@ -1,7 +1,5 @@
 # API Contracts – Match Management (Integrated Enhancements)
 
-<!-- File migrated from specs/001-captain-match-management/contracts/endpoints.md on 2025-09-21 -->
-
 Base URL: `/api`
 Authentication: Transitional dual mode. Read endpoints: API secret OR JWT (via `AllowApiSecret`). Mutation endpoints: Captain JWT required; legacy secret/admin path allowed only when `ALLOW_SECRET_MUTATIONS` true (logged & deprecated). Future tightening will disable secret writes.
 Content-Type: `application/json`
@@ -37,7 +35,6 @@ Request:
   "matchDate": "2025-01-12T20:00:00Z"  // maps to persisted scheduledAt
 }
 ```
-
 Response 201:
 
 ```json
@@ -57,6 +54,7 @@ Response 201:
   "updatedUtc": "2025-01-12T21:00:00Z"
 }
 ```
+
 
 ### List Recent Team Matches (by Team within Division)
 
@@ -99,7 +97,6 @@ Request:
   "awayPlayerSkill": 3
 }
 ```
-
 Response 201:
 
 ```json
@@ -115,6 +112,7 @@ Response 201:
   "updatedUtc": "..."
 }
 ```
+
 
 ### Get PlayerMatch
 
@@ -148,7 +146,6 @@ Request:
 ```json
 { "rackNumber": 3, "pointsHome": 2, "pointsAway": 1, "divisionId": "DIV123", "winner": "home" }
 ```
-
 Response 201:
 
 ```json
@@ -161,6 +158,7 @@ Notes:
 - Legacy `gamesWonHome/gamesWonAway` updated only if winner supplied AND all points zero (fallback case).
 - If any Game in a PlayerMatch has points > 0, team aggregation uses points (fallback to gamesWon otherwise – feature flag removable).
 
+
 ### List Games for PlayerMatch
 
 GET `/api/player-matches/{playerMatchId}/games`
@@ -169,6 +167,8 @@ Response 200:
 ```json
 { "items": [ { "id": "01HH...", "rackNumber": 3, "pointsHome": 2, "pointsAway": 1, "winner": "home" } ] }
 ```
+
+
 
 ---
  
@@ -198,3 +198,10 @@ Codes (MVP): `validation_failed`, `not_found`, `conflict` (reserved), `internal_
 - Potential route alternative: `POST /api/divisions/{divisionId}/team-matches` to derive partition from path (trade-off: duplication vs explicit body field). MVP keeps body field for flexibility with future migration tooling.
 
 ## Ready Checklist
+
+- [x] CRUD endpoints enumerated
+- [x] Request/response skeletons
+- [x] Error shape standardized
+- [x] Future expansion noted
+
+Status: READY (integration version) for quickstart + plan.md consolidation.

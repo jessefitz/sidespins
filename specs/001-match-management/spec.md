@@ -8,6 +8,8 @@
 **Status**: Draft (integrated with existing match codepath)  
 **Input**: User description: "Team captains should be able to manage matches. Match management is a critical feature core to the SideSpins platform. The APA public website offers captains the ability to see upcoming matches and view outcomes of past matches, but lacks the flexibility for captains and players to capture additional information about matches (e.g. notes and pictures), nor can captains schedule and track the outcomes of other matches outside of official APA play. SideSpin's mission is to fill this gap and other critical gaps so that teams can experience a richer, more informed match management experience."
 
+**Constitution Reference**: Validated against Constitution v1.0.0 (Principles 1–6). This feature MUST NOT introduce a new Azure Functions class parallel to `MatchesFunctions.cs`; enhancements MUST be additive within the existing class & service layers unless a future spec explicitly justifies a refactor (Complexity Tracking entry required).
+
 ## Scope Breakdown
 
 ### MVP (Frontend User-Visible)
@@ -16,6 +18,35 @@
 - View details for a single team match: player matches, per-player total points, overall team total.
 - (Optional if capacity) Basic upcoming matches list (read-only) sourced from manually created or externally imported entries.
 - Lineup planning remains available through existing lineup explorer (no new UI beyond linking).
+
+#### Basic Outcomes Viewer (Added Clarification)
+
+The MVP explicitly includes a minimal "Outcomes Viewer" capability to ensure players and captains can inspect recorded match results without waiting for future broader scheduling UI work:
+
+| Page | Purpose | Data Sources | Notes |
+|------|---------|-------------|-------|
+| `matches.html` (Past Matches) | List recently completed team matches for a given division/team | `GET /api/divisions/{divisionId}/teams/{teamId}/team-matches` | Provides date, opponent, teamScoreHome/teamScoreAway, computed outcome label (Win/Loss/Tie). |
+| `match.html` (Match Detail) | Show a single TeamMatch with its PlayerMatches and Games | `GET /api/team-matches/{id}` + per-player: `GET /api/player-matches/{pid}` + games `GET /api/player-matches/{pid}/games` | N+1 acceptable MVP; aggregated endpoint deferred. |
+
+Interaction Rules:
+
+- Read-only; no editing from these pages in MVP.
+- Use existing API secret auth path (header injection) until JWT UI integration lands.
+- Progressive disclosure: Games for a PlayerMatch fetched only when its accordion row expands.
+- Outcome label derived client-side: compare team scores; treat equal as "Tie".
+
+Accessibility Commitments:
+
+- Semantic table for match list (thead/tbody with scope="col").
+- Accordion buttons with `aria-expanded` and region panels with `role="region"` + `aria-labelledby`.
+- Live region (`aria-live='polite'`) for loading state per expansion.
+
+Performance Constraints:
+
+- Hard limit of 25 matches per initial list request (configurable constant in JS).
+- Throttle simultaneous player match/game fetches (simple promise queue or sequential loads) to avoid burst.
+
+Deferred Enhancements (NOT in MVP Outcomes Viewer): client-side filtering, opponent name resolution beyond IDs (may appear as raw ID if lookup API not yet exposed), sorting toggles, aggregated single endpoint.
 
 ### MVP (API Capability)
 
@@ -43,7 +74,7 @@ Enhance existing `MatchesFunctions` + `LeagueService` instead of introducing a s
 
 ### Guiding Principle
 
-Design the domain model now to support future expansion without schema-breaking changes, while keeping the initial UI lean and read-focused.
+Design the domain model now to support future expansion without schema-breaking changes, while keeping the initial UI lean and read-focused. Architectural Cohesion Reinforcement: No new `CaptainMatchesFunctions` class; reuse + incrementally extend `MatchesFunctions.cs` and `LeagueService` to avoid divergent routing/auth logic.
 
 ## Execution Flow (main)
 

@@ -2,7 +2,7 @@
 
 _Migrated from `specs/001-captain-match-management/plan.md` on 2025-09-21._
 
-**Branch**: `001-match-management` | **Date**: 2025-09-20 (updated 2025-09-21) | **Spec**: `spec.md`
+**Branch**: `001-match-management` | **Date**: 2025-09-20 (updated 2025-09-21) | **Spec**: `spec.md` | **Constitution**: v1.0.0
 **Input**: Feature specification from `/specs/001-match-management/spec.md` (directory renamed from previous captain path)
 
 ## Execution Flow (/plan command scope)
@@ -12,7 +12,7 @@ _Migrated from `specs/001-captain-match-management/plan.md` on 2025-09-21._
 ```text
 1. Load feature spec from Input path → OK
 2. Fill Technical Context → OK (no unresolved NEEDS CLARIFICATION)
-3. Constitution Check → Placeholder constitution; no violations logged
+3. Constitution Check → Constitution v1.0.0 applied (Spec-First, Cohesion, Auth Discipline, Observability). Reuse safeguard added.
 4. Evaluate Constitution Check → PASS initial
 5. Execute Phase 0 → research.md generated
 6. Execute Phase 1 → data-model.md, contracts/endpoints.md, quickstart.md generated
@@ -25,7 +25,7 @@ _Migrated from `specs/001-captain-match-management/plan.md` on 2025-09-21._
 
 ## Summary
 
-Enhance existing `MatchesFunctions` and `LeagueService` with nested PlayerMatch and Game operations plus explicit team score fields while preserving backward compatibility. We are NOT creating a separate `CaptainMatchesFunctions`; this avoids duplicated CRUD/auth logic. MVP frontend remains read-only (list + detail). Data stays in the existing `TeamMatches` Cosmos container (pk `/divisionId`) using transactional batches for score consistency; queries for team lists remain division-partition scoped.
+Enhance existing `MatchesFunctions` and `LeagueService` with nested PlayerMatch and Game operations plus explicit team score fields while preserving backward compatibility. We are NOT creating a separate `CaptainMatchesFunctions`; any PR introducing a parallel functions class MUST add a spec amendment + Complexity Tracking justification before merge. MVP frontend remains read-only (list + detail). Data stays in the existing `TeamMatches` Cosmos container (pk `/divisionId`) using transactional batches for score consistency; queries for team lists remain division-partition scoped.
 
 LineupPlan Continuity: All existing lineup planning and availability features (the `lineupPlan` object embedded in TeamMatch) remain untouched; no schema or behavioral change. New nested PlayerMatch/Game storage augments result tracking only.
 
@@ -87,7 +87,18 @@ Task Impacts (Phase 2 additions):
 
 ## Constitution Check
 
-Constitution file is largely placeholder; no explicit prohibitions triggered. Simplicity adhered to: single container, no repository pattern layer added, minimal validation. No complexity deviations requiring justification.
+Applied Constitution v1.0.0.
+
+| Principle | Assessment | Notes |
+|-----------|------------|-------|
+| Spec-First | PASS | Artifacts sequence intact. |
+| Cohesion & Reuse | PASS | Single existing `MatchesFunctions.cs` reused; safeguard explicit. |
+| Mobile Simplicity | PASS | Minimal read-only viewer; no SPA framework. |
+| Auth Discipline | TRANSITIONAL | API secret read allowed temporarily; deprecation scheduled. |
+| Observability & Tests | PARTIAL | Additional logging & telemetry tasks to be appended. |
+| Versioning & Change Control | PASS | Alias + fallback model documented. |
+
+Planned remediation tasks will add: logging enrichment, secret deprecation schedule, fallback disable gating.
 
 ## Project Structure
 
@@ -117,6 +128,18 @@ functions/league/
 ```
  
 No frontend source reorg; Jekyll page addition optional (e.g., matches.html) consuming list endpoint.
+
+### Minimal Frontend Outcomes (Added Clarification)
+
+Although broader scheduling & future-facing lineup explorer pages are deferred, the MVP explicitly ships a minimal "Outcomes Viewer" so users can read match results:
+
+| Artifact | Purpose | Implementation Notes |
+|----------|---------|----------------------|
+| `docs/matches.html` | Past match list (team/division scoped) | Uses list endpoint; derives outcome (W/L/T) client-side. |
+| `docs/match.html` | Single match detail | Fetches TeamMatch then lazy-loads PlayerMatches + Games. |
+| `docs/assets/js/match-results.js` | Shared fetch & render helpers | Centralizes header injection (`x-api-secret`) pending JWT UI. |
+
+Constraints: Read-only; N+1 fetch pattern acceptable; accessibility (table semantics + expandable sections) required; no client-side filtering or pagination beyond "Load more" button.
 
 ## Phase 0: Outline & Research (Completed)
 
@@ -326,9 +349,12 @@ After all PlayerMatches for TeamMatch recomputed:
 
 ## Complexity Tracking
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|--------------------------------------|
-| (none) | | |
+| Deviation | Why Needed | Sunset / Mitigation |
+|-----------|------------|---------------------|
+| API secret allowed for read endpoints (list/detail) | Accelerate MVP before JWT UI and session wiring | Remove in production after JWT rollout (target: R+2 release); add enforcement flag & monitoring |
+| gamesWon fallback scoring retained | Legacy data compatibility (some matches lack points) | Disable when fallback usage <5% over rolling 14 days (telemetry event `scoring_mode_used`) |
+| No scoring strategy interface yet | YAGNI for single current format | Introduce strategy abstraction when second format added |
+| Potential temptation to add new functions class | Prevent divergence & duplicate auth | Guardrail: PR must amend spec + add Complexity Tracking entry; default policy = extend existing file |
 
 ## Progress Tracking
 
@@ -367,3 +393,13 @@ After all PlayerMatches for TeamMatch recomputed:
 - ✅ Comprehensive testing infrastructure
 
 **Future Enhancements**: Advanced browsing features deferred to separate implementation phase.
+
+### Safeguard: Parallel Code Path Prevention
+
+Any proposal to add a new match-related Azure Functions class (e.g. `CaptainMatchesFunctions.cs`) MUST include:
+
+1. Amended spec rationale
+2. Complexity Tracking entry (justification + risk)
+3. Architecture impact summary (auth, routing, duplication analysis)
+
+Without these three artifacts the change MUST be rejected.

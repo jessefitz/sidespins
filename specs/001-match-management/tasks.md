@@ -1,5 +1,7 @@
 # Phase 2 Tasks – Match Management (Captain Enhancements Integration)
 
+Constitution Reference: v1.0.0 (Cohesion rule – extend existing `MatchesFunctions.cs`, do not create parallel functions class.)
+
 Feature Directory: `specs/001-match-management` (directory renamed from `specs/001-captain-match-management`)
 Branch: `001-match-management` (renamed from `001-captain-match-management` on 2025-09-21)
 Generated: 2025-09-20 (updated 2025-09-21 for integration approach)
@@ -155,51 +157,51 @@ Example batch (after foundational tasks):
 
 ### Endpoint Implementations (Augment Existing `MatchesFunctions`)
 
-**T021** – Enhance existing Create Match endpoint (add optional fields, captain auth)
+**T021** – Enhance existing Create Match endpoint (add optional fields, captain auth) (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs` (Create handler)
+- Files: `functions/league/MatchesFunctions.cs` (Create handler)
 - Behavior: Validate body, create TeamMatch, return 201
 - Dependencies: T015
 
-**T022** – Enhance list matches (team + division filters, include new score fields)
+**T022** – Enhance list matches (team + division filters, include new score fields) (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs` (List handler)
+- Files: `functions/league/MatchesFunctions.cs` (List handler)
 - Behavior: Query by divisionId + teamId, order by matchDate DESC (limit + continuation)
 - Dependencies: T016
 
-**T023** – Enhance get match (alias `scheduledAt` → `matchDate`, include new scores)
+**T023** – Enhance get match (alias `scheduledAt` → `matchDate`, include new scores) (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs` (Get handler)
+- Files: `functions/league/MatchesFunctions.cs` (Get handler)
 - Behavior: Retrieve by id; 404 on missing
 - Dependencies: T017
 
-**T024** – Add PlayerMatch nested route (POST `/team-matches/{id}/player-matches`)
+**T024** – Add PlayerMatch nested route (POST `/team-matches/{id}/player-matches`) (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs` (AddPlayerMatch handler)
+- Files: `functions/league/MatchesFunctions.cs` (AddPlayerMatch handler)
 - Behavior: Transactional batch add; update parent ids
 - Dependencies: T018, T009
 
-**T025** – Add Game nested route (POST `/player-matches/{id}/games` + recompute)
+**T025** – Add Game nested route (POST `/player-matches/{id}/games` + recompute) (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs` (RecordGame handler)
+- Files: `functions/league/MatchesFunctions.cs` (RecordGame handler)
 - Behavior: Transactional batch add game + update PlayerMatch + recompute TeamMatch via service
 - Dependencies: T019, T008, T009
 
-**T026 [P]** – List Games nested route
+**T026 [P]** – List Games nested route (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs` (ListGames handler)
+- Files: `functions/league/MatchesFunctions.cs` (ListGames handler)
 - Behavior: Query games by playerMatchId ordered by rackNumber
 - Dependencies: T020
 
-**T027** – (Optional) Patch PlayerMatch Function
+**T027** – (Optional) Patch PlayerMatch Function (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs`
+- Files: `functions/league/MatchesFunctions.cs`
 - Behavior: Allow manual correction (gamesWon/points) with recompute
 - Dependencies: T010, T018
 
-**T028** – (Optional) Delete TeamMatch Function (with cascading child cleanup)
+**T028** – (Optional) Delete TeamMatch Function (with cascading child cleanup) (File: `functions/league/MatchesFunctions.cs`)
 
-- Files: `functions/league/CaptainMatchesFunctions.cs`
+- Files: `functions/league/MatchesFunctions.cs`
 - Behavior: Delete TeamMatch + child docs (iterative) – best-effort MVP
 - Dependencies: T023, T024, T025
 
@@ -222,12 +224,34 @@ Example batch (after foundational tasks):
 
 ### Telemetry & Logging
 
-**T032** – Add structured logging fields (authMode, divisionId, teamMatchId) to enhanced handlers
+**T032** – Add structured logging fields (authMode, divisionId, teamMatchId, correlationId, latencyBucket, principalUserId) to enhanced handlers
 
-- Files: `functions/league/CaptainMatchesFunctions.cs`, `functions/auth/AuthenticationMiddleware.cs`
+- Files: `functions/league/MatchesFunctions.cs`, `functions/auth/AuthenticationMiddleware.cs`
 - Dependencies: T021–T026, T014
 
 **T033** – Emit custom event `scoring_mode_used` (points vs gamesWon fallback) in recompute logic
+
+### Flag Rationalization & Additional Telemetry (New)
+
+**T046** – Instrument secret usage telemetry events
+
+- Files: `functions/auth/AuthenticationMiddleware.cs`, `functions/league/MatchesFunctions.cs`, `functions/league/ScoreRecomputeService.cs`
+- Events: `match_secret_read` (on successful read via ApiSecret), `match_secret_mutation_attempt_blocked` (when secret write denied)
+- Acceptance: Events emit with properties: `endpoint`, `authMode`, `divisionId` (if available), `teamMatchId`/`playerMatchId` (if available)
+- Dependencies: T014, T021–T026
+
+**T047** – Introduce refined flags `ALLOW_SECRET_MATCH_READS`, `ALLOW_SECRET_MATCH_WRITES`
+
+- Files: `functions/league/FeatureFlags.cs`, `functions/Program.cs`, `functions/auth/AuthenticationMiddleware.cs`
+- Behavior: Replace usage of `ALLOW_SECRET_MUTATIONS` / `DISABLE_API_SECRET_MUTATIONS` (keep legacy names mapped but mark deprecated in comments)
+- Acceptance: Middleware enforces reads vs writes independently; unit tests updated (extend T031)
+- Dependencies: T014
+
+**T048** – Update integration tests for new flags
+
+- Files: `functions/tests/integration/AuthModesTests.cs`
+- Cases: read allowed / write blocked matrix for combinations of READS/WRITES flags; legacy flags path still passes when mapped
+- Dependencies: T047, T031
 
 ### Integration / Deprecation & Backward Compatibility
 
@@ -268,7 +292,81 @@ Example batch (after foundational tasks):
 - Files: `specs/001-captain-match-management/plan.md` (update Phase status)
 - Dependencies: All
 
+### Minimal Frontend Outcomes Tasks (MVP Read-Only Viewer)
+
+These tasks (prefixed MF) are REQUIRED for the basic outcomes viewer and are distinct from the previously deferred advanced browsing tasks.
+
+**MF01** – Past Matches Page Scaffold
+
+- Files: `docs/matches.html`
+- Content: Basic HTML shell with container, form for divisionId/teamId (if not provided via query params), table skeleton, "Load more" button
+- Acceptance: Page loads without JS errors; placeholder message when no data
+- Dependencies: T022 (list endpoint)
+
+**MF02** – Match Detail Page Scaffold
+
+- Files: `docs/match.html`
+- Content: Shell with heading, summary section, expandable container for player matches
+- Acceptance: Shows loading state, then basic match metadata after fetch
+- Dependencies: T023 (get endpoint)
+
+**MF03** – Shared Results JS Module
+
+- Files: `docs/assets/js/match-results.js`
+- Functions: `fetchJson(path)`, `loadMatches(divisionId,teamId,limit,continuation)`, `loadMatch(matchId)`, `loadPlayerMatch(id)`, `loadGames(playerMatchId)`
+- Acceptance: Each function returns parsed JSON or throws with descriptive error
+- Dependencies: T022, T023, T026
+
+**MF04** – Render & Interaction Logic
+
+- Files: `docs/assets/js/match-results.js`
+- Implement: `renderMatchList(tableEl, items)`, `appendMatches(...)`, `renderMatchDetail(root, teamMatch)`, lazy load player matches/games on expand
+- Acceptance: Expanding a player match fetches (if not already loaded) and displays games list
+- Dependencies: MF01–MF03
+
+**MF05** – Accessibility & Semantics Pass
+
+- Files: `docs/matches.html`, `docs/match.html`, JS module
+- Add: Table headers `scope="col"`, accordion buttons with `aria-expanded`, regions with `role="region"`, loading live region
+- Acceptance: Basic axe / manual audit passes (no critical A violations)
+- Dependencies: MF04
+
+**MF06** – Outcome Label & Points Formatting
+
+- Files: `docs/assets/js/match-results.js`
+- Add helper: `computeOutcome(home, away)` returning Win/Loss/Tie + CSS class mapping
+- Acceptance: Correct outcome shown for sampled values; tie case handled
+- Dependencies: MF04
+
+**MF07** – Quickstart Documentation Update (Viewer Section)
+
+- Files: `specs/001-match-management/quickstart.md`
+- Add: Section "Viewing Match Outcomes in Browser" with instructions & sample markup expectations
+- Dependencies: MF01–MF06
+
+**MF08** – Smoke Script (Optional Minimal)
+
+- Files: `scripts/test-match-viewer.ps1`
+- Script: curl list endpoint; parse JSON; output count; (optional) open matches.html guidance comment
+- Dependencies: MF07
+
+### Minimal Outcomes Viewer Exit Criteria
+
+- Past matches page lists real data
+- Detail page shows player matches & games on demand
+- Outcome label derived correctly
+- Accessibility basics implemented
+- Quickstart updated
+
 ### Frontend Browsing Tasks (Deferred to Future Implementation)
+
+### Safeguard Task
+
+**SAFE01** – Verify no new match functions class introduced
+
+- Scan repo for `CaptainMatchesFunctions.cs` or similarly named new files. Fail CI if found.
+- Add check script or lightweight grep in build pipeline.
+- Acceptance: Pipeline script returns zero matches.
 
 > **Note**: The following frontend browsing tasks (T039-T050) were originally planned for advanced UI features but have been **deferred to future implementation**. The core captain match management functionality is complete through Phase 8 with:
 >

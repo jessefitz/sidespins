@@ -39,8 +39,26 @@ All calls require header:
 ```text
 x-api-secret: <value from local.settings.json>
 Content-Type: application/json
-
 ```
+
+### 3.1 Prefer JWT (Forward-Looking)
+
+While the API secret works for local development, production-bound flows will require a JWT issued by Stytch. When JWT auth is fully enabled for these endpoints, requests will resemble:
+
+```bash
+curl -X POST http://localhost:7071/api/team-matches \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"divisionId":"DIV123","homeTeamId":"TEAM_A","awayTeamId":"TEAM_B","matchDate":"2025-01-12T20:00:00Z"}'
+```
+
+Transitional Phase Guidance:
+
+Continue using `x-api-secret` only for local/manual testing until flags `ALLOW_SECRET_MATCH_READS` / `ALLOW_SECRET_MATCH_WRITES` are tightened.
+
+Begin integrating login in the frontend and store the JWT (short-lived) rather than baking secrets into JS.
+
+Mutation endpoints will be the first to require JWT only.
 
 ## 4. Create a Team Match (matchDate aliases persisted scheduledAt)
 
@@ -66,6 +84,7 @@ Store returned `id` as PLAYER_MATCH_ID.
 
 ## 6. Record Game Results (Point-Based)
 
+ 
 ```bash
 curl -X POST http://localhost:7071/api/player-matches/$PLAYER_MATCH_ID/games \
   -H "x-api-secret: $API_SECRET" \
@@ -77,6 +96,7 @@ Repeat with incrementing `rackNumber`. You may omit `winner` if points do not im
 
 ## 7. List Recent Matches for a Team
 
+
 ```bash
 curl -H "x-api-secret: $API_SECRET" http://localhost:7071/api/divisions/DIV123/teams/TEAM_A/team-matches?limit=10
 ```
@@ -84,6 +104,7 @@ Returns summary list with scores.
 
 ## 8. Retrieve Match Detail
 
+ 
 ```bash
 curl -H "x-api-secret: $API_SECRET" http://localhost:7071/api/team-matches/$TEAM_MATCH_ID
 ```
@@ -93,6 +114,7 @@ curl -H "x-api-secret: $API_SECRET" http://localhost:7071/api/team-matches/$TEAM
 
 Add JS in the Jekyll site (e.g., `docs/app.html` or a new page) to call the list endpoint and render matches (uses new score fields):
 
+ 
 ```js
 async function loadRecentMatches(divisionId, teamId) {
   const res = await fetch(`http://localhost:7071/api/divisions/${divisionId}/teams/${teamId}/team-matches?limit=5`, {
@@ -102,6 +124,40 @@ async function loadRecentMatches(divisionId, teamId) {
   console.log('Matches', data.items);
 }
 ```
+
+### 9.1 Viewing in Browser (Minimal Outcomes Viewer)
+
+If you create the optional minimal pages described in the spec/plan:
+
+| Page | Suggested Path | Query Params | Purpose |
+|------|----------------|--------------|---------|
+| Past Matches | `/matches.html` | `divisionId`, `teamId` | Lists recent matches with scores & derived outcome |
+| Match Detail | `/match.html` | `id`, `divisionId` | Shows PlayerMatches and loads Games on expand |
+
+Implementation Hints:
+
+- Inject the API secret in all fetch calls via a small helper (`fetchJson`).
+- Derive outcome label: `home > away => Win`, `< => Loss`, `=== => Tie`.
+- Lazy-load games only when a player match row is expanded to reduce initial calls.
+- Provide an empty state message when no matches returned.
+
+Expected JSON Field Mapping:
+
+| UI Field | Source Field |
+|----------|--------------|
+| Match Date | `matchDate` |
+| Opponent Team | `awayTeamId` (temporary until team lookup) |
+| Team Score | `teamScoreHome` / `teamScoreAway` |
+| Player Home Points | `pointsHome` (PlayerMatch) |
+| Player Away Points | `pointsAway` (PlayerMatch) |
+| Game Points | `pointsHome` / `pointsAway` (Game) |
+| Game Winner | `winner` |
+
+Accessibility Checklist (Minimum):
+
+- Table headers use `<th scope="col">`.
+- Expand buttons toggle `aria-expanded` + controlled region with `role="region"`.
+- Loading spinners / text placed in a container with `aria-live="polite"`.
 
 ## 10. Cleanup
 
@@ -119,13 +175,28 @@ curl -X DELETE -H "x-api-secret: $API_SECRET" http://localhost:7071/api/team-mat
 | 404 on child insert | Wrong TEAM_MATCH_ID or partition mismatch | Ensure team ID consistency with parent teamId |
 | Scores not updating | Batch logic not yet implemented | Implement transactional batch or manual recompute service |
 
-## Feature Flags (Transitional)
+## Feature Flags (Transitional & Rationalization Roadmap)
+
+Legacy (current) flags:
 
 | Flag | Purpose | Default (local) |
 |------|---------|-----------------|
 | ALLOW_SECRET_MUTATIONS | Permit API secret write paths (legacy/testing) | true |
 | DISABLE_API_SECRET_MUTATIONS | Force-disable all secret writes | false |
 | DISABLE_GAMESWON_FALLBACK | Prevent fallback to gamesWon* aggregates | false |
+
+Planned refined flags (supersede legacy – see `constitutional-future-considerations.md`):
+
+| Upcoming Flag | Purpose | Notes |
+|---------------|---------|-------|
+| ALLOW_SECRET_MATCH_READS | Allow secret-based read-only access | Will default to true locally, false in prod later |
+| ALLOW_SECRET_MATCH_WRITES | Allow secret-based writes | Will default to false once JWT flows stabilize |
+
+Deprecation Path:
+ 
+ 1. Introduce new flags alongside legacy (mapping legacy to new behavior with warnings).
+ 2. Update integration tests for matrix of read/write perms.
+ 3. Remove legacy flags once no production environment references them.
 
 Configure in `functions/local.settings.json` under `Values`.
 

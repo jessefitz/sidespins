@@ -1,21 +1,24 @@
 # SideSpins
 
-**SideSpins** is a comprehensive pool league management system built for APA (American Poolplayers Association) teams. The project provides team management, lineup planning, and match tracking capabilities through a modern web application with RESTful API backend.
+**SideSpins** is a comprehensive pool league management system built for APA (American Poolplayers Association) teams. The project provides team management, lineup planning, player match tracking, and detailed game recording capabilities through a modern web application with RESTful API backend.
 
 ## Project Overview
 
-SideSpins serves as the digital hub for "Break of Dawn" 9-ball team, providing tools for:
+SideSpins serves as the digital hub for APA pool leagues, providing tools for:
 
-- **Match Scheduling & Tracking**: View upcoming matches and track results
+- **Match Scheduling & Tracking**: View upcoming matches and track detailed results
 - **Lineup Planning**: Interactive lineup explorer with skill cap validation (23-point APA limit)
+- **Player Match Management**: Individual player vs player contest tracking within team matches
+- **Game Recording**: Rack-by-rack game results with points and winner tracking
+- **Score Aggregation**: Automatic totaling from individual games to team match scores
 - **Player Management**: Roster management with skill levels and availability tracking
-- **Team Administration**: Membership management and team statistics
+- **Team Administration**: Membership management and comprehensive statistics
 
 ## Architecture
 
 This is a full-stack application with three main components:
 
-### 🌐 Frontend (`site/`)
+### 🌐 Frontend (`docs/`)
 
 **Technology**: Jekyll static site generator with Ruby  
 **Deployment**: GitHub Pages with automated CI/CD
@@ -23,10 +26,12 @@ This is a full-stack application with three main components:
 - **Public website** hosted at `sidespins.com`
 - **Key Features**:
   - Interactive Lineup Explorer for experimenting with player combinations
+  - Enhanced Match Management with player match detail tracking
+  - Real-time Game Recording interface optimized for mobile devices
   - Schedule display with match details and lineup planning links
-  - Player availability system
-  - Mobile-responsive design
-- **Dynamic Features**: JavaScript applications that consume the Azure Functions API
+  - Player availability system with team captain management
+  - Mobile-responsive design with touch-optimized interfaces
+- **Dynamic Features**: JavaScript applications with centralized API utilities that consume the Azure Functions API
 
 ### ⚡ Backend (`functions/`)
 

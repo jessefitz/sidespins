@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player Match Form - SideSpins</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        line-height: 1.6;
+      }
+
+      .header {
+        background: white;
+        border-bottom: 1px solid #e1e5e9;
+        padding: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007cba;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: #666;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+      }
+
+      .nav-links a:hover {
+        background-color: #f0f0f0;
+      }
+
+      .main-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      .breadcrumb {
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: #666;
+      }
+
+      .breadcrumb a {
+        color: #007cba;
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        text-decoration: underline;
+      }
+
+      .form-container {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-header {
+        margin-bottom: 2rem;
+      }
+
+      .form-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-subtitle {
+        color: #666;
+        margin-bottom: 0;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-label.required::after {
+        content: " *";
+        color: #dc3545;
+      }
+
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: #007cba;
+        box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+      }
+
+      .form-help {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+      }
+
+      .form-error {
+        font-size: 0.875rem;
+        color: #dc3545;
+        margin-top: 0.25rem;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .player-section {
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .player-section-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .team-indicator {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: bold;
+      }
+
+      .home-team {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .away-team {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e1e5e9;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: all 0.2s;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: #007cba;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #005a87;
+      }
+
+      .btn-primary:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #545b62;
+      }
+
+      .btn-outline {
+        background: white;
+        color: #007cba;
+        border: 1px solid #007cba;
+      }
+
+      .btn-outline:hover {
+        background: #007cba;
+        color: white;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .nav-links {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .main-content {
+          padding: 1rem 0.5rem;
+        }
+
+        .form-container {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">SideSpins</div>
+        <nav class="nav-links">
+          <a href="/">Home</a>
+          <a href="/schedule-new.html">Schedule</a>
+          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/availability.html">Availability</a>
+          <a href="/team-admin.html">Team Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a href="#" id="teamMatchLink">← Back to Team Match</a>
+      </nav>
+
+      <!-- Form Container -->
+      <div class="form-container">
+        <div class="form-header">
+          <h1 class="form-title" id="formTitle">Create Player Match</h1>
+          <p class="form-subtitle" id="formSubtitle">
+            Set up a new player match for this team match
+          </p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="playerMatchForm">
+          <!-- Home Player Section -->
+          <div class="player-section">
+            <h3 class="player-section-title">
+              <span class="team-indicator home-team">Home</span>
+              Home Player
+            </h3>
+
+            <div class="form-group">
+              <label for="homePlayerId" class="form-label required"
+                >Player</label
+              >
+              <select
+                id="homePlayerId"
+                name="homePlayerId"
+                class="form-select"
+                required
+              >
+                <option value="">Select home player...</option>
+              </select>
+              <div class="form-help">
+                Choose the home team player for this match
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="homePlayerSkillLevel" class="form-label"
+                  >Skill Level</label
+                >
+                <input
+                  type="number"
+                  id="homePlayerSkillLevel"
+                  name="homePlayerSkillLevel"
+                  class="form-input"
+                  min="1"
+                  max="9"
+                  readonly
+                />
+                <div class="form-help">Auto-filled from player profile</div>
+              </div>
+
+              <div class="form-group">
+                <label for="homePlayerScore" class="form-label"
+                  >Initial Score</label
+                >
+                <input
+                  type="number"
+                  id="homePlayerScore"
+                  name="homePlayerScore"
+                  class="form-input"
+                  min="0"
+                  value="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Away Player Section -->
+          <div class="player-section">
+            <h3 class="player-section-title">
+              <span class="team-indicator away-team">Away</span>
+              Away Player
+            </h3>
+
+            <div class="form-group">
+              <label for="awayPlayerId" class="form-label required"
+                >Player</label
+              >
+              <select
+                id="awayPlayerId"
+                name="awayPlayerId"
+                class="form-select"
+                required
+              >
+                <option value="">Select away player...</option>
+              </select>
+              <div class="form-help">
+                Choose the away team player for this match
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="awayPlayerSkillLevel" class="form-label"
+                  >Skill Level</label
+                >
+                <input
+                  type="number"
+                  id="awayPlayerSkillLevel"
+                  name="awayPlayerSkillLevel"
+                  class="form-input"
+                  min="1"
+                  max="9"
+                  readonly
+                />
+                <div class="form-help">Auto-filled from player profile</div>
+              </div>
+
+              <div class="form-group">
+                <label for="awayPlayerScore" class="form-label"
+                  >Initial Score</label
+                >
+                <input
+                  type="number"
+                  id="awayPlayerScore"
+                  name="awayPlayerScore"
+                  class="form-input"
+                  min="0"
+                  value="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Match Details Section -->
+          <div class="form-group">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+              <option value="Pending">Pending</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startTime" class="form-label">Start Time</label>
+              <input
+                type="datetime-local"
+                id="startTime"
+                name="startTime"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="endTime" class="form-label">End Time</label>
+              <input
+                type="datetime-local"
+                id="endTime"
+                name="endTime"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea
+              id="notes"
+              name="notes"
+              class="form-input"
+              rows="3"
+              placeholder="Optional notes about this player match..."
+            ></textarea>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <a href="#" class="btn btn-outline" id="cancelBtn">Cancel</a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span id="submitText">Create Player Match</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Load API utilities -->
+    <script src="/assets/js/match-api.js"></script>
+    <script>
+      // Global variables
+      let currentPlayerMatchId = null;
+      let currentTeamMatchId = null;
+      let currentDivisionId = null;
+      let isEditMode = false;
+      let teamMatchData = null;
+      let players = [];
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        currentPlayerMatchId = urlParams.get("id");
+        currentTeamMatchId = urlParams.get("teamMatchId");
+        currentDivisionId = urlParams.get("divisionId");
+
+        // Determine if we're in edit mode
+        isEditMode = !!currentPlayerMatchId;
+
+        if (!currentDivisionId) {
+          showError("Missing division ID in URL parameters");
+          return;
+        }
+
+        if (!isEditMode && !currentTeamMatchId) {
+          showError("Missing team match ID for creating new player match");
+          return;
+        }
+
+        setupPage();
+        loadPlayers();
+
+        if (isEditMode) {
+          loadPlayerMatchForEdit();
+        } else if (currentTeamMatchId) {
+          loadTeamMatchInfo();
+        }
+
+        setupEventHandlers();
+      });
+
+      // Setup page based on mode
+      function setupPage() {
+        if (isEditMode) {
+          document.getElementById("formTitle").textContent =
+            "Edit Player Match";
+          document.getElementById("formSubtitle").textContent =
+            "Update player match details";
+          document.getElementById("submitText").textContent =
+            "Update Player Match";
+        }
+      }
+
+      // Load players for dropdowns
+      async function loadPlayers() {
+        try {
+          loadingManager.setLoading("loadPlayers", true);
+          players = await matchAPI.getPlayersByDivision(currentDivisionId);
+          populatePlayerDropdowns();
+        } catch (error) {
+          console.error("Error loading players:", error);
+          alertSystem.showError("Failed to load players: " + error.message);
+        } finally {
+          loadingManager.setLoading("loadPlayers", false);
+        }
+      }
+
+      // Populate player dropdowns
+      function populatePlayerDropdowns() {
+        const homeSelect = document.getElementById("homePlayerId");
+        const awaySelect = document.getElementById("awayPlayerId");
+
+        // Clear existing options except the first one
+        homeSelect.innerHTML =
+          '<option value="">Select home player...</option>';
+        awaySelect.innerHTML =
+          '<option value="">Select away player...</option>';
+
+        players.forEach((player) => {
+          const option = document.createElement("option");
+          option.value = player.id;
+          option.textContent = `${player.name} (SL: ${
+            player.skillLevel || "N/A"
+          })`;
+          option.dataset.skillLevel = player.skillLevel || "";
+
+          homeSelect.appendChild(option.cloneNode(true));
+          awaySelect.appendChild(option);
+        });
+      }
+
+      // Load team match info for new player matches
+      async function loadTeamMatchInfo() {
+        try {
+          loadingManager.setLoading("loadTeamMatch", true);
+          teamMatchData = await matchAPI.getTeamMatch(
+            currentTeamMatchId,
+            currentDivisionId
+          );
+
+          // Update breadcrumb
+          document.getElementById(
+            "teamMatchLink"
+          ).href = `team-match-detail.html?id=${currentTeamMatchId}&divisionId=${currentDivisionId}`;
+        } catch (error) {
+          console.error("Error loading team match info:", error);
+          alertSystem.showError(
+            "Failed to load team match info: " + error.message
+          );
+        } finally {
+          loadingManager.setLoading("loadTeamMatch", false);
+        }
+      }
+
+      // Load player match for editing
+      async function loadPlayerMatchForEdit() {
+        try {
+          loadingManager.setLoading("loadPlayerMatch", true);
+          const playerMatch = await matchAPI.getPlayerMatch(
+            currentPlayerMatchId,
+            currentDivisionId
+          );
+          populateFormForEdit(playerMatch);
+
+          // Update breadcrumb
+          if (playerMatch.teamMatchId) {
+            currentTeamMatchId = playerMatch.teamMatchId;
+            document.getElementById(
+              "teamMatchLink"
+            ).href = `team-match-detail.html?id=${playerMatch.teamMatchId}&divisionId=${currentDivisionId}`;
+          }
+        } catch (error) {
+          console.error("Error loading player match for edit:", error);
+          alertSystem.showError(
+            "Failed to load player match: " + error.message
+          );
+        } finally {
+          loadingManager.setLoading("loadPlayerMatch", false);
+        }
+      }
+
+      // Populate form for editing
+      function populateFormForEdit(playerMatch) {
+        document.getElementById("homePlayerId").value =
+          playerMatch.homePlayerId || "";
+        document.getElementById("awayPlayerId").value =
+          playerMatch.awayPlayerId || "";
+        document.getElementById("homePlayerScore").value =
+          playerMatch.homePlayerScore || "0";
+        document.getElementById("awayPlayerScore").value =
+          playerMatch.awayPlayerScore || "0";
+        document.getElementById("status").value =
+          playerMatch.status || "Pending";
+        document.getElementById("notes").value = playerMatch.notes || "";
+
+        // Set skill levels
+        updatePlayerSkillLevel("home", playerMatch.homePlayerSkillLevel);
+        updatePlayerSkillLevel("away", playerMatch.awayPlayerSkillLevel);
+
+        // Format and set datetime values
+        if (playerMatch.startTime) {
+          document.getElementById("startTime").value = formatDateTimeForInput(
+            playerMatch.startTime
+          );
+        }
+        if (playerMatch.endTime) {
+          document.getElementById("endTime").value = formatDateTimeForInput(
+            playerMatch.endTime
+          );
+        }
+      }
+
+      // Setup event handlers
+      function setupEventHandlers() {
+        // Player selection change handlers
+        document
+          .getElementById("homePlayerId")
+          .addEventListener("change", function () {
+            updatePlayerSkillLevelFromSelection("home");
+          });
+
+        document
+          .getElementById("awayPlayerId")
+          .addEventListener("change", function () {
+            updatePlayerSkillLevelFromSelection("away");
+          });
+
+        // Form submission
+        document
+          .getElementById("playerMatchForm")
+          .addEventListener("submit", handleFormSubmit);
+
+        // Cancel button
+        document
+          .getElementById("cancelBtn")
+          .addEventListener("click", function (e) {
+            e.preventDefault();
+            goBack();
+          });
+      }
+
+      // Update player skill level from dropdown selection
+      function updatePlayerSkillLevelFromSelection(team) {
+        const select = document.getElementById(`${team}PlayerId`);
+        const skillInput = document.getElementById(`${team}PlayerSkillLevel`);
+
+        if (select.value) {
+          const selectedOption = select.options[select.selectedIndex];
+          const skillLevel = selectedOption.dataset.skillLevel;
+          skillInput.value = skillLevel || "";
+        } else {
+          skillInput.value = "";
+        }
+      }
+
+      // Update player skill level directly
+      function updatePlayerSkillLevel(team, skillLevel) {
+        const skillInput = document.getElementById(`${team}PlayerSkillLevel`);
+        skillInput.value = skillLevel || "";
+      }
+
+      // Handle form submission
+      async function handleFormSubmit(e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+          return;
+        }
+
+        const formData = collectFormData();
+        const submitBtn = document.getElementById("submitBtn");
+        const originalText = document.getElementById("submitText").textContent;
+
+        // Disable submit button and show loading
+        submitBtn.disabled = true;
+        document.getElementById("submitText").textContent = isEditMode
+          ? "Updating..."
+          : "Creating...";
+        loadingManager.setLoading("savePlayerMatch", true);
+
+        try {
+          let result;
+
+          if (isEditMode) {
+            result = await matchAPI.updatePlayerMatch(currentPlayerMatchId, {
+              ...formData,
+              divisionId: currentDivisionId,
+            });
+          } else {
+            result = await matchAPI.createPlayerMatch(currentTeamMatchId, {
+              ...formData,
+              divisionId: currentDivisionId,
+            });
+          }
+
+          alertSystem.showSuccess(
+            isEditMode
+              ? "Player match updated successfully!"
+              : "Player match created successfully!"
+          );
+
+          // Navigate to player match detail or team match detail
+          setTimeout(() => {
+            if (isEditMode) {
+              window.location.href = `player-match-detail.html?id=${currentPlayerMatchId}&divisionId=${currentDivisionId}`;
+            } else {
+              window.location.href = `player-match-detail.html?id=${result.id}&divisionId=${currentDivisionId}`;
+            }
+          }, 1000);
+        } catch (error) {
+          console.error("Error saving player match:", error);
+          alertSystem.showError(
+            "Failed to save player match: " + error.message
+          );
+        } finally {
+          // Re-enable submit button
+          submitBtn.disabled = false;
+          document.getElementById("submitText").textContent = originalText;
+          loadingManager.setLoading("savePlayerMatch", false);
+        }
+      }
+
+      // Validate form
+      function validateForm() {
+        alertSystem.clearAlerts();
+
+        const homePlayerId = document.getElementById("homePlayerId").value;
+        const awayPlayerId = document.getElementById("awayPlayerId").value;
+
+        if (!homePlayerId) {
+          alertSystem.showError("Please select a home player");
+          return false;
+        }
+
+        if (!awayPlayerId) {
+          alertSystem.showError("Please select an away player");
+          return false;
+        }
+
+        if (homePlayerId === awayPlayerId) {
+          alertSystem.showError("Home and away players must be different");
+          return false;
+        }
+
+        // Use matchUtils for additional validation if available
+        const formData = collectFormData();
+        const validationResult = matchUtils.validatePlayerMatch
+          ? matchUtils.validatePlayerMatch(formData)
+          : { isValid: true };
+
+        if (!validationResult.isValid) {
+          alertSystem.showError(
+            validationResult.message || "Form validation failed"
+          );
+          return false;
+        }
+
+        return true;
+      }
+
+      // Collect form data
+      function collectFormData() {
+        return {
+          homePlayerId: document.getElementById("homePlayerId").value,
+          awayPlayerId: document.getElementById("awayPlayerId").value,
+          homePlayerScore:
+            parseInt(document.getElementById("homePlayerScore").value) || 0,
+          awayPlayerScore:
+            parseInt(document.getElementById("awayPlayerScore").value) || 0,
+          status: document.getElementById("status").value,
+          startTime: document.getElementById("startTime").value || null,
+          endTime: document.getElementById("endTime").value || null,
+          notes: document.getElementById("notes").value || null,
+        };
+      }
+
+      // Format datetime for input field
+      function formatDateTimeForInput(dateString) {
+        const date = new Date(dateString);
+        return date.toISOString().slice(0, 16);
+      }
+
+      // Navigation helper
+      function goBack() {
+        if (isEditMode && currentPlayerMatchId) {
+          window.location.href = `player-match-detail.html?id=${currentPlayerMatchId}&divisionId=${currentDivisionId}`;
+        } else if (currentTeamMatchId) {
+          window.location.href = `team-match-detail.html?id=${currentTeamMatchId}&divisionId=${currentDivisionId}`;
+        } else {
+          window.location.href = "/schedule-new.html";
+        }
+      }
+    </script>
+  </body>
+</html>

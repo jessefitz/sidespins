@@ -244,6 +244,28 @@ public class TeamMatch
 
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
+
+    // New match management fields
+    [JsonProperty("teamId")]
+    public string? TeamId { get; set; }
+
+    [JsonProperty("playerMatchIds")]
+    public List<string> PlayerMatchIds { get; set; } = new();
+
+    [JsonProperty("teamScoreHome")]
+    public int TeamScoreHome { get; set; }
+
+    [JsonProperty("teamScoreAway")]
+    public int TeamScoreAway { get; set; }
+
+    [JsonProperty("externalLeagueMatchId")]
+    public string? ExternalLeagueMatchId { get; set; }
+
+    [JsonProperty("updatedUtc")]
+    public DateTime UpdatedUtc { get; set; }
+
+    [JsonProperty("docType")]
+    public string DocType { get; set; } = "teamMatch";
 }
 
 public class UpdateAvailabilityRequest
@@ -251,3 +273,162 @@ public class UpdateAvailabilityRequest
     [JsonProperty("availability")]
     public string Availability { get; set; } = string.Empty; // "available" or "unavailable"
 }
+
+// New match management models
+public class PlayerMatch
+{
+    [JsonProperty("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonProperty("docType")]
+    public string DocType { get; set; } = "playerMatch";
+
+    [JsonProperty("divisionId")]
+    public string DivisionId { get; set; } = string.Empty;
+
+    [JsonProperty("teamId")]
+    public string TeamId { get; set; } = string.Empty;
+
+    [JsonProperty("teamMatchId")]
+    public string TeamMatchId { get; set; } = string.Empty;
+
+    [JsonProperty("order")]
+    public int Order { get; set; }
+
+    [JsonProperty("homePlayerId")]
+    public string HomePlayerId { get; set; } = string.Empty;
+
+    [JsonProperty("awayPlayerId")]
+    public string AwayPlayerId { get; set; } = string.Empty;
+
+    [JsonProperty("homePlayerSkill")]
+    public int? HomePlayerSkill { get; set; }
+
+    [JsonProperty("awayPlayerSkill")]
+    public int? AwayPlayerSkill { get; set; }
+
+    [JsonProperty("gamesWonHome")]
+    public int GamesWonHome { get; set; }
+
+    [JsonProperty("gamesWonAway")]
+    public int GamesWonAway { get; set; }
+
+    [JsonProperty("pointsHome")]
+    public int PointsHome { get; set; }
+
+    [JsonProperty("pointsAway")]
+    public int PointsAway { get; set; }
+
+    [JsonProperty("totalRacks")]
+    public int TotalRacks { get; set; }
+
+    [JsonProperty("createdUtc")]
+    public DateTime CreatedUtc { get; set; }
+
+    [JsonProperty("updatedUtc")]
+    public DateTime UpdatedUtc { get; set; }
+}
+
+public class Game
+{
+    [JsonProperty("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonProperty("docType")]
+    public string DocType { get; set; } = "game";
+
+    [JsonProperty("divisionId")]
+    public string DivisionId { get; set; } = string.Empty;
+
+    [JsonProperty("teamId")]
+    public string TeamId { get; set; } = string.Empty;
+
+    [JsonProperty("playerMatchId")]
+    public string PlayerMatchId { get; set; } = string.Empty;
+
+    [JsonProperty("rackNumber")]
+    public int RackNumber { get; set; }
+
+    [JsonProperty("pointsHome")]
+    public int PointsHome { get; set; }
+
+    [JsonProperty("pointsAway")]
+    public int PointsAway { get; set; }
+
+    [JsonProperty("winner")]
+    public string? Winner { get; set; } // "home", "away", or null
+
+    [JsonProperty("createdUtc")]
+    public DateTime CreatedUtc { get; set; }
+}
+
+// Request/Response models
+public record CreateTeamMatchRequest(
+    string DivisionId,
+    string HomeTeamId,
+    string AwayTeamId,
+    DateTime MatchDate
+);
+
+public record CreatePlayerMatchRequest(
+    string DivisionId,
+    string HomePlayerId,
+    string AwayPlayerId,
+    int Order,
+    int? HomePlayerSkill = null,
+    int? AwayPlayerSkill = null
+);
+
+public record UpdatePlayerMatchRequest(
+    int? GamesWonHome = null,
+    int? GamesWonAway = null,
+    int? PointsHome = null,
+    int? PointsAway = null
+);
+
+public record CreateGameRequest(
+    string DivisionId,
+    int RackNumber,
+    int PointsHome,
+    int PointsAway,
+    string? Winner = null
+);
+
+public record TeamMatchListResponse(List<TeamMatch> Items, string? ContinuationToken);
+
+// Additional request models for MatchService
+public record UpdateTeamMatchRequest(
+    string DivisionId,
+    DateTime? MatchDate = null,
+    MatchStatus? Status = null
+);
+
+// Enums
+public enum MatchStatus
+{
+    Scheduled,
+    InProgress,
+    Completed,
+    Cancelled,
+}
+
+// Summary models for match scoring
+public record MatchScoringSummary(
+    string TeamMatchId,
+    int TotalHomePoints,
+    int TotalAwayPoints,
+    int TotalGamesWonHome,
+    int TotalGamesWonAway,
+    IEnumerable<PlayerMatchSummary> PlayerMatches
+);
+
+public record PlayerMatchSummary(
+    string PlayerMatchId,
+    int Order,
+    string HomePlayerId,
+    string AwayPlayerId,
+    int GamesWonHome,
+    int GamesWonAway,
+    int PointsHome,
+    int PointsAway
+);

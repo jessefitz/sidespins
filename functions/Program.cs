@@ -18,6 +18,19 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services.AddScoped<AuthenticationMiddleware>();
 builder.UseMiddleware<AuthenticationMiddleware>();
 
+// Register feature flags and utilities
+builder.Services.AddSingleton<FeatureFlags>();
+builder.Services.AddScoped<ITimeProvider, SystemTimeProvider>();
+
+// Register score recomputation service
+builder.Services.AddScoped<IScoreRecomputeService, ScoreRecomputeService>();
+
+// Register match persistence service
+builder.Services.AddScoped<IMatchPersistence, CosmosMatchPersistence>();
+
+// Register match business logic service
+builder.Services.AddScoped<IMatchService, MatchService>();
+
 // Configure JSON serialization options for Newtonsoft.Json
 JsonConvert.DefaultSettings = () =>
     new JsonSerializerSettings

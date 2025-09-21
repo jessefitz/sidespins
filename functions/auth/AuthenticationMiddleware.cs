@@ -37,6 +37,7 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         // Discover attributes on the function method
         var requiresAuth = HasAuthenticationAttribute(context);
         var teamRoleRequirement = GetTeamRoleRequirement(context);
+        var allowsApiSecret = GetAllowApiSecretAttribute(context);
 
         if (!requiresAuth && teamRoleRequirement == null)
         {
@@ -46,7 +47,22 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
 
         try
         {
-            // Extract and validate JWT
+            // Check for API secret authentication first (if allowed)
+            if (
+                allowsApiSecret != null
+                && TryAuthenticateWithApiSecret(httpContext.Request, allowsApiSecret)
+            )
+            {
+                // API secret authentication successful
+                _logger.LogInformation(
+                    "Request authenticated using API secret for function {FunctionName}",
+                    context.FunctionDefinition.Name
+                );
+                await next(context);
+                return;
+            }
+
+            // Fall back to JWT authentication
             var jwt = ExtractJwtFromRequest(httpContext.Request);
             if (string.IsNullOrEmpty(jwt))
             {
@@ -344,5 +360,80 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
             };
 
         await response.WriteAsync(JsonSerializer.Serialize(responseObject));
+    }
+
+    private AllowApiSecretAttribute? GetAllowApiSecretAttribute(FunctionContext context)
+    {
+        try
+        {
+            var functionName = context.FunctionDefinition.Name;
+            var assembly = Assembly.GetExecutingAssembly();
+            var functionTypes = assembly
+                .GetTypes()
+                .Where(t =>
+                    t.GetMethods()
+                        .Any(m => m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName)
+                );
+
+            foreach (var type in functionTypes)
+            {
+                var method = type.GetMethods()
+                    .FirstOrDefault(m =>
+                        m.GetCustomAttribute<FunctionAttribute>()?.Name == functionName
+                    );
+
+                if (method != null)
+                {
+                    return method.GetCustomAttribute<AllowApiSecretAttribute>();
+                }
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Error checking AllowApiSecret attribute for function {FunctionName}",
+                context.FunctionDefinition.Name
+            );
+            return null;
+        }
+    }
+
+    private bool TryAuthenticateWithApiSecret(
+        HttpRequest request,
+        AllowApiSecretAttribute allowApiSecretAttr
+    )
+    {
+        try
+        {
+            var providedSecret = request.Headers["x-api-secret"].FirstOrDefault();
+            var expectedSecret = Environment.GetEnvironmentVariable("API_SHARED_SECRET");
+
+            if (string.IsNullOrEmpty(providedSecret) || string.IsNullOrEmpty(expectedSecret))
+            {
+                return false;
+            }
+
+            if (providedSecret != expectedSecret)
+            {
+                _logger.LogWarning(
+                    "Invalid API secret provided for endpoint allowing API secret auth"
+                );
+                return false;
+            }
+
+            _logger.LogInformation(
+                "API secret authentication successful. Reason: {Reason}",
+                allowApiSecretAttr.Reason
+            );
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during API secret authentication");
+            return false;
+        }
     }
 }

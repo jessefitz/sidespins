@@ -714,4 +714,158 @@ public class LeagueService
             return false;
         }
     }
+
+    // New PlayerMatch operations (uses same TeamMatches container with /divisionId partition)
+    public async Task<PlayerMatch> CreatePlayerMatchAsync(PlayerMatch playerMatch)
+    {
+        if (string.IsNullOrEmpty(playerMatch.Id))
+        {
+            playerMatch.Id = $"pm_{Guid.NewGuid():N}";
+        }
+        playerMatch.CreatedUtc = DateTime.UtcNow;
+        playerMatch.UpdatedUtc = DateTime.UtcNow;
+        playerMatch.DocType = "playerMatch";
+
+        var response = await _matchesContainer.CreateItemAsync(
+            playerMatch,
+            new PartitionKey(playerMatch.DivisionId)
+        );
+        return response.Resource;
+    }
+
+    public async Task<PlayerMatch?> GetPlayerMatchByIdAsync(string id, string divisionId)
+    {
+        try
+        {
+            var response = await _matchesContainer.ReadItemAsync<PlayerMatch>(
+                id,
+                new PartitionKey(divisionId)
+            );
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<IEnumerable<PlayerMatch>> GetPlayerMatchesByTeamMatchIdAsync(
+        string teamMatchId,
+        string divisionId
+    )
+    {
+        var query =
+            "SELECT * FROM c WHERE c.docType = 'playerMatch' AND c.teamMatchId = @teamMatchId";
+        var queryDefinition = new QueryDefinition(query).WithParameter("@teamMatchId", teamMatchId);
+
+        var resultSet = _matchesContainer.GetItemQueryIterator<PlayerMatch>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
+
+        var playerMatches = new List<PlayerMatch>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            playerMatches.AddRange(response.ToList());
+        }
+
+        return playerMatches;
+    }
+
+    public async Task<PlayerMatch?> UpdatePlayerMatchAsync(PlayerMatch playerMatch)
+    {
+        try
+        {
+            playerMatch.UpdatedUtc = DateTime.UtcNow;
+            var response = await _matchesContainer.ReplaceItemAsync(
+                playerMatch,
+                playerMatch.Id,
+                new PartitionKey(playerMatch.DivisionId)
+            );
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    // New Game operations (uses same TeamMatches container with /divisionId partition)
+    public async Task<Game> CreateGameAsync(Game game)
+    {
+        if (string.IsNullOrEmpty(game.Id))
+        {
+            game.Id = $"g_{Guid.NewGuid():N}";
+        }
+        game.CreatedUtc = DateTime.UtcNow;
+        game.DocType = "game";
+
+        var response = await _matchesContainer.CreateItemAsync(
+            game,
+            new PartitionKey(game.DivisionId)
+        );
+        return response.Resource;
+    }
+
+    public async Task<IEnumerable<Game>> GetGamesByPlayerMatchIdAsync(
+        string playerMatchId,
+        string divisionId
+    )
+    {
+        var query =
+            "SELECT * FROM c WHERE c.docType = 'game' AND c.playerMatchId = @playerMatchId ORDER BY c.rackNumber ASC";
+        var queryDefinition = new QueryDefinition(query).WithParameter(
+            "@playerMatchId",
+            playerMatchId
+        );
+
+        var resultSet = _matchesContainer.GetItemQueryIterator<Game>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
+
+        var games = new List<Game>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            games.AddRange(response.ToList());
+        }
+
+        return games;
+    }
+
+    // Batch operations for transactional consistency
+    public async Task<(PlayerMatch playerMatch, List<Game> games)> AddPlayerMatchBatchAsync(
+        PlayerMatch playerMatch,
+        List<Game> games
+    )
+    {
+        // For MVP, we'll use individual operations
+        // In production, we'd use TransactionalBatch for atomicity
+        var createdPlayerMatch = await CreatePlayerMatchAsync(playerMatch);
+        var createdGames = new List<Game>();
+
+        foreach (var game in games)
+        {
+            game.PlayerMatchId = createdPlayerMatch.Id;
+            game.DivisionId = createdPlayerMatch.DivisionId;
+            game.TeamId = createdPlayerMatch.TeamId;
+            var createdGame = await CreateGameAsync(game);
+            createdGames.Add(createdGame);
+        }
+
+        return (createdPlayerMatch, createdGames);
+    }
+
+    public async Task<Game> AddGameBatchAsync(Game game, PlayerMatch playerMatch)
+    {
+        // Create the game
+        var createdGame = await CreateGameAsync(game);
+
+        // Note: Score recomputation will be handled at the function level
+        // to keep this service focused on persistence
+
+        return createdGame;
+    }
 }

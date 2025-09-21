@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Recording - SideSpins</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        line-height: 1.6;
+      }
+
+      .header {
+        background: white;
+        border-bottom: 1px solid #e1e5e9;
+        padding: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007cba;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: #666;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+      }
+
+      .nav-links a:hover {
+        background-color: #f0f0f0;
+      }
+
+      .main-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      .breadcrumb {
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: #666;
+      }
+
+      .breadcrumb a {
+        color: #007cba;
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        text-decoration: underline;
+      }
+
+      .match-info {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .match-header {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .match-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .match-status {
+        color: #666;
+        font-size: 0.875rem;
+      }
+
+      .score-display {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin: 1rem 0;
+      }
+
+      .player-score {
+        text-align: center;
+      }
+
+      .player-name {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.25rem;
+      }
+
+      .score-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #007cba;
+      }
+
+      .vs-separator {
+        font-size: 1.5rem;
+        color: #666;
+      }
+
+      .game-form {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-header {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .form-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .rack-number {
+        background: #007cba;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-label.required::after {
+        content: " *";
+        color: #dc3545;
+      }
+
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: #007cba;
+        box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+      }
+
+      .winner-selection {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .winner-option {
+        position: relative;
+      }
+
+      .winner-radio {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .winner-label {
+        display: block;
+        padding: 1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+      }
+
+      .winner-radio:checked + .winner-label {
+        border-color: #007cba;
+        background: #f0f8ff;
+        color: #007cba;
+        font-weight: bold;
+      }
+
+      .winner-label:hover {
+        border-color: #007cba;
+      }
+
+      .points-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .quick-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .quick-btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #007cba;
+        border-radius: 6px;
+        background: white;
+        color: #007cba;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: bold;
+      }
+
+      .quick-btn:hover {
+        background: #007cba;
+        color: white;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: all 0.2s;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: #007cba;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #005a87;
+      }
+
+      .btn-primary:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #545b62;
+      }
+
+      .btn-outline {
+        background: white;
+        color: #007cba;
+        border: 1px solid #007cba;
+      }
+
+      .btn-outline:hover {
+        background: #007cba;
+        color: white;
+      }
+
+      .recent-games {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .recent-games-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 1rem;
+      }
+
+      .game-history {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .game-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        background: #fafafa;
+      }
+
+      .game-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .game-rack {
+        font-weight: bold;
+        color: #007cba;
+        min-width: 60px;
+      }
+
+      .game-winner {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: bold;
+      }
+
+      .winner-home {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .winner-away {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .game-points {
+        color: #666;
+        font-size: 0.875rem;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .nav-links {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .score-display {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .winner-selection,
+        .points-section {
+          grid-template-columns: 1fr;
+        }
+
+        .quick-actions,
+        .form-actions {
+          flex-direction: column;
+        }
+
+        .game-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+
+        .game-info {
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .main-content {
+          padding: 1rem 0.5rem;
+        }
+
+        .match-info,
+        .game-form,
+        .recent-games {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">SideSpins</div>
+        <nav class="nav-links">
+          <a href="/">Home</a>
+          <a href="/schedule-new.html">Schedule</a>
+          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/availability.html">Availability</a>
+          <a href="/team-admin.html">Team Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a href="#" id="playerMatchLink">← Back to Player Match</a>
+      </nav>
+
+      <!-- Match Info -->
+      <div class="match-info">
+        <div class="match-header">
+          <div class="match-title" id="matchTitle">Loading...</div>
+          <div class="match-status" id="matchStatus">Status: Loading...</div>
+        </div>
+
+        <div class="score-display">
+          <div class="player-score">
+            <div class="player-name" id="homePlayerName">Home Player</div>
+            <div class="score-value" id="homeScore">0</div>
+          </div>
+          <div class="vs-separator">vs</div>
+          <div class="player-score">
+            <div class="player-name" id="awayPlayerName">Away Player</div>
+            <div class="score-value" id="awayScore">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Recording Form -->
+      <div class="game-form">
+        <div class="form-header">
+          <h2 class="form-title">Record New Game</h2>
+          <div class="rack-number" id="rackNumber">Rack #1</div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="gameForm">
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <button
+              type="button"
+              class="quick-btn"
+              onclick="setQuickResult('home', 0, 0)"
+            >
+              Home Wins (0-0)
+            </button>
+            <button
+              type="button"
+              class="quick-btn"
+              onclick="setQuickResult('away', 0, 0)"
+            >
+              Away Wins (0-0)
+            </button>
+            <button
+              type="button"
+              class="quick-btn"
+              onclick="setQuickResult('home', 1, 0)"
+            >
+              Home Wins (1-0)
+            </button>
+            <button
+              type="button"
+              class="quick-btn"
+              onclick="setQuickResult('away', 0, 1)"
+            >
+              Away Wins (0-1)
+            </button>
+          </div>
+
+          <!-- Winner Selection -->
+          <div class="form-group">
+            <label class="form-label required">Game Winner</label>
+            <div class="winner-selection">
+              <div class="winner-option">
+                <input
+                  type="radio"
+                  id="winnerHome"
+                  name="winner"
+                  value="home"
+                  class="winner-radio"
+                  required
+                />
+                <label for="winnerHome" class="winner-label">
+                  <strong id="homeWinnerLabel">Home Player</strong>
+                </label>
+              </div>
+              <div class="winner-option">
+                <input
+                  type="radio"
+                  id="winnerAway"
+                  name="winner"
+                  value="away"
+                  class="winner-radio"
+                  required
+                />
+                <label for="winnerAway" class="winner-label">
+                  <strong id="awayWinnerLabel">Away Player</strong>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Points Section -->
+          <div class="form-group">
+            <label class="form-label">Points Scored</label>
+            <div class="points-section">
+              <div>
+                <label for="pointsHome" class="form-label">Home Points</label>
+                <input
+                  type="number"
+                  id="pointsHome"
+                  name="pointsHome"
+                  class="form-input"
+                  min="0"
+                  value="0"
+                />
+              </div>
+              <div>
+                <label for="pointsAway" class="form-label">Away Points</label>
+                <input
+                  type="number"
+                  id="pointsAway"
+                  name="pointsAway"
+                  class="form-input"
+                  min="0"
+                  value="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              Record Game
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Recent Games -->
+      <div class="recent-games">
+        <h3 class="recent-games-title">Game History</h3>
+        <div id="gameHistoryContainer">
+          <div class="loading">Loading game history...</div>
+        </div>
+      </div>
+    </main>
+
+    <script src="match-api.js"></script>
+    <script>
+      // Global variables
+      let currentPlayerMatchId = null;
+      let currentDivisionId = null;
+      let playerMatchData = null;
+      let games = [];
+      let nextRackNumber = 1;
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        currentPlayerMatchId = urlParams.get("playerMatchId");
+        currentDivisionId = urlParams.get("divisionId");
+
+        if (!currentPlayerMatchId || !currentDivisionId) {
+          showError("Missing player match ID or division ID in URL parameters");
+          return;
+        }
+
+        loadPlayerMatchInfo();
+        loadGameHistory();
+        setupEventHandlers();
+      });
+
+      // Load player match information
+      async function loadPlayerMatchInfo() {
+        try {
+          loadingManager.setLoading("loadPlayerMatch", true);
+          playerMatchData = await matchAPI.getPlayerMatch(
+            currentPlayerMatchId,
+            currentDivisionId
+          );
+          displayPlayerMatchInfo(playerMatchData);
+        } catch (error) {
+          console.error("Error loading player match info:", error);
+          alertSystem.showError(
+            "Failed to load player match information: " + error.message
+          );
+        } finally {
+          loadingManager.setLoading("loadPlayerMatch", false);
+        }
+      }
+
+      // Display player match information
+      function displayPlayerMatchInfo(match) {
+        const homePlayerName = match.homePlayerName || "Home Player";
+        const awayPlayerName = match.awayPlayerName || "Away Player";
+
+        document.getElementById(
+          "matchTitle"
+        ).textContent = `${homePlayerName} vs ${awayPlayerName}`;
+        document.getElementById("matchStatus").textContent = `Status: ${
+          match.status || "Pending"
+        }`;
+        document.getElementById("homePlayerName").textContent = homePlayerName;
+        document.getElementById("awayPlayerName").textContent = awayPlayerName;
+        document.getElementById("homeScore").textContent =
+          match.homePlayerScore || "0";
+        document.getElementById("awayScore").textContent =
+          match.awayPlayerScore || "0";
+
+        // Update winner labels
+        document.getElementById("homeWinnerLabel").textContent = homePlayerName;
+        document.getElementById("awayWinnerLabel").textContent = awayPlayerName;
+
+        // Update breadcrumb
+        document.getElementById(
+          "playerMatchLink"
+        ).href = `player-match-detail.html?id=${currentPlayerMatchId}&divisionId=${currentDivisionId}`;
+      }
+
+      // Load game history
+      async function loadGameHistory() {
+        try {
+          loadingManager.setLoading("loadGames", true);
+          games = await matchAPI.getGamesByPlayerMatch(
+            currentPlayerMatchId,
+            currentDivisionId
+          );
+          displayGameHistory(games);
+          updateNextRackNumber();
+        } catch (error) {
+          console.error("Error loading game history:", error);
+          alertSystem.showError(
+            "Failed to load game history: " + error.message
+          );
+          const container = document.getElementById("gameHistoryContainer");
+          container.innerHTML =
+            '<div class="error">Failed to load game history: ' +
+            error.message +
+            "</div>";
+        } finally {
+          loadingManager.setLoading("loadGames", false);
+        }
+      }
+
+      // Display game history
+      function displayGameHistory(games) {
+        const container = document.getElementById("gameHistoryContainer");
+
+        if (!games || games.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">No games recorded yet</div>';
+          return;
+        }
+
+        // Sort games by rack number descending (most recent first)
+        const sortedGames = [...games].sort(
+          (a, b) => (b.rackNumber || 0) - (a.rackNumber || 0)
+        );
+
+        const html = sortedGames
+          .map((game) => createGameHistoryItem(game))
+          .join("");
+        container.innerHTML = `<div class="game-history">${html}</div>`;
+      }
+
+      // Create game history item
+      function createGameHistoryItem(game) {
+        const winnerClass =
+          game.winner === "home" ? "winner-home" : "winner-away";
+        const winnerText = game.winner === "home" ? "Home" : "Away";
+
+        return `
+          <div class="game-item">
+            <div class="game-info">
+              <div class="game-rack">Rack #${game.rackNumber || "?"}</div>
+              <div class="game-winner ${winnerClass}">${winnerText} Wins</div>
+              <div class="game-points">${game.pointsHome || 0} - ${
+          game.pointsAway || 0
+        }</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Update next rack number
+      function updateNextRackNumber() {
+        if (games && games.length > 0) {
+          const maxRack = Math.max(...games.map((g) => g.rackNumber || 0));
+          nextRackNumber = maxRack + 1;
+        } else {
+          nextRackNumber = 1;
+        }
+
+        document.getElementById(
+          "rackNumber"
+        ).textContent = `Rack #${nextRackNumber}`;
+      }
+
+      // Setup event handlers
+      function setupEventHandlers() {
+        // Form submission
+        document
+          .getElementById("gameForm")
+          .addEventListener("submit", handleFormSubmit);
+
+        // Cancel button
+        document
+          .getElementById("cancelBtn")
+          .addEventListener("click", function () {
+            window.location.href = `player-match-detail.html?id=${currentPlayerMatchId}&divisionId=${currentDivisionId}`;
+          });
+      }
+
+      // Set quick result
+      function setQuickResult(winner, homePoints, awayPoints) {
+        // Set winner radio
+        document.getElementById(
+          winner === "home" ? "winnerHome" : "winnerAway"
+        ).checked = true;
+
+        // Set points
+        document.getElementById("pointsHome").value = homePoints;
+        document.getElementById("pointsAway").value = awayPoints;
+      }
+
+      // Handle form submission
+      async function handleFormSubmit(e) {
+        e.preventDefault();
+
+        const formData = collectFormData();
+        if (!validateFormData(formData)) {
+          return;
+        }
+
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Recording...";
+
+        try {
+          const result = await matchAPI.createGame(currentPlayerMatchId, {
+            ...formData,
+            divisionId: currentDivisionId,
+          });
+
+          alertSystem.showSuccess("Game recorded successfully!");
+
+          // Reset form and reload data
+          resetForm();
+          await loadPlayerMatchInfo(); // Refresh scores
+          await loadGameHistory(); // Refresh game list
+          updateNextRackNumber();
+        } catch (error) {
+          console.error("Error recording game:", error);
+          alertSystem.showError("Failed to record game: " + error.message);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Record Game";
+        }
+      }
+
+      // Collect form data
+      function collectFormData() {
+        const winnerRadio = document.querySelector(
+          'input[name="winner"]:checked'
+        );
+
+        return {
+          rackNumber: nextRackNumber,
+          winner: winnerRadio ? winnerRadio.value : null,
+          pointsHome:
+            parseInt(document.getElementById("pointsHome").value) || 0,
+          pointsAway:
+            parseInt(document.getElementById("pointsAway").value) || 0,
+        };
+      }
+
+      // Validate form data
+      function validateFormData(data) {
+        clearAlerts();
+
+        if (!data.winner) {
+          showError("Please select a game winner");
+          return false;
+        }
+
+        if (data.pointsHome < 0 || data.pointsAway < 0) {
+          showError("Points cannot be negative");
+          return false;
+        }
+
+        return true;
+      }
+
+      // Reset form
+      function resetForm() {
+        document.getElementById("gameForm").reset();
+        document.getElementById("pointsHome").value = "0";
+        document.getElementById("pointsAway").value = "0";
+      }
+    </script>
+  </body>
+</html>

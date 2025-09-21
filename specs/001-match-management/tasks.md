@@ -28,28 +28,28 @@ Example batch (after foundational tasks):
 
 ### Setup & Foundation (Unchanged Core Utilities)
 
-**T001** – Create ULID utility & time provider
+**T001** – ✅ Create ULID utility & time provider
 
 - Files: `functions/league/UlidGenerator.cs`, `functions/league/ITimeProvider.cs`, `functions/league/SystemTimeProvider.cs`
 - Purpose: Provide deterministic id & timestamp abstractions used across services/endpoints
 - Acceptance: Utility returns 26-char ULID; time provider returns UTC now; unit test skeleton added
 - Dependencies: None
 
-**T002** – Add scoring constants & enums
+**T002** – ✅ Add scoring constants & enums
 
 - Files: `functions/league/Scoring.cs`
 - Content: Enum `RackWinner { Home, Away }`, static validation methods (non-negative points)
 - Acceptance: Methods throw `ArgumentException` on invalid values
 - Dependencies: T001
 
-**T003** – Extend existing `LeagueModels.cs` with new / augmented models (PlayerMatch, Game, TeamMatch score fields)
+**T003** – ✅ Extend existing `LeagueModels.cs` with new / augmented models (PlayerMatch, Game, TeamMatch score fields)
 
 - Files: `functions/league/LeagueModels.cs`
 - Content: Public record types for create/request/response shapes matching `data-model.md` & `contracts/endpoints.md`
 - Acceptance: Builds; JSON property names camelCase; includes `docType`
 - Dependencies: T001
 
-**T004** – Add configuration flags
+**T004** – ✅ Add configuration flags
 
 - Files: `functions/Program.cs` (DI), `functions/league/FeatureFlags.cs`
 - Flags: `ALLOW_SECRET_MUTATIONS`, `DISABLE_API_SECRET_MUTATIONS`, `DISABLE_GAMESWON_FALLBACK`

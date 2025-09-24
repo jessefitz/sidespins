@@ -581,8 +581,8 @@
         <!-- Desktop Navigation -->
         <div class="nav-links">
           <a href="/app.html" class="active">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -636,8 +636,8 @@
 
         <div class="mobile-nav-links">
           <a href="/app.html" class="active">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -678,7 +678,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=202509170629"></script>
+    <script src="/assets/auth.js?v=202509232004"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         const authManager = new AuthManager();
@@ -845,13 +845,13 @@
           const commonActions = [
             {
               text: "Schedule",
-              href: "/schedule-new.html",
+              href: "/schedule-new.html?v=2",
               description: "View team schedule and match results",
               icon: "📅",
             },
             {
               text: "Lineup Explorer",
-              href: "/lineup-explorer-new.html",
+              href: "/lineup-explorer-new.html?v=2",
               description: "Explore different player combinations",
               icon: "🎯",
             },

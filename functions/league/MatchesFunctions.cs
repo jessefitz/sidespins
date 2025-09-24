@@ -15,16 +15,19 @@ public class MatchesFunctions
     private readonly ILogger<MatchesFunctions> _logger;
     private readonly LeagueService _cosmosService;
     private readonly IMembershipService _membershipService;
+    private readonly IPlayerService _playerService;
 
     public MatchesFunctions(
         ILogger<MatchesFunctions> logger,
         LeagueService cosmosService,
-        IMembershipService membershipService
+        IMembershipService membershipService,
+        IPlayerService playerService
     )
     {
         _logger = logger;
         _cosmosService = cosmosService;
         _membershipService = membershipService;
+        _playerService = playerService;
     }
 
     [Function("GetMatches")]
@@ -761,5 +764,396 @@ public class MatchesFunctions
         }
 
         return preservedLineup;
+    }
+
+    [Function("VolunteerAsAlternate")]
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> VolunteerAsAlternate(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "matches/{matchId}/volunteer-alternate"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string matchId
+    )
+    {
+        try
+        {
+            var userId = context.GetUserId();
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+            var teamId = req.Query["teamId"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(teamId))
+            {
+                return new BadRequestObjectResult("teamId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new BadRequestObjectResult("User ID not found");
+            }
+
+            // Get the current user's player record
+            var currentUserPlayer = await _playerService.GetPlayerByAuthUserIdAsync(userId);
+            if (currentUserPlayer == null)
+            {
+                return new BadRequestObjectResult("Player not found for current user");
+            }
+
+            // Verify the user is authorized to volunteer for this team
+            var userMemberships = await _membershipService.GetAllAsync(userId);
+            var teamMembership = userMemberships?.FirstOrDefault(m => m.TeamId == teamId);
+
+            if (teamMembership == null)
+            {
+                return new BadRequestObjectResult("You are not a member of this team");
+            }
+
+            // Get the match
+            var match = await _cosmosService.GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Verify the team is playing in this match
+            bool isHomeTeam = match.HomeTeamId == teamId;
+            bool isAwayTeam = match.AwayTeamId == teamId;
+
+            if (!isHomeTeam && !isAwayTeam)
+            {
+                return new BadRequestObjectResult("This team is not playing in this match");
+            }
+
+            // Check if the player is already in the lineup (including as alternate)
+            var targetLineup = isHomeTeam ? match.LineupPlan.Home : match.LineupPlan.Away;
+            var existingPlayerInLineup = targetLineup.FirstOrDefault(p =>
+                p.PlayerId == currentUserPlayer.Id
+            );
+
+            if (existingPlayerInLineup != null)
+            {
+                return new BadRequestObjectResult("You are already in the lineup for this match");
+            }
+
+            // Get player's skill level - we'll need to look it up from team memberships
+            var teamMemberships = await _cosmosService.GetMembershipsByTeamIdAsync(teamId);
+            var playerMembership = teamMemberships?.FirstOrDefault(m =>
+                m.PlayerId == currentUserPlayer.Id && m.LeftAt == null
+            );
+
+            if (playerMembership == null)
+            {
+                return new BadRequestObjectResult("Player membership not found for this team");
+            }
+
+            // Create new alternate lineup player
+            var alternatePlayer = new LineupPlayer
+            {
+                PlayerId = currentUserPlayer.Id,
+                SkillLevel = playerMembership.SkillLevel_9b ?? 0,
+                IntendedOrder = targetLineup.Count + 1, // Add at the end
+                IsAlternate = true,
+                Notes = "Volunteered as alternate",
+                Availability = "available", // Since they're volunteering, they're available
+            };
+
+            // Add the alternate to the appropriate team's lineup
+            targetLineup.Add(alternatePlayer);
+
+            // Update the match with the new lineup
+            var updatedMatch = await _cosmosService.UpdateMatchLineupAsync(
+                matchId,
+                divisionId,
+                match.LineupPlan
+            );
+
+            if (updatedMatch == null)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return new OkObjectResult(
+                new { message = "Successfully volunteered as alternate", match = updatedMatch }
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error volunteering as alternate for match {MatchId}", matchId);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("VolunteerPlayerAsAlternate")]
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> VolunteerPlayerAsAlternate(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "matches/{matchId}/volunteer-player-alternate"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string matchId
+    )
+    {
+        try
+        {
+            var userId = context.GetUserId();
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+            var teamId = req.Query["teamId"].FirstOrDefault();
+            var playerId = req.Query["playerId"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(teamId))
+            {
+                return new BadRequestObjectResult("teamId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(playerId))
+            {
+                return new BadRequestObjectResult("playerId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new BadRequestObjectResult("User ID not found");
+            }
+
+            // Get the current user's player record to verify they are captain/manager
+            var currentUserPlayer = await _playerService.GetPlayerByAuthUserIdAsync(userId);
+            if (currentUserPlayer == null)
+            {
+                return new BadRequestObjectResult("Player not found for current user");
+            }
+
+            // Verify the current user is captain or manager of this team
+            var teamMemberships = await _cosmosService.GetMembershipsByTeamIdAsync(teamId);
+            var currentUserMembership = teamMemberships?.FirstOrDefault(m =>
+                m.PlayerId == currentUserPlayer.Id && m.LeftAt == null
+            );
+
+            if (
+                currentUserMembership == null
+                || (
+                    currentUserMembership.Role != "captain"
+                    && currentUserMembership.Role != "manager"
+                )
+            )
+            {
+                return new ForbidResult(
+                    "Only team captains and managers can volunteer players as alternates"
+                );
+            }
+
+            // Verify the target player is a member of this team
+            var targetPlayerMembership = teamMemberships?.FirstOrDefault(m =>
+                m.PlayerId == playerId && m.LeftAt == null
+            );
+
+            if (targetPlayerMembership == null)
+            {
+                return new BadRequestObjectResult("Target player is not a member of this team");
+            }
+
+            // Get the match
+            var match = await _cosmosService.GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Verify the team is playing in this match
+            bool isHomeTeam = match.HomeTeamId == teamId;
+            bool isAwayTeam = match.AwayTeamId == teamId;
+
+            if (!isHomeTeam && !isAwayTeam)
+            {
+                return new BadRequestObjectResult("This team is not playing in this match");
+            }
+
+            // Check if the player is already in the lineup (including as alternate)
+            var targetLineup = isHomeTeam ? match.LineupPlan.Home : match.LineupPlan.Away;
+            var existingPlayerInLineup = targetLineup.FirstOrDefault(p => p.PlayerId == playerId);
+
+            if (existingPlayerInLineup != null)
+            {
+                return new BadRequestObjectResult("Player is already in the lineup for this match");
+            }
+
+            // Create new alternate lineup player
+            var alternatePlayer = new LineupPlayer
+            {
+                PlayerId = playerId,
+                SkillLevel = targetPlayerMembership.SkillLevel_9b ?? 0,
+                IntendedOrder = targetLineup.Count + 1, // Add at the end
+                IsAlternate = true,
+                Notes =
+                    $"Volunteered as alternate by {currentUserPlayer.FirstName} {currentUserPlayer.LastName}",
+                Availability = null, // Leave as null since captain is volunteering them
+            };
+
+            // Add the alternate to the appropriate team's lineup
+            targetLineup.Add(alternatePlayer);
+
+            // Update the match with the new lineup
+            var updatedMatch = await _cosmosService.UpdateMatchLineupAsync(
+                matchId,
+                divisionId,
+                match.LineupPlan
+            );
+
+            if (updatedMatch == null)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return new OkObjectResult(
+                new
+                {
+                    message = "Successfully volunteered player as alternate",
+                    match = updatedMatch,
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error volunteering player as alternate for match {MatchId}",
+                matchId
+            );
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("RemovePlayerAsAlternate")]
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> RemovePlayerAsAlternate(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "matches/{matchId}/remove-alternate"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string matchId
+    )
+    {
+        try
+        {
+            var userId = context.GetUserId();
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+            var teamId = req.Query["teamId"].FirstOrDefault();
+            var playerId = req.Query["playerId"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(teamId))
+            {
+                return new BadRequestObjectResult("teamId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(playerId))
+            {
+                return new BadRequestObjectResult("playerId query parameter is required");
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new BadRequestObjectResult("User ID not found");
+            }
+
+            // Get the current user's player record to verify they are captain/manager
+            var currentUserPlayer = await _playerService.GetPlayerByAuthUserIdAsync(userId);
+            if (currentUserPlayer == null)
+            {
+                return new BadRequestObjectResult("Player not found for current user");
+            }
+
+            // Verify the current user is captain or manager of this team
+            var teamMemberships = await _cosmosService.GetMembershipsByTeamIdAsync(teamId);
+            var currentUserMembership = teamMemberships?.FirstOrDefault(m =>
+                m.PlayerId == currentUserPlayer.Id && m.LeftAt == null
+            );
+
+            if (
+                currentUserMembership == null
+                || (
+                    currentUserMembership.Role != "captain"
+                    && currentUserMembership.Role != "manager"
+                )
+            )
+            {
+                return new ForbidResult(
+                    "Only team captains and managers can remove player alternates"
+                );
+            }
+
+            // Get the match
+            var match = await _cosmosService.GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Verify the team is playing in this match
+            bool isHomeTeam = match.HomeTeamId == teamId;
+            bool isAwayTeam = match.AwayTeamId == teamId;
+
+            if (!isHomeTeam && !isAwayTeam)
+            {
+                return new BadRequestObjectResult("This team is not playing in this match");
+            }
+
+            // Find and remove the alternate player from the lineup
+            var targetLineup = isHomeTeam ? match.LineupPlan.Home : match.LineupPlan.Away;
+            var alternatePlayer = targetLineup.FirstOrDefault(p =>
+                p.PlayerId == playerId && p.IsAlternate
+            );
+
+            if (alternatePlayer == null)
+            {
+                return new BadRequestObjectResult("Player is not an alternate in this match");
+            }
+
+            // Remove the alternate from the lineup
+            targetLineup.Remove(alternatePlayer);
+
+            // Update the match with the new lineup
+            var updatedMatch = await _cosmosService.UpdateMatchLineupAsync(
+                matchId,
+                divisionId,
+                match.LineupPlan
+            );
+
+            if (updatedMatch == null)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return new OkObjectResult(
+                new { message = "Successfully removed player as alternate", match = updatedMatch }
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing player as alternate for match {MatchId}", matchId);
+            return new StatusCodeResult(500);
+        }
     }
 }

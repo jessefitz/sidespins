@@ -1030,8 +1030,8 @@
         <!-- Desktop Navigation -->
         <div class="nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html" class="active">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2" class="active">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -1085,8 +1085,8 @@
 
         <div class="mobile-nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html" class="active">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2" class="active">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -1140,7 +1140,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=202509170629"></script>
+    <script src="/assets/auth.js?v=202509211810"></script>
     <script>
       class ScheduleApp {
         constructor() {
@@ -1721,7 +1721,7 @@
                         </div>
                         <div class="match-actions">
                             <div class="match-time">${matchTime}</div>
-                            <a href="/lineup-explorer-new.html?matchId=${match.id}" 
+                            <a href="/lineup-explorer-new.html?v=2&matchId=${match.id}" 
                                class="lineup-explorer-btn"
                                title="Experiment with different lineups for this match">
                                 🎯 Lineup Explorer

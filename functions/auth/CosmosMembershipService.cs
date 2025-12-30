@@ -201,4 +201,120 @@ public class CosmosMembershipService : IMembershipService
             return new List<UserTeamMembership>();
         }
     }
+
+    public async Task<List<TeamMembership>> GetFullMembershipsAsync(
+        string authUserId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
+        {
+            // First, map the auth user ID to player ID
+            var player = await _playerService.GetPlayerByAuthUserIdAsync(
+                authUserId,
+                cancellationToken
+            );
+            if (player == null)
+            {
+                _logger.LogWarning("No player found for auth user ID {AuthUserId}", authUserId);
+                return new List<TeamMembership>();
+            }
+
+            var container = _cosmosClient.GetContainer(_databaseName, _containerName);
+            var memberships = new List<TeamMembership>();
+
+            // Query for all active memberships for the player
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.playerId = @playerId AND (c.leftAt = null OR NOT IS_DEFINED(c.leftAt))"
+            ).WithParameter("@playerId", player.Id);
+
+            var iterator = container.GetItemQueryIterator<TeamMembership>(query);
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync(cancellationToken);
+                memberships.AddRange(response);
+            }
+
+            return memberships;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error retrieving full memberships for auth user {AuthUserId}",
+                authUserId
+            );
+            return new List<TeamMembership>();
+        }
+    }
+
+    public async Task<List<TeamMembership>> GetTeamMembershipsAsync(string teamId)
+    {
+        try
+        {
+            var container = _cosmosClient.GetContainer(_databaseName, _containerName);
+            var memberships = new List<TeamMembership>();
+
+            // Query for all memberships for the team (use teamId as partition key)
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.type = 'membership'");
+
+            var requestOptions = new QueryRequestOptions
+            {
+                PartitionKey = new PartitionKey(teamId),
+            };
+
+            var iterator = container.GetItemQueryIterator<TeamMembership>(
+                query,
+                requestOptions: requestOptions
+            );
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                memberships.AddRange(response);
+            }
+
+            return memberships;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving team memberships for team {TeamId}", teamId);
+            return new List<TeamMembership>();
+        }
+    }
+
+    public async Task<Team?> GetTeamAsync(string teamId, string divisionId)
+    {
+        try
+        {
+            var container = _cosmosClient.GetContainer(_databaseName, _containerName);
+
+            var response = await container.ReadItemAsync<Team>(
+                teamId,
+                new PartitionKey(divisionId)
+            );
+
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger.LogWarning(
+                "Team {TeamId} not found in division {DivisionId}",
+                teamId,
+                divisionId
+            );
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error retrieving team {TeamId} from division {DivisionId}",
+                teamId,
+                divisionId
+            );
+            return null;
+        }
+    }
 }

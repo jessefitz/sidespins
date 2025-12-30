@@ -1630,19 +1630,48 @@
           this.setupSaveButton();
           this.updateSkillSummary();
 
-          // Check for matchId in URL parameters
+          // Check for matchId and teamId in URL parameters
           const urlParams = new URLSearchParams(window.location.search);
           const matchId = urlParams.get("matchId");
+          const teamIdParam = urlParams.get("teamId");
+
+          // If teamId is provided in URL, switch to that team (captain mode)
+          if (teamIdParam && teamIdParam !== this.teamId) {
+            // Check if user has access to this team
+            const membership = this.authManager.userMemberships.find(
+              (m) => m.teamId === teamIdParam
+            );
+            if (membership) {
+              this.teamId = teamIdParam;
+              this.teamName = membership.teamName || teamIdParam;
+              this.authManager.activeTeamId = teamIdParam;
+              localStorage.setItem("activeTeamId", teamIdParam);
+
+              // Update UI elements
+              document.getElementById("team-name").textContent = this.teamName;
+              const teamSelect = document.getElementById("team-select");
+              if (teamSelect) {
+                teamSelect.value = teamIdParam;
+              }
+
+              // Reload data for new team
+              await this.loadData();
+              this.renderPlayerList();
+            }
+          }
+
           if (matchId) {
             const matchSelect = document.getElementById("match-select");
             matchSelect.value = matchId;
 
-            // Set default to captain's lineup when coming from schedule
-            const captainRadio = document.querySelector(
-              'input[name="start-state"][value="captain"]'
-            );
-            if (captainRadio) {
-              captainRadio.checked = true;
+            // Set default to captain's lineup when coming from schedule with teamId
+            if (teamIdParam) {
+              const captainRadio = document.querySelector(
+                'input[name="start-state"][value="captain"]'
+              );
+              if (captainRadio) {
+                captainRadio.checked = true;
+              }
             }
 
             // Load the match directly instead of using change event

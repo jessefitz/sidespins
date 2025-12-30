@@ -61,17 +61,50 @@ public class MembershipFunctions
                 userId
             );
 
-            // Now get memberships using the player ID
-            var memberships = await _membershipService.GetAllAsync(player.AuthUserId);
+            // Get full membership objects with divisionId
+            var memberships = await _membershipService.GetFullMembershipsAsync(player.AuthUserId);
 
-            var membershipInfos = memberships
-                .Select(m => new
+            // Enrich memberships with team names
+            var membershipInfos = new List<UserTeamMembershipInfo>();
+            foreach (var membership in memberships)
+            {
+                try
                 {
-                    teamId = m.TeamId,
-                    role = m.Role,
-                    active = m.Active,
-                })
-                .ToList();
+                    // Get team name from team service
+                    var team = await _membershipService.GetTeamAsync(
+                        membership.TeamId,
+                        membership.DivisionId
+                    );
+
+                    membershipInfos.Add(
+                        new UserTeamMembershipInfo
+                        {
+                            TeamId = membership.TeamId,
+                            DivisionId = membership.DivisionId,
+                            Role = membership.Role,
+                            TeamName = team?.Name ?? membership.TeamId,
+                        }
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "Failed to load team details for membership {TeamId}",
+                        membership.TeamId
+                    );
+                    // Include membership with minimal info if lookup fails
+                    membershipInfos.Add(
+                        new UserTeamMembershipInfo
+                        {
+                            TeamId = membership.TeamId,
+                            DivisionId = membership.DivisionId,
+                            Role = membership.Role,
+                            TeamName = membership.TeamId,
+                        }
+                    );
+                }
+            }
 
             _logger.LogInformation(
                 "Found {Count} memberships for player {PlayerId}",

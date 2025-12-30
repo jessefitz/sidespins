@@ -1965,6 +1965,13 @@
                                title="Experiment with different lineups for this match">
                                 🎯 Lineup Explorer
                             </a>
+                            <a href="/lineup-explorer-new.html?matchId=${match.id}&teamId=${this.teamId}" 
+                               class="lineup-explorer-btn"
+                               data-requires-role="captain"
+                               data-hide-if-unauthorized
+                               title="Edit your team's lineup for this match">
+                                ✏️ Edit Lineup
+                            </a>
                         </div>
                     </div>
                     ${lineupsHtml}

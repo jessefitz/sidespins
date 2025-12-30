@@ -260,6 +260,106 @@ public class MatchesFunctions
         }
     }
 
+    [Function("CreateTeamMatch")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> CreateTeamMatch(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "teams/{teamId}/matches")]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
+    {
+        try
+        {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var match = JsonConvert.DeserializeObject<TeamMatch>(requestBody);
+
+            if (match == null)
+            {
+                return new BadRequestObjectResult("Invalid match data");
+            }
+
+            // Validate required fields
+            if (match.Week <= 0 || match.ScheduledAt == default(DateTime))
+            {
+                return new BadRequestObjectResult("Week and ScheduledAt are required");
+            }
+
+            var createdMatch = await _cosmosService.CreateTeamMatchAsync(teamId, match);
+
+            if (createdMatch == null)
+            {
+                return new NotFoundObjectResult($"Team with ID {teamId} not found");
+            }
+
+            return new CreatedResult(
+                $"/api/teams/{teamId}/matches/{createdMatch.Id}",
+                createdMatch
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating team match for team {TeamId}", teamId);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Function("DeleteTeamMatch")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> DeleteTeamMatch(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "delete",
+            Route = "teams/{teamId}/matches/{matchId}"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId,
+        string matchId
+    )
+    {
+        try
+        {
+            // Extract divisionId from query parameter since we need it for partition key
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult(
+                    "divisionId query parameter is required for match deletion"
+                );
+            }
+
+            // Verify the match exists and that the team is the home team (creator)
+            var match = await _cosmosService.GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Only allow deletion if the requesting team is the home team (creator)
+            if (match.HomeTeamId != teamId)
+            {
+                return new ForbidResult();
+            }
+
+            var deleted = await _cosmosService.DeleteMatchAsync(matchId, divisionId);
+            if (!deleted)
+            {
+                return new NotFoundResult();
+            }
+
+            return new NoContentResult();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting team match {TeamId} {MatchId}", teamId, matchId);
+            return new StatusCodeResult(500);
+        }
+    }
+
     [Function("UpdateTeamMatchLineup")]
     [RequireAuthentication]
     [RequireTeamRole("captain")]

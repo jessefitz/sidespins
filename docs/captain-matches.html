@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Match Management - SideSpins</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        line-height: 1.6;
+      }
+
+      .header {
+        background: white;
+        border-bottom: 1px solid #e1e5e9;
+        padding: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007cba;
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: #666;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+      }
+
+      .nav-links a:hover {
+        background-color: #f8f9fa;
+      }
+
+      .nav-links a.active {
+        background-color: #007cba;
+        color: white;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .team-switcher {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .team-switcher label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .team-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        min-width: 200px;
+      }
+
+      .team-select:focus {
+        outline: none;
+        border-color: #007cba;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      .page-header {
+        margin-bottom: 2rem;
+      }
+
+      .page-header h1 {
+        margin: 0 0 0.5rem 0;
+        color: #333;
+        font-size: 2rem;
+      }
+
+      .page-header .description {
+        color: #666;
+        font-size: 1.1rem;
+      }
+
+      .section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e1e5e9;
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #007cba;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+
+      .btn-primary {
+        background-color: #007cba;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #005a87;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background-color: #545b62;
+      }
+
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background-color: #c82333;
+      }
+
+      .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .match-list {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .match-card {
+        background: #f8f9fa;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1.5rem;
+        align-items: center;
+      }
+
+      .match-date {
+        text-align: center;
+      }
+
+      .match-date .day {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #007cba;
+        line-height: 1;
+      }
+
+      .match-date .month {
+        font-size: 0.9rem;
+        color: #666;
+        text-transform: uppercase;
+      }
+
+      .match-info {
+        flex: 1;
+      }
+
+      .match-week {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+      }
+
+      .match-time {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+      }
+
+      .match-teams {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .match-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+      }
+
+      .match-status.scheduled {
+        background-color: #cce5ff;
+        color: #004085;
+      }
+
+      .match-status.in-progress {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+
+      .match-status.completed {
+        background-color: #d4edda;
+        color: #155724;
+      }
+
+      .match-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-direction: column;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+      }
+
+      .empty-state h3 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .alert {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007cba;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-content">
+        <a href="/app.html" class="logo">SideSpins</a>
+        <div class="user-info">
+          <div class="team-switcher">
+            <label for="team-select">Team:</label>
+            <select id="team-select" class="team-select">
+              <option value="">Loading...</option>
+            </select>
+          </div>
+          <div class="nav-links">
+            <a href="/app.html">Dashboard</a>
+            <a href="/schedule-new.html">Schedule</a>
+            <a href="/captain-matches.html" class="active">Matches</a>
+            <a href="/team-admin.html">Team</a>
+            <button id="logout-btn" class="btn btn-secondary btn-sm">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="page-header">
+        <h1>Match Management</h1>
+        <p class="description">Create and manage matches for your team</p>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <!-- Create Match Section -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Create New Match</h2>
+        </div>
+        <form id="create-match-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="match-week">Week Number *</label>
+              <input type="number" id="match-week" min="1" max="52" required />
+            </div>
+            <div class="form-group">
+              <label for="match-date">Match Date *</label>
+              <input type="date" id="match-date" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="match-time">Match Time *</label>
+            <input type="time" id="match-time" value="19:00" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Create Match</button>
+        </form>
+      </div>
+
+      <!-- Matches List Section -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Your Team's Matches</h2>
+        </div>
+        <div id="loading-state" class="loading">
+          <div class="spinner"></div>
+          <p>Loading matches...</p>
+        </div>
+        <div id="matches-container" class="match-list hidden"></div>
+        <div id="empty-state" class="empty-state hidden">
+          <h3>No Matches Yet</h3>
+          <p>Create your first match using the form above.</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+      let authManager;
+      let currentTeam = null;
+      let currentDivisionId = null;
+
+      async function init() {
+        authManager = new AuthManager();
+
+        // Check authentication
+        const isAuth = await authManager.checkAuth();
+        if (!isAuth) {
+          window.location.href = "/login-new.html";
+          return;
+        }
+
+        // Load memberships and set up team switcher
+        await authManager.loadUserMemberships();
+        if (
+          !authManager.userMemberships ||
+          authManager.userMemberships.length === 0
+        ) {
+          showAlert(
+            "You are not a member of any teams. Contact your captain to be added.",
+            "error"
+          );
+          return;
+        }
+
+        // Check captain permission
+        if (!authManager.hasTeamRole("captain")) {
+          showAlert(
+            "You need captain permissions to access this page.",
+            "error"
+          );
+          setTimeout(() => (window.location.href = "/app.html"), 2000);
+          return;
+        }
+
+        setupTeamSwitcher();
+        setupEventListeners();
+        await loadMatches();
+      }
+
+      function setupTeamSwitcher() {
+        const teamSelect = document.getElementById("team-select");
+        teamSelect.innerHTML = "";
+
+        authManager.userMemberships.forEach((membership) => {
+          const option = document.createElement("option");
+          option.value = membership.teamId;
+          option.textContent = `${membership.teamName} (${membership.role})`;
+          if (membership.teamId === authManager.activeTeamId) {
+            option.selected = true;
+          }
+          teamSelect.appendChild(option);
+        });
+
+        teamSelect.addEventListener("change", async (e) => {
+          authManager.activeTeamId = e.target.value;
+          localStorage.setItem("activeTeamId", e.target.value);
+          updateCurrentTeam();
+          await loadMatches();
+        });
+
+        // Load current team info
+        updateCurrentTeam();
+      }
+
+      function updateCurrentTeam() {
+        const membership = authManager.getActiveMembership();
+        if (membership) {
+          currentTeam = {
+            id: membership.teamId,
+            name: membership.teamName,
+            role: membership.role,
+          };
+          currentDivisionId = membership.divisionId;
+
+          console.log("Current team updated:", currentTeam);
+          console.log("Division ID:", currentDivisionId);
+        } else {
+          console.warn("No active membership found");
+          currentTeam = null;
+          currentDivisionId = null;
+        }
+      }
+
+      function setupEventListeners() {
+        document
+          .getElementById("create-match-form")
+          .addEventListener("submit", handleCreateMatch);
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", async () => {
+            await authManager.logout();
+            window.location.href = "/login-new.html";
+          });
+      }
+
+      async function handleCreateMatch(e) {
+        e.preventDefault();
+
+        const week = parseInt(document.getElementById("match-week").value);
+        const date = document.getElementById("match-date").value;
+        const time = document.getElementById("match-time").value;
+
+        if (!currentTeam || !currentDivisionId) {
+          showAlert(
+            "Unable to determine team or division. Please refresh and try again.",
+            "error"
+          );
+          return;
+        }
+
+        // Create date in local timezone, then convert to ISO
+        const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+
+        const matchData = {
+          divisionId: currentDivisionId,
+          week: week,
+          scheduledAt: scheduledAt,
+          status: "scheduled",
+        };
+
+        try {
+          const token = authManager.getAuthToken();
+          const response = await fetch(
+            `${authManager.baseUrl}/teams/${currentTeam.id}/matches`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(matchData),
+            }
+          );
+
+          if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || "Failed to create match");
+          }
+
+          const result = await response.json();
+          showAlert("Match created successfully!", "success");
+
+          // Reset form
+          document.getElementById("create-match-form").reset();
+          document.getElementById("match-time").value = "19:00";
+
+          // Reload matches
+          await loadMatches();
+        } catch (error) {
+          console.error("Error creating match:", error);
+          showAlert(`Error: ${error.message}`, "error");
+        }
+      }
+
+      async function loadMatches() {
+        if (!currentDivisionId || !currentTeam) {
+          updateCurrentTeam();
+          if (!currentDivisionId || !currentTeam) {
+            console.error("Missing team or division:", {
+              currentTeam,
+              currentDivisionId,
+            });
+            showAlert(
+              "Unable to load matches - division not found. Please ensure your team membership has a valid division assigned.",
+              "error"
+            );
+            return;
+          }
+        }
+
+        const loadingState = document.getElementById("loading-state");
+        const matchesContainer = document.getElementById("matches-container");
+        const emptyState = document.getElementById("empty-state");
+
+        loadingState.classList.remove("hidden");
+        matchesContainer.classList.add("hidden");
+        emptyState.classList.add("hidden");
+
+        try {
+          const token = authManager.getAuthToken();
+          const response = await fetch(
+            `${authManager.baseUrl}/GetMatches?divisionId=${currentDivisionId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to load matches");
+          }
+
+          const matches = await response.json();
+
+          // Filter matches for current team
+          const teamMatches = matches.filter(
+            (m) =>
+              m.homeTeamId === currentTeam.id || m.awayTeamId === currentTeam.id
+          );
+
+          // Update the week number input with next available week
+          if (matches.length > 0) {
+            const maxWeek = Math.max(...matches.map(m => m.week || 0));
+            const weekInput = document.getElementById("match-week");
+            if (weekInput && !weekInput.value) {
+              weekInput.value = maxWeek + 1;
+            }
+          }
+
+          loadingState.classList.add("hidden");
+
+          if (teamMatches.length === 0) {
+            emptyState.classList.remove("hidden");
+          } else {
+            matchesContainer.classList.remove("hidden");
+            renderMatches(teamMatches);
+          }
+        } catch (error) {
+          console.error("Error loading matches:", error);
+          loadingState.classList.add("hidden");
+          showAlert(`Error loading matches: ${error.message}`, "error");
+        }
+      }
+
+      function renderMatches(matches) {
+        const container = document.getElementById("matches-container");
+        container.innerHTML = "";
+
+        // Sort by date, newest first
+        matches.sort(
+          (a, b) => new Date(b.scheduledAt) - new Date(a.scheduledAt)
+        );
+
+        matches.forEach((match) => {
+          const matchCard = createMatchCard(match);
+          container.appendChild(matchCard);
+        });
+      }
+
+      function createMatchCard(match) {
+        const card = document.createElement("div");
+        card.className = "match-card";
+
+        const matchDate = new Date(match.scheduledAt);
+        const day = matchDate.getDate();
+        const month = matchDate.toLocaleString("default", { month: "short" });
+        const time = matchDate.toLocaleTimeString("default", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+
+        const hasLineup =
+          match.lineupPlan?.home?.length > 0 ||
+          match.lineupPlan?.away?.length > 0;
+
+        card.innerHTML = `
+          <div class="match-date">
+            <div class="day">${day}</div>
+            <div class="month">${month}</div>
+          </div>
+          <div class="match-info">
+            <div class="match-week">Week ${match.week}</div>
+            <div class="match-time">${time}</div>
+            <span class="match-status ${match.status}">${match.status
+          .replace("-", " ")
+          .toUpperCase()}</span>
+          </div>
+          <div class="match-actions">
+            <a href="/lineup-explorer-new.html?matchId=${match.id}&teamId=${
+          currentTeam.id
+        }" 
+               class="btn btn-primary btn-sm">
+              ${hasLineup ? "Edit Lineup" : "Set Lineup"}
+            </a>
+            ${
+              match.homeTeamId === currentTeam.id
+                ? `
+              <button class="btn btn-danger btn-sm" onclick="deleteMatch('${match.id}', '${match.divisionId}')">
+                Delete
+              </button>
+            `
+                : ""
+            }
+          </div>
+        `;
+
+        return card;
+      }
+
+      async function deleteMatch(matchId, divisionId) {
+        if (!confirm("Are you sure you want to delete this match?")) {
+          return;
+        }
+
+        try {
+          const token = authManager.getAuthToken();
+          const response = await fetch(
+            `${authManager.baseUrl}/teams/${currentTeam.id}/matches/${matchId}?divisionId=${divisionId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to delete match");
+          }
+
+          showAlert("Match deleted successfully", "success");
+          await loadMatches();
+        } catch (error) {
+          console.error("Error deleting match:", error);
+          showAlert(`Error: ${error.message}`, "error");
+        }
+      }
+
+      function showAlert(message, type = "info") {
+        const container = document.getElementById("alert-container");
+        const alert = document.createElement("div");
+        alert.className = `alert alert-${type}`;
+        alert.textContent = message;
+        container.appendChild(alert);
+
+        setTimeout(() => {
+          alert.remove();
+        }, 5000);
+      }
+
+      // Initialize on page load
+      init();
+    </script>
+  </body>
+</html>

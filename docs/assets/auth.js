@@ -804,6 +804,69 @@ class AuthManager {
             throw error;
         }
     }
+
+    /**
+     * Create a new match for a team (captain operation)
+     * @param {string} teamId - Team ID
+     * @param {Object} matchData - Match data (divisionId, week, scheduledAt, status)
+     * @returns {Promise<Object>} Created match object
+     */
+    async createTeamMatch(teamId, matchData) {
+        const url = `${this.baseUrl}/teams/${teamId}/matches`;
+        const response = await this.makeAuthenticatedRequest(url, {
+            method: 'POST',
+            body: JSON.stringify(matchData)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to create match');
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Update a match lineup for a team (captain operation)
+     * @param {string} teamId - Team ID
+     * @param {string} matchId - Match ID
+     * @param {string} divisionId - Division ID (required for partition key)
+     * @param {Object} lineupPlan - Lineup plan data
+     * @returns {Promise<Object>} Updated match object
+     */
+    async updateTeamMatchLineup(teamId, matchId, divisionId, lineupPlan) {
+        const url = `${this.baseUrl}/teams/${teamId}/matches/${matchId}/lineup?divisionId=${divisionId}`;
+        const response = await this.makeAuthenticatedRequest(url, {
+            method: 'PATCH',
+            body: JSON.stringify(lineupPlan)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to update lineup');
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Delete a match for a team (captain operation)
+     * @param {string} teamId - Team ID
+     * @param {string} matchId - Match ID
+     * @param {string} divisionId - Division ID (required for partition key)
+     * @returns {Promise<void>}
+     */
+    async deleteTeamMatch(teamId, matchId, divisionId) {
+        const url = `${this.baseUrl}/teams/${teamId}/matches/${matchId}?divisionId=${divisionId}`;
+        const response = await this.makeAuthenticatedRequest(url, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to delete match');
+        }
+    }
 }
 
 /**

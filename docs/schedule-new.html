@@ -1270,7 +1270,7 @@
           <h1>Team Schedule</h1>
           <div class="team-info">
             <h3><span id="team-name">Team</span></h3>
-            <p>Division: <span id="division-name">Loading...</span></p>
+            <p id="active-sessions-display">Loading sessions...</p>
           </div>
         </div>
 
@@ -1467,11 +1467,12 @@
 
             // Update team display
             document.getElementById("team-name").textContent = this.teamName;
-            document.getElementById("division-name").textContent =
-              this.divisionId;
 
             // Load schedule data
             await this.loadSchedule();
+
+            // Update active sessions display after loading
+            this.updateActiveSessionsDisplay();
 
             // Setup logout handler
             this.setupLogoutHandler();
@@ -1631,14 +1632,33 @@
           document.getElementById("schedule-container").style.display = "block";
         }
 
+        updateActiveSessionsDisplay() {
+          const display = document.getElementById("active-sessions-display");
+          if (!this.activeSessions || this.activeSessions.length === 0) {
+            display.textContent = "No active sessions";
+            return;
+          }
+
+          const sessionNames = this.activeSessions
+            .map((s) => s.name)
+            .join(", ");
+          display.textContent = `Active Sessions: ${sessionNames}`;
+        }
+
         async loadSchedule() {
           try {
-            // Fetch matches and team data using authenticated requests
-            const [matches, players, memberships] = await Promise.all([
-              this.fetchMatches(),
-              this.fetchPlayers(),
-              this.fetchMemberships(),
-            ]);
+            // Fetch matches, team data, and active sessions using authenticated requests
+            const [matches, players, memberships, activeSessions] =
+              await Promise.all([
+                this.fetchMatches(),
+                this.fetchPlayers(),
+                this.fetchMemberships(),
+                this.fetchActiveSessions(),
+              ]);
+
+            // Store active session IDs and full session objects for filtering and display
+            this.activeSessionIds = new Set(activeSessions.map((s) => s.id));
+            this.activeSessions = activeSessions;
 
             // Create player lookup with skill levels
             const playerSkills = this.createPlayerSkillMap(
@@ -1667,6 +1687,14 @@
             `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`
           );
           if (!response.ok) throw new Error("Failed to fetch matches");
+          return response.json();
+        }
+
+        async fetchActiveSessions() {
+          const response = await this.authManager.makeAuthenticatedRequest(
+            `${this.authManager.baseUrl}/divisions/${this.divisionId}/sessions/active`
+          );
+          if (!response.ok) throw new Error("Failed to fetch active sessions");
           return response.json();
         }
 
@@ -1716,11 +1744,13 @@
         groupMatchesByDate(matches) {
           const matchesByDate = {};
 
-          // Filter matches for our team
+          // Filter matches for our team AND that have a sessionId in active sessions
           const teamMatches = matches.filter(
             (match) =>
-              match.homeTeamId === this.teamId ||
-              match.awayTeamId === this.teamId
+              (match.homeTeamId === this.teamId ||
+                match.awayTeamId === this.teamId) &&
+              match.sessionId && // Exclude matches without sessionId
+              this.activeSessionIds.has(match.sessionId) // Only include matches from active sessions
           );
 
           teamMatches.forEach((match) => {

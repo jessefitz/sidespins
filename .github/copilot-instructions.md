@@ -24,14 +24,16 @@ SideSpins is a pool league management system for APA teams with a **three-tier a
   - TeamMatches (`/divisionId` - queries by division)
   - Teams (`/divisionId` - queries by division)
   - Divisions (`/id` - self-partitioned)
+  - Sessions (`/divisionId` - queries by division, enables season management)
 - Models in `functions/league/LeagueModels.cs` use **Newtonsoft.Json** with `[JsonProperty]` attributes for camelCase serialization
 - **Global JSON settings** configured in `Program.cs` with `CamelCasePropertyNamesContractResolver`
 - **2 MB item limit** per Cosmos DB document - avoid embedding large collections
 - Seed data: `db/seed_sidespins.json` for development, import with `db/import_cosmos_sidespins.py --seed ./seed_sidespins.json --create-db`
 - Container specs defined in Python import script (`CONTAINER_SPECS` dict)
+- **IMPORTANT**: Always create Cosmos DB containers via Azure Portal or Azure CLI - VS Code Cosmos DB extension may create containers with incorrect partition key configurations
 
 ### API Design Patterns
-- **CRUD operations** organized by domain: `PlayersFunctions.cs`, `TeamsFunctions.cs`, `MembershipsFunctions.cs`, `MatchesFunctions.cs`
+- **CRUD operations** organized by domain: `PlayersFunctions.cs`, `TeamsFunctions.cs`, `MembershipsFunctions.cs`, `MatchesFunctions.cs`, `SessionsFunctions.cs`
 - **Consistent response format**: HTTP status codes (200, 201, 400, 401, 404, 500), JSON camelCase, error handling
 - **CORS configuration**: Enabled for Jekyll site via `ENABLE_CODE_CORS` environment variable with `ALLOWED_ORIGINS` list
 - **Dependency Injection**: `LeagueService` registered as singleton, `CosmosClient` configured in `Program.cs`

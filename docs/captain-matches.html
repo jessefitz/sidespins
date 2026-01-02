@@ -619,11 +619,13 @@
         if (!activeSessions || activeSessions.length === 0) {
           // No active sessions - show warning, hide selector, disable button
           selectorContainer.style.display = "none";
+          sessionSelect.removeAttribute("required");
           sessionWarning.style.display = "block";
           createButton.disabled = true;
         } else if (activeSessions.length === 1) {
           // One active session - show as read-only info, hide selector
           selectorContainer.style.display = "none";
+          sessionSelect.removeAttribute("required");
           sessionWarning.style.display = "none";
           sessionWarning.innerHTML = `ℹ️ Matches will be created for session: <strong>${activeSessions[0].name}</strong>`;
           sessionWarning.style.display = "block";
@@ -631,6 +633,7 @@
           createButton.disabled = false;
         } else {
           // Multiple active sessions - show dropdown
+          sessionSelect.setAttribute("required", "required");
           sessionSelect.innerHTML =
             '<option value="">Select a session...</option>';
           activeSessions.forEach((session) => {
@@ -682,8 +685,12 @@
           status: "scheduled",
         };
 
-        // Include sessionId if multiple sessions exist
-        if (activeSessions.length > 1) {
+        // Include sessionId based on active sessions
+        if (activeSessions.length === 1) {
+          // Single active session - use it automatically
+          matchData.sessionId = activeSessions[0].id;
+        } else if (activeSessions.length > 1) {
+          // Multiple sessions - get user selection
           const sessionId = document.getElementById("match-session").value;
           if (!sessionId) {
             showAlert("Please select a session", "error");
@@ -691,6 +698,7 @@
           }
           matchData.sessionId = sessionId;
         }
+        // If no active sessions, sessionId will be undefined (backend will handle)
 
         try {
           const token = authManager.getAuthToken();

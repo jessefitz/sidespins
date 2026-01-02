@@ -23,6 +23,33 @@ public class Division
     public DateTime CreatedAt { get; set; }
 }
 
+public class Session
+{
+    [JsonProperty("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonProperty("type")]
+    public string Type { get; set; } = "session";
+
+    [JsonProperty("divisionId")]
+    public string DivisionId { get; set; } = string.Empty;
+
+    [JsonProperty("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonProperty("startDate")]
+    public DateTime StartDate { get; set; }
+
+    [JsonProperty("endDate")]
+    public DateTime EndDate { get; set; }
+
+    [JsonProperty("isActive")]
+    public bool IsActive { get; set; }
+
+    [JsonProperty("createdAt")]
+    public DateTime CreatedAt { get; set; }
+}
+
 public class Team
 {
     [JsonProperty("id")]
@@ -211,6 +238,9 @@ public class TeamMatch
 
     [JsonProperty("divisionId")]
     public string DivisionId { get; set; } = string.Empty;
+
+    [JsonProperty("sessionId")]
+    public string? SessionId { get; set; }
 
     [JsonProperty("week")]
     public int Week { get; set; }

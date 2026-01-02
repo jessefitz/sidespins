@@ -793,6 +793,109 @@
           flex-direction: column;
         }
       }
+
+      /* Session Management Styles */
+      .session-card {
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: box-shadow 0.2s;
+      }
+
+      .session-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .session-card.active {
+        border-color: #28a745;
+        border-width: 2px;
+        background-color: #f0fff4;
+      }
+
+      .session-info {
+        flex: 1;
+      }
+
+      .session-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .session-dates {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .session-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .session-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      .session-badge.active {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .session-badge.inactive {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      .session-match-count {
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .session-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-content h3 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
     </style>
   </head>
   <body>
@@ -975,6 +1078,89 @@
               </form>
             </div>
           </div>
+
+          <!-- Sessions Section -->
+          <div class="admin-section">
+            <div class="section-header">
+              <h2 class="section-title">Seasons/Sessions</h2>
+              <div class="section-actions">
+                <button id="add-session-btn" class="btn btn-primary">
+                  <span>➕</span> Create Session
+                </button>
+              </div>
+            </div>
+
+            <div id="sessions-list">
+              <p>Loading sessions...</p>
+            </div>
+
+            <!-- Add/Edit Session Form (Modal) -->
+            <div id="session-modal" class="modal" style="display: none">
+              <div class="modal-content">
+                <h3 id="session-modal-title">Create Session</h3>
+                <form id="session-form-element">
+                  <div class="form-group">
+                    <label for="session-name">Session Name *</label>
+                    <input
+                      type="text"
+                      id="session-name"
+                      class="form-control"
+                      placeholder="e.g., Fall 2025, Winter 2026"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="session-start-date">Start Date *</label>
+                    <input
+                      type="date"
+                      id="session-start-date"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="session-end-date">End Date *</label>
+                    <input
+                      type="date"
+                      id="session-end-date"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>
+                      <input
+                        type="checkbox"
+                        id="session-is-active"
+                        style="margin-right: 0.5rem"
+                      />
+                      Active
+                    </label>
+                  </div>
+
+                  <div class="form-actions">
+                    <button
+                      type="button"
+                      id="cancel-session-btn"
+                      class="btn btn-secondary"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      id="save-session-btn"
+                      class="btn btn-primary"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -989,6 +1175,8 @@
           this.teamMembers = [];
           this.allPlayers = [];
           this.selectedPlayer = null;
+          this.sessions = [];
+          this.editingSessionId = null;
 
           // Bind methods
           this.handleTeamChange = this.handleTeamChange.bind(this);
@@ -1000,6 +1188,13 @@
           this.handleUpdateMemberSkill =
             this.handleUpdateMemberSkill.bind(this);
           this.handleRemoveMember = this.handleRemoveMember.bind(this);
+          this.showSessionModal = this.showSessionModal.bind(this);
+          this.hideSessionModal = this.hideSessionModal.bind(this);
+          this.handleSaveSession = this.handleSaveSession.bind(this);
+          this.handleEditSession = this.handleEditSession.bind(this);
+          this.handleDeleteSession = this.handleDeleteSession.bind(this);
+          this.handleToggleSessionActive =
+            this.handleToggleSessionActive.bind(this);
         }
 
         async initialize() {
@@ -1065,6 +1260,26 @@
           document
             .getElementById("player-search")
             .addEventListener("input", this.handlePlayerSearch);
+
+          // Session management
+          document
+            .getElementById("add-session-btn")
+            .addEventListener("click", this.showSessionModal);
+          document
+            .getElementById("cancel-session-btn")
+            .addEventListener("click", this.hideSessionModal);
+          document
+            .getElementById("session-form-element")
+            .addEventListener("submit", this.handleSaveSession);
+
+          // Close modal when clicking outside
+          document
+            .getElementById("session-modal")
+            .addEventListener("click", (e) => {
+              if (e.target.id === "session-modal") {
+                this.hideSessionModal();
+              }
+            });
 
           // Avatar dropdown
           const userAvatar = document.getElementById("user-avatar");
@@ -1238,8 +1453,8 @@
             // Update team info
             this.updateTeamHeader();
 
-            // Load team members
-            await this.loadTeamMembers();
+            // Load team members and sessions
+            await Promise.all([this.loadTeamMembers(), this.loadSessions()]);
           } catch (error) {
             console.error("Failed to load team data:", error);
             this.showError(
@@ -1858,6 +2073,310 @@
           document.getElementById("main-content").style.display = "none";
           document.getElementById("no-team").style.display = "none";
           document.getElementById("permission-denied").style.display = "block";
+        }
+
+        // Session Management Methods
+        async loadSessions() {
+          try {
+            const currentMembership = this.authManager.getActiveMembership();
+            if (!currentMembership?.divisionId) {
+              document.getElementById("sessions-list").innerHTML =
+                "<p>No division selected.</p>";
+              return;
+            }
+
+            const response = await this.authManager.apiRequest(
+              `/divisions/${currentMembership.divisionId}/sessions`
+            );
+
+            if (response.ok) {
+              this.sessions = await response.json();
+              await this.renderSessionsList();
+            } else {
+              throw new Error("Failed to load sessions");
+            }
+          } catch (error) {
+            console.error("Failed to load sessions:", error);
+            document.getElementById("sessions-list").innerHTML =
+              "<p>Failed to load sessions. Please try again.</p>";
+          }
+        }
+
+        async renderSessionsList() {
+          const sessionsListElement = document.getElementById("sessions-list");
+
+          if (this.sessions.length === 0) {
+            sessionsListElement.innerHTML =
+              '<p>No sessions found. Use the "Create Session" button to add a new session/season.</p>';
+            return;
+          }
+
+          // Sort sessions by start date (newest first)
+          const sortedSessions = [...this.sessions].sort(
+            (a, b) => new Date(b.startDate) - new Date(a.startDate)
+          );
+
+          // Get match counts for each session
+          const currentMembership = this.authManager.getActiveMembership();
+          const matchCounts = {};
+
+          for (const session of sortedSessions) {
+            try {
+              const response = await this.authManager.apiRequest(
+                `/GetMatches?divisionId=${currentMembership.divisionId}`
+              );
+              if (response.ok) {
+                const matches = await response.json();
+                matchCounts[session.id] = matches.filter(
+                  (m) => m.sessionId === session.id
+                ).length;
+              } else {
+                matchCounts[session.id] = 0;
+              }
+            } catch (error) {
+              matchCounts[session.id] = 0;
+            }
+          }
+
+          sessionsListElement.innerHTML = sortedSessions
+            .map((session) => {
+              const startDate = new Date(
+                session.startDate
+              ).toLocaleDateString();
+              const endDate = new Date(session.endDate).toLocaleDateString();
+              const activeClass = session.isActive ? "active" : "";
+              const badgeClass = session.isActive ? "active" : "inactive";
+              const badgeText = session.isActive ? "Active" : "Inactive";
+              const matchCount = matchCounts[session.id] || 0;
+              const canDelete = matchCount === 0;
+
+              return `
+              <div class="session-card ${activeClass}">
+                <div class="session-info">
+                  <div class="session-name">${this.escapeHtml(
+                    session.name
+                  )}</div>
+                  <div class="session-dates">${startDate} - ${endDate}</div>
+                  <div class="session-meta">
+                    <span class="session-badge ${badgeClass}">${badgeText}</span>
+                    <span class="session-match-count">${matchCount} match${
+                matchCount !== 1 ? "es" : ""
+              }</span>
+                  </div>
+                </div>
+                <div class="session-actions">
+                  <button 
+                    class="btn ${
+                      session.isActive ? "btn-secondary" : "btn-primary"
+                    } btn-sm"
+                    onclick="teamAdminApp.handleToggleSessionActive('${
+                      session.id
+                    }', ${!session.isActive})"
+                    title="${session.isActive ? "Deactivate" : "Activate"}"
+                  >
+                    ${session.isActive ? "⏸️ Deactivate" : "▶️ Activate"}
+                  </button>
+                  <button 
+                    class="btn btn-secondary btn-sm"
+                    onclick="teamAdminApp.handleEditSession('${session.id}')"
+                    title="Edit"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button 
+                    class="btn btn-danger btn-sm"
+                    onclick="teamAdminApp.handleDeleteSession('${session.id}')"
+                    ${canDelete ? "" : "disabled"}
+                    title="${
+                      canDelete
+                        ? "Delete"
+                        : "Cannot delete session with matches"
+                    }"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            `;
+            })
+            .join("");
+        }
+
+        showSessionModal() {
+          this.editingSessionId = null;
+          document.getElementById("session-modal-title").textContent =
+            "Create Session";
+          document.getElementById("session-name").value = "";
+          document.getElementById("session-start-date").value = "";
+          document.getElementById("session-end-date").value = "";
+          document.getElementById("session-is-active").checked = true;
+          document.getElementById("session-modal").style.display = "flex";
+        }
+
+        hideSessionModal() {
+          document.getElementById("session-modal").style.display = "none";
+          this.editingSessionId = null;
+        }
+
+        async handleEditSession(sessionId) {
+          const session = this.sessions.find((s) => s.id === sessionId);
+          if (!session) return;
+
+          this.editingSessionId = sessionId;
+          document.getElementById("session-modal-title").textContent =
+            "Edit Session";
+          document.getElementById("session-name").value = session.name;
+          document.getElementById("session-start-date").value = new Date(
+            session.startDate
+          )
+            .toISOString()
+            .split("T")[0];
+          document.getElementById("session-end-date").value = new Date(
+            session.endDate
+          )
+            .toISOString()
+            .split("T")[0];
+          document.getElementById("session-is-active").checked =
+            session.isActive;
+          document.getElementById("session-modal").style.display = "flex";
+        }
+
+        async handleSaveSession(event) {
+          event.preventDefault();
+
+          const currentMembership = this.authManager.getActiveMembership();
+          if (!currentMembership?.divisionId) {
+            alert("No division selected.");
+            return;
+          }
+
+          const sessionData = {
+            divisionId: currentMembership.divisionId,
+            name: document.getElementById("session-name").value,
+            startDate: new Date(
+              document.getElementById("session-start-date").value
+            ).toISOString(),
+            endDate: new Date(
+              document.getElementById("session-end-date").value
+            ).toISOString(),
+            isActive: document.getElementById("session-is-active").checked,
+          };
+
+          try {
+            let response;
+            if (this.editingSessionId) {
+              // Update existing session
+              response = await this.authManager.apiRequest(
+                `/divisions/${currentMembership.divisionId}/sessions/${this.editingSessionId}`,
+                {
+                  method: "PUT",
+                  body: JSON.stringify(sessionData),
+                }
+              );
+            } else {
+              // Create new session
+              response = await this.authManager.apiRequest(
+                `/divisions/${currentMembership.divisionId}/sessions`,
+                {
+                  method: "POST",
+                  body: JSON.stringify(sessionData),
+                }
+              );
+            }
+
+            if (response.ok) {
+              this.hideSessionModal();
+              await this.loadSessions();
+              alert(
+                this.editingSessionId
+                  ? "Session updated successfully!"
+                  : "Session created successfully!"
+              );
+            } else {
+              const errorText = await response.text();
+              throw new Error(errorText || "Failed to save session");
+            }
+          } catch (error) {
+            console.error("Failed to save session:", error);
+            alert(`Failed to save session: ${error.message}`);
+          }
+        }
+
+        async handleToggleSessionActive(sessionId, newActiveState) {
+          const session = this.sessions.find((s) => s.id === sessionId);
+          if (!session) return;
+
+          const currentMembership = this.authManager.getActiveMembership();
+          if (!currentMembership?.divisionId) return;
+
+          const sessionData = {
+            ...session,
+            isActive: newActiveState,
+          };
+
+          try {
+            const response = await this.authManager.apiRequest(
+              `/divisions/${currentMembership.divisionId}/sessions/${sessionId}`,
+              {
+                method: "PUT",
+                body: JSON.stringify(sessionData),
+              }
+            );
+
+            if (response.ok) {
+              await this.loadSessions();
+            } else {
+              const errorText = await response.text();
+              throw new Error(errorText || "Failed to update session");
+            }
+          } catch (error) {
+            console.error("Failed to toggle session active state:", error);
+            alert(`Failed to update session: ${error.message}`);
+          }
+        }
+
+        async handleDeleteSession(sessionId) {
+          if (
+            !confirm(
+              "Are you sure you want to delete this session? This action cannot be undone."
+            )
+          ) {
+            return;
+          }
+
+          const currentMembership = this.authManager.getActiveMembership();
+          if (!currentMembership?.divisionId) return;
+
+          try {
+            const response = await this.authManager.apiRequest(
+              `/divisions/${currentMembership.divisionId}/sessions/${sessionId}`,
+              {
+                method: "DELETE",
+              }
+            );
+
+            if (response.ok || response.status === 204) {
+              await this.loadSessions();
+              alert("Session deleted successfully!");
+            } else {
+              const errorText = await response.text();
+              throw new Error(errorText || "Failed to delete session");
+            }
+          } catch (error) {
+            console.error("Failed to delete session:", error);
+            alert(`Failed to delete session: ${error.message}`);
+          }
+        }
+
+        escapeHtml(text) {
+          const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;",
+          };
+          return text.replace(/[&<>"']/g, (m) => map[m]);
         }
       }
 

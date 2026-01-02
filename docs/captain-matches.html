@@ -338,6 +338,32 @@
         border: 1px solid #bee5eb;
       }
 
+      .warning-message {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffc107;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .info-message {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .match-session {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+      }
+
       .hidden {
         display: none !important;
       }
@@ -420,7 +446,27 @@
             <label for="match-time">Match Time *</label>
             <input type="time" id="match-time" value="19:00" required />
           </div>
-          <button type="submit" class="btn btn-primary">Create Match</button>
+          <div
+            id="session-selector-container"
+            class="form-group"
+            style="display: none"
+          >
+            <label for="match-session">Session *</label>
+            <select id="match-session" required>
+              <option value="">Loading sessions...</option>
+            </select>
+          </div>
+          <div
+            id="session-warning"
+            class="warning-message"
+            style="display: none"
+          >
+            ⚠️ No active sessions available. Please create a session in Team
+            Admin before creating matches.
+          </div>
+          <button type="submit" class="btn btn-primary" id="create-match-btn">
+            Create Match
+          </button>
         </form>
       </div>
 
@@ -446,6 +492,7 @@
       let authManager;
       let currentTeam = null;
       let currentDivisionId = null;
+      let activeSessions = [];
 
       async function init() {
         authManager = new AuthManager();
@@ -482,6 +529,7 @@
 
         setupTeamSwitcher();
         setupEventListeners();
+        await loadActiveSessions();
         await loadMatches();
       }
 
@@ -529,6 +577,74 @@
         }
       }
 
+      async function loadActiveSessions() {
+        if (!currentDivisionId) {
+          console.warn("No division ID available for loading sessions");
+          return;
+        }
+
+        try {
+          const token = authManager.getAuthToken();
+          const response = await fetch(
+            `${authManager.baseUrl}/divisions/${currentDivisionId}/sessions/active`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch active sessions");
+          }
+
+          activeSessions = await response.json();
+          updateSessionSelector();
+        } catch (error) {
+          console.error("Error loading active sessions:", error);
+          activeSessions = [];
+          updateSessionSelector();
+        }
+      }
+
+      function updateSessionSelector() {
+        const selectorContainer = document.getElementById(
+          "session-selector-container"
+        );
+        const sessionSelect = document.getElementById("match-session");
+        const sessionWarning = document.getElementById("session-warning");
+        const createButton = document.getElementById("create-match-btn");
+
+        if (!activeSessions || activeSessions.length === 0) {
+          // No active sessions - show warning, hide selector, disable button
+          selectorContainer.style.display = "none";
+          sessionWarning.style.display = "block";
+          createButton.disabled = true;
+        } else if (activeSessions.length === 1) {
+          // One active session - show as read-only info, hide selector
+          selectorContainer.style.display = "none";
+          sessionWarning.style.display = "none";
+          sessionWarning.innerHTML = `ℹ️ Matches will be created for session: <strong>${activeSessions[0].name}</strong>`;
+          sessionWarning.style.display = "block";
+          sessionWarning.className = "info-message";
+          createButton.disabled = false;
+        } else {
+          // Multiple active sessions - show dropdown
+          sessionSelect.innerHTML =
+            '<option value="">Select a session...</option>';
+          activeSessions.forEach((session) => {
+            const option = document.createElement("option");
+            option.value = session.id;
+            option.textContent = session.name;
+            sessionSelect.appendChild(option);
+          });
+          selectorContainer.style.display = "block";
+          sessionWarning.style.display = "none";
+          createButton.disabled = false;
+        }
+      }
+
       function setupEventListeners() {
         document
           .getElementById("create-match-form")
@@ -565,6 +681,16 @@
           scheduledAt: scheduledAt,
           status: "scheduled",
         };
+
+        // Include sessionId if multiple sessions exist
+        if (activeSessions.length > 1) {
+          const sessionId = document.getElementById("match-session").value;
+          if (!sessionId) {
+            showAlert("Please select a session", "error");
+            return;
+          }
+          matchData.sessionId = sessionId;
+        }
 
         try {
           const token = authManager.getAuthToken();
@@ -649,7 +775,7 @@
 
           // Update the week number input with next available week
           if (matches.length > 0) {
-            const maxWeek = Math.max(...matches.map(m => m.week || 0));
+            const maxWeek = Math.max(...matches.map((m) => m.week || 0));
             const weekInput = document.getElementById("match-week");
             if (weekInput && !weekInput.value) {
               weekInput.value = maxWeek + 1;
@@ -703,6 +829,15 @@
           match.lineupPlan?.home?.length > 0 ||
           match.lineupPlan?.away?.length > 0;
 
+        // Find session name if sessionId exists
+        let sessionInfo = "";
+        if (match.sessionId) {
+          const session = activeSessions.find((s) => s.id === match.sessionId);
+          sessionInfo = session ? session.name : "Unknown Session";
+        } else {
+          sessionInfo = "No Session Assigned";
+        }
+
         card.innerHTML = `
           <div class="match-date">
             <div class="day">${day}</div>
@@ -711,6 +846,7 @@
           <div class="match-info">
             <div class="match-week">Week ${match.week}</div>
             <div class="match-time">${time}</div>
+            <div class="match-session">📅 ${sessionInfo}</div>
             <span class="match-status ${match.status}">${match.status
           .replace("-", " ")
           .toUpperCase()}</span>

@@ -288,7 +288,7 @@ public class CosmosMembershipService : IMembershipService
     {
         try
         {
-            var container = _cosmosClient.GetContainer(_databaseName, _containerName);
+            var container = _cosmosClient.GetContainer(_databaseName, "Teams");
 
             var response = await container.ReadItemAsync<Team>(
                 teamId,

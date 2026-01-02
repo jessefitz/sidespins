@@ -26,6 +26,7 @@ CONTAINER_SPECS = {
     "Players":        {"partition_key": "/id",          "indexing_policy": None},
     "TeamMemberships":{"partition_key": "/teamId",      "indexing_policy": None},
     "TeamMatches":    {"partition_key": "/divisionId",  "indexing_policy": None},
+    "Sessions":       {"partition_key": "/divisionId",  "indexing_policy": None},
 }
 
 def get_args():
@@ -113,7 +114,7 @@ def main():
         containers[name] = ensure_container(db, name, spec, args.throughput)
 
     # Upsert groups in an order that satisfies references
-    order = ["Divisions", "Players", "Teams", "TeamMemberships", "TeamMatches"]
+    order = ["Divisions", "Sessions", "Players", "Teams", "TeamMemberships", "TeamMatches"]
     for group in order:
         if group not in seed:
             print(f"[skip] No '{group}' in seed")

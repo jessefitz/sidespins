@@ -506,6 +506,94 @@
         font-size: 1.1rem;
       }
 
+      .schedule-summary {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e9ecef;
+      }
+
+      .schedule-summary-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        user-select: none;
+        padding: 0.5rem 0;
+      }
+
+      .schedule-summary-header:hover {
+        opacity: 0.8;
+      }
+
+      .schedule-summary-header h4 {
+        margin: 0;
+        color: #495057;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .toggle-icon {
+        font-size: 1.2rem;
+        color: #007cba;
+        transition: transform 0.3s ease;
+        font-weight: bold;
+      }
+
+      .toggle-icon.expanded {
+        transform: rotate(90deg);
+      }
+
+      .schedule-summary-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .schedule-summary-content.expanded {
+        max-height: 2000px;
+      }
+
+      .session-count-group {
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+      }
+
+      .session-count-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .session-count-header {
+        font-weight: 600;
+        color: #007cba;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+      }
+
+      .player-count-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+
+      .player-count-list li {
+        padding: 0.25rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .player-name {
+        color: #333;
+      }
+
+      .game-count {
+        color: #666;
+        font-weight: 500;
+        white-space: nowrap;
+        margin-left: 1rem;
+      }
+
       .schedule-content {
         background: white;
         border-radius: 12px;
@@ -1270,7 +1358,22 @@
           <h1>Team Schedule</h1>
           <div class="team-info">
             <h3><span id="team-name">Team</span></h3>
-            <p id="active-sessions-display">Loading sessions...</p>
+            <div
+              class="schedule-summary"
+              id="schedule-summary"
+              style="display: none"
+            >
+              <div class="schedule-summary-header" id="schedule-summary-toggle">
+                <span class="toggle-icon" id="toggle-icon">▶</span>
+                <h4>Schedule Summary</h4>
+              </div>
+              <div
+                class="schedule-summary-content"
+                id="schedule-summary-content"
+              >
+                <div id="session-player-counts"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1633,16 +1736,145 @@
         }
 
         updateActiveSessionsDisplay() {
-          const display = document.getElementById("active-sessions-display");
-          if (!this.activeSessions || this.activeSessions.length === 0) {
-            display.textContent = "No active sessions";
+          // No longer needed - removed display element
+        }
+
+        initializeScheduleSummaryToggle() {
+          const toggle = document.getElementById("schedule-summary-toggle");
+          const content = document.getElementById("schedule-summary-content");
+          const icon = document.getElementById("toggle-icon");
+
+          toggle.addEventListener("click", () => {
+            const isExpanded = content.classList.contains("expanded");
+
+            if (isExpanded) {
+              content.classList.remove("expanded");
+              icon.classList.remove("expanded");
+            } else {
+              content.classList.add("expanded");
+              icon.classList.add("expanded");
+            }
+          });
+        }
+
+        calculatePlayerGameCounts(matches, playerSkills) {
+          // Structure: { sessionId: { playerId: count } }
+          const sessionPlayerCounts = {};
+
+          // Filter matches for our team and active sessions
+          const teamMatches = matches.filter(
+            (match) =>
+              (match.homeTeamId === this.teamId ||
+                match.awayTeamId === this.teamId) &&
+              match.sessionId &&
+              this.activeSessionIds.has(match.sessionId)
+          );
+
+          // Iterate through each match and count player appearances
+          teamMatches.forEach((match) => {
+            const sessionId = match.sessionId;
+
+            if (!sessionPlayerCounts[sessionId]) {
+              sessionPlayerCounts[sessionId] = {};
+            }
+
+            // Process home lineup
+            if (match.lineupPlan && match.lineupPlan.home) {
+              match.lineupPlan.home.forEach((lineupPlayer) => {
+                // Exclude alternates
+                if (!lineupPlayer.isAlternate && lineupPlayer.playerId) {
+                  const playerId = lineupPlayer.playerId;
+                  sessionPlayerCounts[sessionId][playerId] =
+                    (sessionPlayerCounts[sessionId][playerId] || 0) + 1;
+                }
+              });
+            }
+
+            // Process away lineup
+            if (match.lineupPlan && match.lineupPlan.away) {
+              match.lineupPlan.away.forEach((lineupPlayer) => {
+                // Exclude alternates
+                if (!lineupPlayer.isAlternate && lineupPlayer.playerId) {
+                  const playerId = lineupPlayer.playerId;
+                  sessionPlayerCounts[sessionId][playerId] =
+                    (sessionPlayerCounts[sessionId][playerId] || 0) + 1;
+                }
+              });
+            }
+          });
+
+          return sessionPlayerCounts;
+        }
+
+        displayScheduleSummary(sessionPlayerCounts, playerSkills) {
+          const container = document.getElementById("session-player-counts");
+          const summarySection = document.getElementById("schedule-summary");
+
+          // Clear previous content
+          container.innerHTML = "";
+
+          // Check if we have any counts to display
+          const hasCounts = Object.keys(sessionPlayerCounts).length > 0;
+
+          if (!hasCounts) {
+            summarySection.style.display = "none";
             return;
           }
 
-          const sessionNames = this.activeSessions
-            .map((s) => s.name)
-            .join(", ");
-          display.textContent = `Active Sessions: ${sessionNames}`;
+          summarySection.style.display = "block";
+
+          // Sort sessions by name for consistent display
+          const sortedSessions = this.activeSessions
+            .filter((session) => sessionPlayerCounts[session.id])
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+          sortedSessions.forEach((session) => {
+            const playerCounts = sessionPlayerCounts[session.id];
+
+            // Create session group
+            const sessionGroup = document.createElement("div");
+            sessionGroup.className = "session-count-group";
+
+            // Session header
+            const header = document.createElement("div");
+            header.className = "session-count-header";
+            header.textContent = session.name;
+            sessionGroup.appendChild(header);
+
+            // Player list
+            const playerList = document.createElement("ul");
+            playerList.className = "player-count-list";
+
+            // Convert to array and sort by player name
+            const playerEntries = Object.entries(playerCounts)
+              .map(([playerId, count]) => ({
+                playerId,
+                count,
+                name: playerSkills[playerId]?.name || "Unknown Player",
+              }))
+              .sort((a, b) => a.name.localeCompare(b.name));
+
+            playerEntries.forEach(({ playerId, count, name }) => {
+              const listItem = document.createElement("li");
+
+              const nameSpan = document.createElement("span");
+              nameSpan.className = "player-name";
+              nameSpan.textContent = name;
+
+              const countSpan = document.createElement("span");
+              countSpan.className = "game-count";
+              countSpan.textContent = `${count} ${
+                count === 1 ? "game" : "games"
+              }`;
+
+              listItem.appendChild(nameSpan);
+              listItem.appendChild(countSpan);
+              playerList.appendChild(listItem);
+            });
+
+            sessionGroup.appendChild(playerList);
+            container.appendChild(sessionGroup);
+          });
         }
 
         async loadSchedule() {
@@ -1665,6 +1897,14 @@
               players,
               memberships
             );
+
+            // Calculate and display schedule summary
+            const sessionPlayerCounts = this.calculatePlayerGameCounts(
+              matches,
+              playerSkills
+            );
+            this.displayScheduleSummary(sessionPlayerCounts, playerSkills);
+            this.initializeScheduleSummaryToggle();
 
             // Group matches by date
             const matchesByDate = this.groupMatchesByDate(matches);

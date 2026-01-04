@@ -13,6 +13,7 @@ public class LeagueService
     private readonly Container _matchesContainer;
     private readonly Container _teamsContainer;
     private readonly Container _divisionsContainer;
+    private readonly Container _sessionsContainer;
 
     public LeagueService(CosmosClient cosmosClient, string databaseName)
     {
@@ -23,6 +24,7 @@ public class LeagueService
         _matchesContainer = database.GetContainer("TeamMatches");
         _teamsContainer = database.GetContainer("Teams");
         _divisionsContainer = database.GetContainer("Divisions");
+        _sessionsContainer = database.GetContainer("Sessions");
     }
 
     // Player operations (partition key: /id - self-partitioned)
@@ -358,11 +360,100 @@ public class LeagueService
         match.CreatedAt = DateTime.UtcNow;
         match.Type = "teamMatch";
 
+        // Auto-assign sessionId from newest active session if not already set
+        if (string.IsNullOrEmpty(match.SessionId))
+        {
+            var activeSessions = await GetActiveSessionsAsync(match.DivisionId);
+            var newestSession = activeSessions.OrderByDescending(s => s.StartDate).FirstOrDefault();
+
+            if (newestSession != null)
+            {
+                match.SessionId = newestSession.Id;
+            }
+        }
+
         var response = await _matchesContainer.CreateItemAsync(
             match,
             new PartitionKey(match.DivisionId)
         );
         return response.Resource;
+    }
+
+    public async Task<TeamMatch?> CreateTeamMatchAsync(string teamId, TeamMatch match)
+    {
+        // Fetch team to get divisionId and validate team exists
+        var team = await GetTeamsByDivisionIdAsync(match.DivisionId ?? "");
+        var teamExists = team.Any(t => t.Id == teamId);
+
+        if (!teamExists)
+        {
+            // If divisionId wasn't provided, try to find team across divisions
+            var allTeams = await GetTeamsAsync();
+            var foundTeam = allTeams.FirstOrDefault(t => t.Id == teamId);
+            if (foundTeam == null)
+            {
+                return null; // Team not found
+            }
+
+            // Use team's divisionId
+            match.DivisionId = foundTeam.DivisionId;
+        }
+
+        // Set captain's team as home team
+        match.HomeTeamId = teamId;
+        match.HomeTeamName = team.FirstOrDefault(t => t.Id == teamId)?.Name;
+
+        // Leave away team as null (bye week) unless specified
+        if (match.AwayTeamId == null)
+        {
+            match.AwayTeamName = null;
+        }
+
+        // Initialize lineup plan with defaults if not provided
+        if (match.LineupPlan == null)
+        {
+            match.LineupPlan = new LineupPlan
+            {
+                Ruleset = "APA_9B",
+                MaxTeamSkillCap = 23,
+                Home = new List<LineupPlayer>(),
+                Away = new List<LineupPlayer>(),
+                Totals = new LineupTotals
+                {
+                    HomePlannedSkillSum = 0,
+                    AwayPlannedSkillSum = 0,
+                    HomeWithinCap = true,
+                    AwayWithinCap = true,
+                },
+                Locked = false,
+                LockedBy = null,
+                LockedAt = null,
+                History = new List<LineupHistoryEntry>(),
+            };
+        }
+
+        // Initialize empty totals
+        if (match.Totals == null)
+        {
+            match.Totals = new MatchTotals
+            {
+                HomePoints = 0,
+                AwayPoints = 0,
+                BonusPoints = new BonusPoints { Home = 0, Away = 0 },
+            };
+        }
+
+        // Initialize empty player matches
+        match.PlayerMatches = new List<object>();
+
+        // Set default status if not provided
+        if (string.IsNullOrEmpty(match.Status))
+        {
+            match.Status = "scheduled";
+        }
+
+        // Use the existing CreateMatchAsync method
+        return await CreateMatchAsync(match);
     }
 
     public async Task<TeamMatch?> UpdateMatchAsync(string id, string divisionId, TeamMatch match)
@@ -620,6 +711,22 @@ public class LeagueService
     }
 
     // Team operations (partition key: /divisionId)
+    public async Task<IEnumerable<Team>> GetTeamsAsync()
+    {
+        var query = "SELECT * FROM c";
+        var queryDefinition = new QueryDefinition(query);
+        var resultSet = _teamsContainer.GetItemQueryIterator<Team>(queryDefinition);
+
+        var teams = new List<Team>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            teams.AddRange(response.ToList());
+        }
+
+        return teams;
+    }
+
     public async Task<IEnumerable<Team>> GetTeamsByDivisionIdAsync(string divisionId)
     {
         var query = "SELECT * FROM c";
@@ -713,5 +820,153 @@ public class LeagueService
         {
             return false;
         }
+    }
+
+    // Session operations (partition key: /divisionId)
+    public async Task<IEnumerable<Session>> GetSessionsAsync(string divisionId)
+    {
+        var query = "SELECT * FROM c WHERE c.type = 'session' AND c.divisionId = @divisionId";
+        var queryDefinition = new QueryDefinition(query).WithParameter("@divisionId", divisionId);
+
+        var resultSet = _sessionsContainer.GetItemQueryIterator<Session>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
+
+        var sessions = new List<Session>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            sessions.AddRange(response.ToList());
+        }
+
+        return sessions;
+    }
+
+    public async Task<IEnumerable<Session>> GetActiveSessionsAsync(string divisionId)
+    {
+        var query =
+            "SELECT * FROM c WHERE c.type = 'session' AND c.divisionId = @divisionId AND c.isActive = true";
+        var queryDefinition = new QueryDefinition(query).WithParameter("@divisionId", divisionId);
+
+        var resultSet = _sessionsContainer.GetItemQueryIterator<Session>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
+
+        var sessions = new List<Session>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            sessions.AddRange(response.ToList());
+        }
+
+        return sessions;
+    }
+
+    public async Task<Session?> GetSessionByIdAsync(string id, string divisionId)
+    {
+        try
+        {
+            var response = await _sessionsContainer.ReadItemAsync<Session>(
+                id,
+                new PartitionKey(divisionId)
+            );
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<Session> CreateSessionAsync(Session session)
+    {
+        if (string.IsNullOrEmpty(session.Id))
+        {
+            session.Id = $"session_{Guid.NewGuid():N}";
+        }
+        if (string.IsNullOrEmpty(session.DivisionId))
+        {
+            throw new ArgumentException(
+                $"DivisionId is required for creating a session. Received: '{session.DivisionId}'"
+            );
+        }
+        session.CreatedAt = DateTime.UtcNow;
+        session.Type = "session";
+
+        // Log for debugging
+        Console.WriteLine(
+            $"Creating session with DivisionId: '{session.DivisionId}', Id: '{session.Id}'"
+        );
+        var serialized = JsonConvert.SerializeObject(session, Formatting.Indented);
+        Console.WriteLine($"Serialized session JSON:\n{serialized}");
+
+        var response = await _sessionsContainer.CreateItemAsync(
+            session,
+            new PartitionKey(session.DivisionId)
+        );
+        return response.Resource;
+    }
+
+    public async Task<Session?> UpdateSessionAsync(string id, string divisionId, Session session)
+    {
+        try
+        {
+            session.Id = id;
+            session.Type = "session";
+            session.DivisionId = divisionId;
+
+            if (session.CreatedAt == default(DateTime))
+            {
+                session.CreatedAt = DateTime.UtcNow;
+            }
+
+            var response = await _sessionsContainer.ReplaceItemAsync(
+                session,
+                id,
+                new PartitionKey(divisionId)
+            );
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteSessionAsync(string id, string divisionId)
+    {
+        try
+        {
+            await _sessionsContainer.DeleteItemAsync<Session>(id, new PartitionKey(divisionId));
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+    }
+
+    public async Task<int> GetMatchCountBySessionAsync(string sessionId, string divisionId)
+    {
+        var query =
+            "SELECT VALUE COUNT(1) FROM c WHERE c.type = 'teamMatch' AND c.sessionId = @sessionId AND c.divisionId = @divisionId";
+        var queryDefinition = new QueryDefinition(query)
+            .WithParameter("@sessionId", sessionId)
+            .WithParameter("@divisionId", divisionId);
+
+        var resultSet = _matchesContainer.GetItemQueryIterator<int>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
+
+        if (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            return response.FirstOrDefault();
+        }
+
+        return 0;
     }
 }

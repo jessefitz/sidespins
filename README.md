@@ -6,7 +6,8 @@
 
 SideSpins serves as the digital hub for "Break of Dawn" 9-ball team, providing tools for:
 
-- **Match Scheduling & Tracking**: View upcoming matches and track results
+- **Session/Season Management**: Organize matches into seasons with start/end dates and active status
+- **Match Scheduling & Tracking**: View upcoming matches and track results with session assignments
 - **Lineup Planning**: Interactive lineup explorer with skill cap validation (23-point APA limit)
 - **Player Management**: Roster management with skill levels and availability tracking
 - **Team Administration**: Membership management and team statistics
@@ -15,7 +16,7 @@ SideSpins serves as the digital hub for "Break of Dawn" 9-ball team, providing t
 
 This is a full-stack application with three main components:
 
-### 🌐 Frontend (`site/`)
+### 🌐 Frontend (`docs/`)
 
 **Technology**: Jekyll static site generator with Ruby  
 **Deployment**: GitHub Pages with automated CI/CD
@@ -33,12 +34,15 @@ This is a full-stack application with three main components:
 **Technology**: .NET 8 Azure Functions (HTTP triggered)  
 **Deployment**: Azure Functions with Application Insights integration
 
-- **Secure REST API** with secret key authentication (`x-api-secret` header)
+- **Secure REST API** with JWT authentication middleware and Stytch integration
+- **Authentication**: Two-stage flow (Stytch session JWT → App JWT → API access)
+- **Authorization**: Role-based access control (player, manager, admin) with team-scoped permissions
 - **CRUD Operations** for:
   - Players management
   - Team memberships
   - Match data and lineup planning
-- **Data Models**: Division, Team, Player, TeamMembership, and TeamMatch entities
+  - Session/season management with automatic match assignment
+- **Data Models**: Division, Team, Player, TeamMembership, TeamMatch, and Session entities
 - **CORS Configuration**: Enables cross-origin requests from the Jekyll site
 - **Error Handling**: Comprehensive HTTP status code responses
 
@@ -52,6 +56,7 @@ This is a full-stack application with three main components:
   - **TeamMatches** (partition: `/divisionId`)
   - **Teams** (partition: `/divisionId`)
   - **Divisions** (partition: `/id`)
+  - **Sessions** (partition: `/divisionId`)
 - **Seed Data**: JSON-based initial data structure for development and testing
 - **Import Script**: Python utility for database setup and data migration
 
@@ -66,7 +71,7 @@ This is a full-stack application with three main components:
 ### Jekyll Site Development
 
 ```bash
-cd site
+cd docs
 bundle install
 bundle exec jekyll serve
 # Site available at http://localhost:4000
@@ -103,10 +108,13 @@ Interactive tool for experimenting with player combinations:
 
 ### 📅 Schedule Management
 
-- Week-by-week match display
+- Session/season organization with start and end dates
+- Active session filtering and display
+- Week-by-week match display with session assignments
 - Player availability tracking
 - Direct links to lineup planning tools
 - Match status and results tracking
+- Automatic match assignment to newest active session
 
 ### 👥 Team Administration
 
@@ -145,6 +153,10 @@ The Azure Functions API provides secure endpoints for all CRUD operations. See `
 
 ## Security
 
-- **API Security**: Secret key authentication for all backend operations
+- **User Authentication**: Stytch integration for SMS/Email-based user login and signup
+- **API Security**: JWT middleware validates all requests with role-based authorization
+- **Authorization Levels**: Three-tier access control (player → manager → admin)
+- **Team Scoping**: Users can only access data for their assigned teams
 - **CORS Policy**: Configured to allow requests only from authorized domains
 - **Environment Variables**: Sensitive configuration stored securely
+- **Testing**: Dedicated test scripts for authentication flows (`test-auth-middleware.ps1`, `test-signup-flow.ps1`)

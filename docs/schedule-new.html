@@ -554,7 +554,7 @@
       }
 
       .session-count-group {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         margin-top: 1rem;
       }
 
@@ -565,7 +565,7 @@
       .session-count-header {
         font-weight: 600;
         color: #007cba;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-size: 0.95rem;
       }
 
@@ -573,25 +573,49 @@
         list-style: none;
         padding: 0;
         margin: 0;
-        font-size: 0.9rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.75rem;
       }
 
       .player-count-list li {
-        padding: 0.25rem 0;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .player-count-list li:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-color: #007cba;
+        transform: translateY(-2px);
       }
 
       .player-name {
         color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
       }
 
       .game-count {
+        color: #007cba;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-top: 0.25rem;
+      }
+
+      .game-count-label {
         color: #666;
-        font-weight: 500;
-        white-space: nowrap;
-        margin-left: 1rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.15rem;
       }
 
       .schedule-content {
@@ -1863,12 +1887,17 @@
 
               const countSpan = document.createElement("span");
               countSpan.className = "game-count";
-              countSpan.textContent = `${count} ${
-                count === 1 ? "game" : "games"
-              }`;
+              countSpan.textContent = count;
+
+              const labelSpan = document.createElement("span");
+              labelSpan.className = "game-count-label";
+              labelSpan.textContent = `${
+                count === 1 ? "Game" : "Games"
+              } Scheduled`;
 
               listItem.appendChild(nameSpan);
               listItem.appendChild(countSpan);
+              listItem.appendChild(labelSpan);
               playerList.appendChild(listItem);
             });
 

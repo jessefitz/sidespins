@@ -33,6 +33,7 @@ plugins:
   - jekyll-feed
 
 header_pages:
+  - about.html
   - index.md
   - schedule.html
   - lineup-explorer.html

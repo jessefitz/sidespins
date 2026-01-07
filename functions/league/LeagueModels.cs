@@ -150,6 +150,24 @@ public class LineupPlayer
     public string? Availability { get; set; } // "available", "unavailable", or null
 }
 
+public class PlayerMatch
+{
+    [JsonProperty("playerId")]
+    public string PlayerId { get; set; } = string.Empty;
+
+    [JsonProperty("playerName")]
+    public string PlayerName { get; set; } = string.Empty;
+
+    [JsonProperty("skillLevel")]
+    public int SkillLevel { get; set; }
+
+    [JsonProperty("result")]
+    public string Result { get; set; } = string.Empty; // "win", "loss", or "forfeit"
+
+    [JsonProperty("recordedAt")]
+    public DateTime RecordedAt { get; set; }
+}
+
 public class LineupHistoryEntry
 {
     [JsonProperty("at")]
@@ -267,7 +285,7 @@ public class TeamMatch
     public LineupPlan LineupPlan { get; set; } = new();
 
     [JsonProperty("playerMatches")]
-    public List<object> PlayerMatches { get; set; } = new();
+    public List<PlayerMatch> PlayerMatches { get; set; } = new();
 
     [JsonProperty("totals")]
     public MatchTotals Totals { get; set; } = new();

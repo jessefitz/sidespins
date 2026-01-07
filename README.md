@@ -9,6 +9,7 @@ SideSpins serves as the digital hub for "Break of Dawn" 9-ball team, providing t
 - **Session/Season Management**: Organize matches into seasons with start/end dates and active status
 - **Match Scheduling & Tracking**: View upcoming matches and track results with session assignments
 - **Lineup Planning**: Interactive lineup explorer with skill cap validation (23-point APA limit)
+- **Match Outcome Recording**: Captains can record actual game results (Win/Loss/Forfeit) for players after matches
 - **Player Management**: Roster management with skill levels and availability tracking
 - **Team Administration**: Membership management and team statistics
 
@@ -115,6 +116,12 @@ Interactive tool for experimenting with player combinations:
 - Direct links to lineup planning tools
 - Match status and results tracking
 - Automatic match assignment to newest active session
+- **Match Outcome Recording** (Captain-only):
+  - Record Win/Loss/Forfeit for any team member
+  - Available for matches on or after scheduled date
+  - Edit/overwrite previously recorded scores
+  - Results display alongside planned lineups
+  - Players don't need to be in planned lineup to record results
 
 ### 👥 Team Administration
 

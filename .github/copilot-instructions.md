@@ -101,6 +101,40 @@ python import_cosmos_sidespins.py --seed ./seed_sidespins.json --create-db
 
 ## Common Tasks
 
+### Match Outcome Recording
+**Feature**: Captains can record actual game results after matches occur
+
+**Backend Components**:
+- `PlayerMatch` model in `LeagueModels.cs`:
+  - `playerId`, `playerName`, `skillLevel`
+  - `result` (win/loss/forfeit)
+  - `recordedAt` timestamp
+- `UpdateMatchPlayerScoresAsync` in `LeagueService.cs` - replaces entire playerMatches array (allows edits)
+- `PATCH /api/teams/{teamId}/matches/{matchId}/scores` endpoint in `MatchesFunctions.cs`
+  - Requires `[RequireTeamRole("captain")]`
+  - Validates match date <= today
+  - Validates team is part of match
+  - Accepts array of PlayerMatch objects
+
+**Frontend Components**:
+- `match-scores.html` - Score entry page
+  - Loads team roster from memberships + bulk player data
+  - Click Win/Loss/Forfeit buttons for each player
+  - Only saves players with recorded results
+  - Pre-populates existing scores for editing
+- Schedule page (`schedule-new.html`):
+  - "📝 Record Scores" button (captain-only, match date <= today)
+  - `renderActualResults()` displays outcomes alongside lineups
+  - Uses same `.player-card` styling as lineup cards
+  - Result status shown with color-coded badges
+
+**Data Flow**:
+1. Captain clicks "Record Scores" button on schedule
+2. `match-scores.html` loads with team roster
+3. Captain selects Win/Loss/Forfeit for players
+4. Submits to `/teams/{teamId}/matches/{matchId}/scores`
+5. Schedule page displays results in `match.playerMatches` array
+
 ### Adding New API Endpoints
 1. Add model to `LeagueModels.cs` with proper `JsonProperty` attributes for camelCase
 2. Create function in appropriate `{Domain}Functions.cs` file
@@ -116,7 +150,52 @@ python import_cosmos_sidespins.py --seed ./seed_sidespins.json --create-db
 - **Authenticated requests**: Include JWT in `Authorization: Bearer <token>` header for user-specific operations
 - **Responsive design**: Bootstrap-based styling in `_sass/` directory
 - **Dynamic features**: Client-side JavaScript consumes Azure Functions API
-- **Key pages**: `lineup-explorer-new.html` for interactive lineup planning with 23-point skill cap validation
+- **Key pages**: `lineup-explorer-new.html` for interactive lineup planning with 23-point skill cap validation, `match-scores.html` for captain match outcome recording
+
+### Frontend Authentication Patterns (CRITICAL)
+- **Use `/assets/auth.js`** - Do NOT use `/auth/auth-manager.js` (doesn't exist)
+- **AuthManager instantiation**: `const authManager = new AuthManager();` (no baseUrl parameter needed)
+- **NO `initialize()` method** - AuthManager doesn't have this method
+- **Authentication flow**:
+  ```javascript
+  // Check authentication
+  const isAuthenticated = await authManager.requireAuth('/login-new.html?redirect=...');
+  if (!isAuthenticated) return;
+  
+  // Load memberships (required for role checks)
+  await authManager.loadUserMemberships();
+  
+  // Check role
+  if (!authManager.hasTeamRole('captain')) {
+    // Handle unauthorized
+  }
+  ```
+- **API calls**: Always use `authManager.baseUrl` for constructing endpoints
+  ```javascript
+  // CORRECT
+  const response = await authManager.makeAuthenticatedRequest(
+    `${authManager.baseUrl}/GetMatches?divisionId=${divisionId}`,
+    { method: 'GET' }
+  );
+  
+  // WRONG - Don't create separate baseUrl variable
+  const baseUrl = "{{ site.api_base_url }}"; // Don't do this
+  ```
+- **API endpoint naming**: Use PascalCase function names: `/GetMatches`, `/GetPlayers`, `/CreatePlayer`
+- **Bulk data patterns**: Fetch ALL players with `/GetPlayers`, then combine with memberships for team-specific data
+  ```javascript
+  // CORRECT - Fetch all players once
+  const allPlayers = await authManager.makeAuthenticatedRequest(
+    `${authManager.baseUrl}/GetPlayers`,
+    { method: 'GET' }
+  );
+  
+  // WRONG - Don't fetch individual players in loop
+  // for (const m of memberships) {
+  //   await authManager.makeAuthenticatedRequest(`${authManager.baseUrl}/players/${m.playerId}`);
+  // }
+  ```
+- **Skill levels**: Come from `skillLevel_9b` property on TeamMembership, not Player model
 
 ### Database Changes
 - Update models in `LeagueModels.cs` with `[JsonProperty]` attributes and corresponding containers

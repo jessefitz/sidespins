@@ -441,6 +441,108 @@ public class MatchesFunctions
         }
     }
 
+    [Function("UpdateTeamMatchScores")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> UpdateTeamMatchScores(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "patch",
+            Route = "teams/{teamId}/matches/{matchId}/scores"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId,
+        string matchId
+    )
+    {
+        try
+        {
+            // Extract divisionId from query parameter
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required");
+            }
+
+            // Verify the match exists and that the team is part of it
+            var match = await _cosmosService.GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Verify the team is either home or away team in this match
+            if (match.HomeTeamId != teamId && match.AwayTeamId != teamId)
+            {
+                return new ForbidResult();
+            }
+
+            // Validate match date (must be today or in the past)
+            var matchDate = match.ScheduledAt.Date;
+            var today = DateTime.UtcNow.Date;
+            if (matchDate > today)
+            {
+                return new BadRequestObjectResult(
+                    "Cannot record scores for future matches. Match must be today or in the past."
+                );
+            }
+
+            // Parse request body
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var playerMatches = JsonConvert.DeserializeObject<List<PlayerMatch>>(requestBody);
+
+            if (playerMatches == null || !playerMatches.Any())
+            {
+                return new BadRequestObjectResult("Invalid or empty player matches data");
+            }
+
+            // Validate player matches
+            foreach (var pm in playerMatches)
+            {
+                if (string.IsNullOrEmpty(pm.PlayerId))
+                {
+                    return new BadRequestObjectResult("Each player match must have a playerId");
+                }
+
+                if (
+                    string.IsNullOrEmpty(pm.Result)
+                    || (pm.Result != "win" && pm.Result != "loss" && pm.Result != "forfeit")
+                )
+                {
+                    return new BadRequestObjectResult(
+                        "Each player match must have a valid result: 'win', 'loss', or 'forfeit'"
+                    );
+                }
+            }
+
+            // Update the match with player scores
+            var updatedMatch = await _cosmosService.UpdateMatchPlayerScoresAsync(
+                matchId,
+                divisionId,
+                playerMatches
+            );
+
+            if (updatedMatch == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(updatedMatch);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error updating match scores for team {TeamId}, match {MatchId}",
+                teamId,
+                matchId
+            );
+            return new StatusCodeResult(500);
+        }
+    }
+
     // Public endpoints for the lineup sandbox
     [Function("GetPublicMatches")]
     [RequireAuthentication("player")]

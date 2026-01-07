@@ -350,6 +350,65 @@ public class LeagueService
         }
     }
 
+    public async Task<TeamMatch?> UpdateMatchPlayerScoresAsync(
+        string matchId,
+        string divisionId,
+        List<PlayerMatch> playerMatches
+    )
+    {
+        try
+        {
+            var match = await GetMatchByIdAsync(matchId, divisionId);
+            if (match == null)
+                return null;
+
+            // Set recordedAt timestamp for all player matches
+            foreach (var playerMatch in playerMatches)
+            {
+                playerMatch.RecordedAt = DateTime.UtcNow;
+            }
+
+            // Replace existing playerMatches (allowing edits/overwrites)
+            match.PlayerMatches = playerMatches;
+
+            // Ensure required properties are set
+            if (string.IsNullOrEmpty(match.Id))
+            {
+                match.Id = matchId;
+            }
+            if (string.IsNullOrEmpty(match.DivisionId))
+            {
+                match.DivisionId = divisionId;
+            }
+            if (string.IsNullOrEmpty(match.Type))
+            {
+                match.Type = "teamMatch";
+            }
+            if (match.CreatedAt == default(DateTime))
+            {
+                match.CreatedAt = DateTime.UtcNow;
+            }
+
+            var response = await _matchesContainer.ReplaceItemAsync(
+                match,
+                matchId,
+                new PartitionKey(divisionId)
+            );
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+        catch (CosmosException ex)
+        {
+            Console.WriteLine(
+                $"Cosmos exception during player scores update: {ex.StatusCode} - {ex.Message}"
+            );
+            throw;
+        }
+    }
+
     public async Task<TeamMatch> CreateMatchAsync(TeamMatch match)
     {
         // Ensure the ID is properly set
@@ -444,7 +503,7 @@ public class LeagueService
         }
 
         // Initialize empty player matches
-        match.PlayerMatches = new List<object>();
+        match.PlayerMatches = new List<PlayerMatch>();
 
         // Set default status if not provided
         if (string.IsNullOrEmpty(match.Status))

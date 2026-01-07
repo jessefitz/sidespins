@@ -1815,8 +1815,10 @@
         }
 
         calculatePlayerGameCounts(matches, playerSkills) {
-          // Structure: { sessionId: { playerId: count } }
+          // Structure: { sessionId: { playerId: { played: count, scheduled: count } } }
           const sessionPlayerCounts = {};
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set to start of day
 
           // Filter matches for our team and active sessions
           const teamMatches = matches.filter(
@@ -1830,31 +1832,62 @@
           // Iterate through each match and count player appearances
           teamMatches.forEach((match) => {
             const sessionId = match.sessionId;
+            const matchDate = new Date(match.scheduledAt);
+            matchDate.setHours(0, 0, 0, 0);
+            const isFutureOrToday = matchDate >= today;
 
             if (!sessionPlayerCounts[sessionId]) {
               sessionPlayerCounts[sessionId] = {};
             }
 
-            // Process home lineup
-            if (match.lineupPlan && match.lineupPlan.home) {
-              match.lineupPlan.home.forEach((lineupPlayer) => {
+            // Helper function to process a lineup
+            const processLineup = (lineup) => {
+              if (!lineup) return;
+
+              lineup.forEach((lineupPlayer) => {
                 // Exclude alternates
                 if (!lineupPlayer.isAlternate && lineupPlayer.playerId) {
                   const playerId = lineupPlayer.playerId;
-                  sessionPlayerCounts[sessionId][playerId] =
-                    (sessionPlayerCounts[sessionId][playerId] || 0) + 1;
+
+                  if (!sessionPlayerCounts[sessionId][playerId]) {
+                    sessionPlayerCounts[sessionId][playerId] = {
+                      played: 0,
+                      scheduled: 0,
+                    };
+                  }
+
+                  // Count scheduled games (future + today)
+                  if (isFutureOrToday) {
+                    sessionPlayerCounts[sessionId][playerId].scheduled++;
+                  }
                 }
               });
+            };
+
+            // Process home lineup
+            if (match.lineupPlan && match.lineupPlan.home) {
+              processLineup(match.lineupPlan.home);
             }
 
             // Process away lineup
             if (match.lineupPlan && match.lineupPlan.away) {
-              match.lineupPlan.away.forEach((lineupPlayer) => {
-                // Exclude alternates
-                if (!lineupPlayer.isAlternate && lineupPlayer.playerId) {
-                  const playerId = lineupPlayer.playerId;
-                  sessionPlayerCounts[sessionId][playerId] =
-                    (sessionPlayerCounts[sessionId][playerId] || 0) + 1;
+              processLineup(match.lineupPlan.away);
+            }
+
+            // Count games played (matches with recorded results)
+            if (match.playerMatches && Array.isArray(match.playerMatches)) {
+              match.playerMatches.forEach((playerMatch) => {
+                if (playerMatch.playerId && playerMatch.result) {
+                  const playerId = playerMatch.playerId;
+
+                  if (!sessionPlayerCounts[sessionId][playerId]) {
+                    sessionPlayerCounts[sessionId][playerId] = {
+                      played: 0,
+                      scheduled: 0,
+                    };
+                  }
+
+                  sessionPlayerCounts[sessionId][playerId].played++;
                 }
               });
             }
@@ -1904,33 +1937,51 @@
 
             // Convert to array and sort by player name
             const playerEntries = Object.entries(playerCounts)
-              .map(([playerId, count]) => ({
+              .map(([playerId, counts]) => ({
                 playerId,
-                count,
+                played: counts.played || 0,
+                scheduled: counts.scheduled || 0,
                 name: playerSkills[playerId]?.name || "Unknown Player",
               }))
               .sort((a, b) => a.name.localeCompare(b.name));
 
-            playerEntries.forEach(({ playerId, count, name }) => {
+            playerEntries.forEach(({ playerId, played, scheduled, name }) => {
               const listItem = document.createElement("li");
 
               const nameSpan = document.createElement("span");
               nameSpan.className = "player-name";
               nameSpan.textContent = name;
 
-              const countSpan = document.createElement("span");
-              countSpan.className = "game-count";
-              countSpan.textContent = count;
+              // Games Played section
+              const playedCountSpan = document.createElement("span");
+              playedCountSpan.className = "game-count";
+              playedCountSpan.textContent = played;
 
-              const labelSpan = document.createElement("span");
-              labelSpan.className = "game-count-label";
-              labelSpan.textContent = `${
-                count === 1 ? "Game" : "Games"
-              } Scheduled`;
+              const playedLabelSpan = document.createElement("span");
+              playedLabelSpan.className = "game-count-label";
+              playedLabelSpan.textContent = `${
+                played === 1 ? "Game" : "Games"
+              } Played`;
+
+              // Scheduled Games section
+              const scheduledCountSpan = document.createElement("span");
+              scheduledCountSpan.className = "game-count";
+              scheduledCountSpan.style.marginTop = "0.5rem";
+              scheduledCountSpan.textContent = scheduled;
+
+              const scheduledLabelSpan = document.createElement("span");
+              scheduledLabelSpan.className = "game-count-label";
+              scheduledLabelSpan.textContent = `${
+                scheduled === 1
+                  ? "Scheduled Game Remaining"
+                  : "Scheduled Games Remaining"
+              }`;
 
               listItem.appendChild(nameSpan);
-              listItem.appendChild(countSpan);
-              listItem.appendChild(labelSpan);
+              listItem.appendChild(playedCountSpan);
+              listItem.appendChild(playedLabelSpan);
+              listItem.appendChild(scheduledCountSpan);
+              listItem.appendChild(scheduledLabelSpan);
               playerList.appendChild(listItem);
             });
 

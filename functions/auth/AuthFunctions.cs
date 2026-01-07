@@ -101,16 +101,8 @@ public class AuthFunctions
     {
         try
         {
-            // Clear the session cookie
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddDays(-1),
-            };
-
-            req.HttpContext.Response.Cookies.Append("ssid", "", cookieOptions);
+            // With token-based auth, logout is primarily client-side
+            // Optionally, you could maintain a token blacklist here
 
             return new OkObjectResult(new { message = "Logged out successfully" });
         }
@@ -123,21 +115,19 @@ public class AuthFunctions
 
     [Function("GetCurrentUser")]
     public IActionResult GetCurrentUser(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "auth/user")] HttpRequest req
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "auth/user")] HttpRequest req,
+        FunctionContext context
     )
     {
         try
         {
-            if (
-                !req.Cookies.TryGetValue("ssid", out var sessionJwt)
-                || string.IsNullOrEmpty(sessionJwt)
-            )
+            var jwt = ExtractJwtFromRequest(req);
+            if (string.IsNullOrEmpty(jwt))
             {
                 return new UnauthorizedObjectResult(new { message = "Not authenticated" });
             }
 
-            var (isValid, claims) = _authService.ValidateAppJwt(sessionJwt);
-
+            var (isValid, claims) = _authService.ValidateAppJwt(jwt);
             if (!isValid || claims == null)
             {
                 return new UnauthorizedObjectResult(new { message = "Authentication failed" });
@@ -158,6 +148,25 @@ public class AuthFunctions
             _logger.LogError(ex, "Error getting current user");
             return new StatusCodeResult(500);
         }
+    }
+
+    private string? ExtractJwtFromRequest(HttpRequest request)
+    {
+        // Prioritize Authorization header (new approach)
+        if (request.Headers.TryGetValue("Authorization", out var authHeader))
+        {
+            var token = authHeader.FirstOrDefault()?.Replace("Bearer ", "");
+            if (!string.IsNullOrEmpty(token))
+                return token;
+        }
+
+        // Fallback to cookies for backward compatibility (can be removed later)
+        if (request.Cookies.TryGetValue("ssid", out var sessionToken))
+        {
+            return sessionToken;
+        }
+
+        return null;
     }
 
     [Function("SendSmsCode")]
@@ -332,44 +341,7 @@ public class AuthFunctions
                     }
                 }
 
-                var reqHttp = req.HttpContext.Request;
-
-                bool isLocalhost =
-                    string.Equals(
-                        reqHttp.Host.Host,
-                        "localhost",
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                    || reqHttp.Host.Host.EndsWith(".localhost", StringComparison.OrdinalIgnoreCase);
-
-                bool isSidespinsSite = reqHttp.Host.Host.EndsWith(
-                    "sidespins.com",
-                    StringComparison.OrdinalIgnoreCase
-                );
-
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    // Secure only if the current request is HTTPS (so http://localhost still works)
-                    Secure = string.Equals(
-                        reqHttp.Scheme,
-                        "https",
-                        StringComparison.OrdinalIgnoreCase
-                    ),
-                    SameSite = SameSiteMode.Lax, // same-site between app.sidespins.com and api.sidespins.com
-                    Path = "/",
-                    Expires = DateTimeOffset.UtcNow.AddHours(24),
-                };
-
-                // Share across subdomains in prod; keep host-only locally
-                if (isSidespinsSite)
-                {
-                    cookieOptions.Domain = ".sidespins.com";
-                }
-
-                // Set the session cookie
-                req.HttpContext.Response.Cookies.Append("ssid", result.SessionToken, cookieOptions);
-
+                // Return token in response body instead of setting cookie
                 return new OkObjectResult(
                     new AuthResponse
                     {

@@ -480,9 +480,11 @@ public class MatchesFunctions
             }
 
             // Validate match date (must be today or in the past)
-            var matchDate = match.ScheduledAt.Date;
-            var today = DateTime.UtcNow.Date;
-            if (matchDate > today)
+            // Normalize both to UTC date-only for comparison
+            var matchDateOnly = DateTime.SpecifyKind(match.ScheduledAt.Date, DateTimeKind.Utc);
+            var todayUtc = DateTime.UtcNow.Date;
+            
+            if (matchDateOnly > todayUtc)
             {
                 return new BadRequestObjectResult(
                     "Cannot record scores for future matches. Match must be today or in the past."

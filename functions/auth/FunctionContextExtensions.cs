@@ -40,6 +40,7 @@ public static class FunctionContextExtensions
         var roleHierarchy = new Dictionary<string, int>
         {
             { "player", 1 },
+            { "observing-player", 1 },
             { "manager", 2 },
             { "admin", 3 },
         };

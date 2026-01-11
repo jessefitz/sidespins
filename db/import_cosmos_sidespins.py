@@ -27,6 +27,8 @@ CONTAINER_SPECS = {
     "TeamMemberships":{"partition_key": "/teamId",      "indexing_policy": None},
     "TeamMatches":    {"partition_key": "/divisionId",  "indexing_policy": None},
     "Sessions":       {"partition_key": "/divisionId",  "indexing_policy": None},
+    "Observations":   {"partition_key": "/id",          "indexing_policy": None},
+    "Notes":          {"partition_key": "/observationId", "indexing_policy": None},
 }
 
 def get_args():

@@ -1598,9 +1598,13 @@
             });
 
             // Filter players for this team and add skill levels
+            // Exclude observing-players from lineup planning
             this.players = allPlayers
               .filter((player) =>
-                teamMemberships.some((m) => m.playerId === player.id)
+                teamMemberships.some(
+                  (m) =>
+                    m.playerId === player.id && m.role !== "observing-player"
+                )
               )
               .map((player) => ({
                 ...player,

@@ -75,6 +75,14 @@
       "lastName": "",
       "apaNumber": null,
       "createdAt": "2025-08-30T23:02:05Z"
+    },
+    {
+      "id": "p_observer",
+      "type": "player",
+      "firstName": "Observer",
+      "lastName": "Test",
+      "apaNumber": null,
+      "createdAt": "2025-08-30T23:02:05Z"
     }
   ],
   "TeamMemberships": [
@@ -150,8 +158,19 @@
       "teamId": "team_break_of_dawn_9b",
       "divisionId": "div_nottingham_wed_9b_311",
       "playerId": "p_gail",
-      "role": "player",
-      "skillLevel_9b": 3,
+      "role": "observing-player",
+      "skillLevel_9b": null,
+      "joinedAt": "2025-08-30T23:02:05Z",
+      "leftAt": null
+    },
+    {
+      "id": "m_team_break_of_dawn_9b_p_observer",
+      "type": "membership",
+      "teamId": "team_break_of_dawn_9b",
+      "divisionId": "div_nottingham_wed_9b_311",
+      "playerId": "p_observer",
+      "role": "observing-player",
+      "skillLevel_9b": null,
       "joinedAt": "2025-08-30T23:02:05Z",
       "leftAt": null
     }

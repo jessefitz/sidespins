@@ -476,8 +476,9 @@
           });
 
           // Build the players list from active memberships
+          // Exclude observing-players from match score recording
           players = memberships
-            .filter((m) => !m.leftAt) // Only active members
+            .filter((m) => !m.leftAt && m.role !== "observing-player") // Only active members, exclude observers
             .map((m) => {
               const player = playerMap[m.playerId];
               if (player) {

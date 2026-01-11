@@ -368,6 +368,12 @@
         border: 1px solid #c3e6cb;
       }
 
+      .role-observing-player {
+        background-color: #e7f3ff;
+        color: #004085;
+        border: 1px solid #b8daff;
+      }
+
       .skill-level {
         font-weight: 600;
         font-size: 1.1rem;
@@ -1054,6 +1060,7 @@
                   <label for="member-role">Role</label>
                   <select id="member-role" class="form-control">
                     <option value="player">Player</option>
+                    <option value="observing-player">Observing Player</option>
                     <option value="captain">Captain</option>
                     <option value="manager">Manager</option>
                   </select>
@@ -1629,6 +1636,11 @@
                                     <option value="player" ${
                                       member.role === "player" ? "selected" : ""
                                     }>Player</option>
+                                    <option value="observing-player" ${
+                                      member.role === "observing-player"
+                                        ? "selected"
+                                        : ""
+                                    }>Observing Player</option>
                                     <option value="captain" ${
                                       member.role === "captain"
                                         ? "selected"
@@ -2029,6 +2041,7 @@
         formatRole(role) {
           const roleMap = {
             player: "Player",
+            "observing-player": "Observing Player",
             captain: "Captain",
             manager: "Manager",
           };

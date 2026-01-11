@@ -306,6 +306,7 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         var roleHierarchy = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
             ["player"] = 1,
+            ["observing-player"] = 1,
             ["captain"] = 2,
             ["manager"] = 2, // captain and manager are equivalent
             ["admin"] = 3,

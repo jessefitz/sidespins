@@ -535,6 +535,36 @@ title: Observations - SideSpins
         font-size: 1rem;
       }
 
+      /* Toast Notification */
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #007cba;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 2000;
+        display: none;
+        animation: slideIn 0.3s ease;
+      }
+
+      .toast.active {
+        display: block;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
       /* Responsive */
       @media (max-width: 768px) {
         .header-actions {
@@ -545,6 +575,12 @@ title: Observations - SideSpins
 
         .form-row {
           flex-direction: column;
+        }
+
+        .toast {
+          bottom: 1rem;
+          right: 1rem;
+          left: 1rem;
         }
       }
     </style>
@@ -643,6 +679,9 @@ title: Observations - SideSpins
         </div>
       </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
 
     <!-- Note Modal -->
     <div id="noteModal" class="modal">
@@ -800,6 +839,11 @@ title: Observations - SideSpins
       let availableBlobs = [];
       let selectedBlobs = new Set();
 
+      // Polling state
+      let pollInterval = null;
+      let lastObservationCount = 0;
+      let lastNotesCount = 0;
+
       // Initialize
       document.addEventListener("DOMContentLoaded", async () => {
         // Check authentication
@@ -811,6 +855,34 @@ title: Observations - SideSpins
 
         // Load observations
         await loadObservations();
+        lastObservationCount = observations.length;
+
+        // Load user memberships for role checks
+        await authManager.loadUserMemberships();
+
+        // Hide UI elements for non-captains/managers
+        const isCaptainOrManager =
+          authManager.hasTeamRole("captain") ||
+          authManager.hasTeamRole("manager");
+
+        if (!isCaptainOrManager) {
+          // Hide create observation button
+          const newObsBtn = document.getElementById("newObservationBtn");
+          if (newObsBtn) newObsBtn.style.display = "none";
+
+          // Hide delete and mark complete buttons (they'll be hidden on detail view too)
+          const deleteBtn = document.getElementById("deleteObservationBtn");
+          const toggleBtn = document.getElementById("toggleStatusBtn");
+          if (deleteBtn) deleteBtn.style.display = "none";
+          if (toggleBtn) toggleBtn.style.display = "none";
+        }
+
+        // Start polling for updates
+        startPolling();
+
+        // Pause polling when tab not visible
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("beforeunload", stopPolling);
 
         // Event listeners
         document
@@ -958,6 +1030,7 @@ title: Observations - SideSpins
 
           // Load notes
           await loadNotes(id);
+          lastNotesCount = notes.length;
 
           // Render detail view (but NOT the video yet)
           renderObservationDetail();
@@ -1902,6 +1975,7 @@ title: Observations - SideSpins
         currentObservation = null;
         notes = [];
         videoElement = null;
+        lastNotesCount = 0;
       }
 
       // Show note modal
@@ -2017,6 +2091,188 @@ title: Observations - SideSpins
         const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
+      }
+
+      // ============================================================
+      // POLLING & AUTO-UPDATE
+      // ============================================================
+
+      // Start polling for updates
+      function startPolling() {
+        if (pollInterval) return; // Already polling
+        pollInterval = setInterval(pollForUpdates, 8000); // Poll every 8 seconds
+        console.log("Started polling for updates");
+      }
+
+      // Stop polling
+      function stopPolling() {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+          console.log("Stopped polling for updates");
+        }
+      }
+
+      // Handle visibility change (pause when tab not visible)
+      function handleVisibilityChange() {
+        if (document.hidden) {
+          stopPolling();
+        } else {
+          startPolling();
+        }
+      }
+
+      // Main polling function
+      async function pollForUpdates() {
+        try {
+          // Always update main observations list (unless creating new observation)
+          if (
+            !document
+              .getElementById("newObservationForm")
+              .classList.contains("active")
+          ) {
+            await updateObservationsList();
+          }
+
+          // Only update detail view if appropriate
+          if (shouldUpdateDetailView()) {
+            await updateDetailView();
+          }
+        } catch (error) {
+          console.error("Error polling for updates:", error);
+          // Continue polling even on errors
+        }
+      }
+
+      // Check if detail view should be updated
+      function shouldUpdateDetailView() {
+        // Detail must be active
+        if (
+          !document
+            .getElementById("observationDetail")
+            .classList.contains("active")
+        ) {
+          return false;
+        }
+
+        // No modals open
+        if (
+          document.getElementById("noteModal").classList.contains("active") ||
+          document.getElementById("recordingModal").classList.contains("active")
+        ) {
+          return false;
+        }
+
+        // Video not playing (only update when paused/stopped or no video)
+        if (videoElement && !videoElement.paused && !videoElement.ended) {
+          return false;
+        }
+
+        return true;
+      }
+
+      // Update observations list
+      async function updateObservationsList() {
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/GetObservations`,
+            { method: "GET" }
+          );
+
+          if (!response.ok) return;
+
+          const newObservations = await response.json();
+
+          // Check for new observations
+          if (newObservations.length > lastObservationCount) {
+            const newCount = newObservations.length - lastObservationCount;
+            showToast(
+              `${newCount} new observation${newCount !== 1 ? "s" : ""} added`
+            );
+          }
+
+          lastObservationCount = newObservations.length;
+          observations = newObservations;
+          renderObservationsList();
+        } catch (error) {
+          console.error("Error updating observations list:", error);
+        }
+      }
+
+      // Update detail view (current observation + notes)
+      async function updateDetailView() {
+        if (!currentObservation?.id) return;
+
+        try {
+          // Fetch latest observation data
+          const obsResponse = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            { method: "GET" }
+          );
+
+          if (!obsResponse.ok) return;
+
+          const updatedObs = await obsResponse.json();
+
+          // Check if recording parts changed
+          const partsChanged =
+            JSON.stringify(updatedObs.recordingParts) !==
+            JSON.stringify(currentObservation.recordingParts);
+
+          currentObservation = updatedObs;
+
+          // Update in main observations list
+          const index = observations.findIndex(
+            (o) => o.id === currentObservation.id
+          );
+          if (index !== -1) observations[index] = currentObservation;
+
+          // Update metadata
+          renderObservationDetail();
+
+          // Only reinitialize video if parts changed and video not playing
+          if (partsChanged && (!videoElement || videoElement.paused)) {
+            requestAnimationFrame(() => {
+              renderVideoPlayer();
+            });
+          }
+
+          // Update notes
+          const notesResponse = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
+            { method: "GET" }
+          );
+
+          if (notesResponse.ok) {
+            const newNotes = await notesResponse.json();
+
+            // Check for new notes
+            if (newNotes.length > lastNotesCount) {
+              const newCount = newNotes.length - lastNotesCount;
+              showToast(
+                `${newCount} new note${newCount !== 1 ? "s" : ""} added`
+              );
+            }
+
+            lastNotesCount = newNotes.length;
+            notes = newNotes;
+            renderNotes();
+          }
+        } catch (error) {
+          console.error("Error updating detail view:", error);
+        }
+      }
+
+      // Show toast notification
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("active");
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove("active");
+        }, 3000);
       }
     </script>
   </body>

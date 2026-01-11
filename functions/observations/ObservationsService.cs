@@ -80,16 +80,19 @@ public class ObservationsService
             observation.Status = "active";
         }
 
-        // Populate recordingRef defaults if present
-        if (observation.RecordingRef != null)
+        // Populate recordingParts defaults if present
+        if (observation.RecordingParts != null && observation.RecordingParts.Any())
         {
-            if (string.IsNullOrEmpty(observation.RecordingRef.StorageAccount))
+            foreach (var part in observation.RecordingParts)
             {
-                observation.RecordingRef.StorageAccount = _storageAccountName;
-            }
-            if (string.IsNullOrEmpty(observation.RecordingRef.Container))
-            {
-                observation.RecordingRef.Container = _containerName;
+                if (string.IsNullOrEmpty(part.StorageAccount))
+                {
+                    part.StorageAccount = _storageAccountName;
+                }
+                if (string.IsNullOrEmpty(part.Container))
+                {
+                    part.Container = _containerName;
+                }
             }
         }
 
@@ -122,16 +125,19 @@ public class ObservationsService
                 }
             }
 
-            // Populate recordingRef defaults if present
-            if (observation.RecordingRef != null)
+            // Populate recordingParts defaults if present
+            if (observation.RecordingParts != null && observation.RecordingParts.Any())
             {
-                if (string.IsNullOrEmpty(observation.RecordingRef.StorageAccount))
+                foreach (var part in observation.RecordingParts)
                 {
-                    observation.RecordingRef.StorageAccount = _storageAccountName;
-                }
-                if (string.IsNullOrEmpty(observation.RecordingRef.Container))
-                {
-                    observation.RecordingRef.Container = _containerName;
+                    if (string.IsNullOrEmpty(part.StorageAccount))
+                    {
+                        part.StorageAccount = _storageAccountName;
+                    }
+                    if (string.IsNullOrEmpty(part.Container))
+                    {
+                        part.Container = _containerName;
+                    }
                 }
             }
 
@@ -217,7 +223,11 @@ public class ObservationsService
         }
     }
 
-    public async Task<Note> CreateNoteAsync(Note note)
+    public async Task<Note> CreateNoteAsync(
+        Note note,
+        string? createdByAuthUserId = null,
+        string? createdByName = null
+    )
     {
         if (string.IsNullOrEmpty(note.Id))
         {
@@ -227,6 +237,8 @@ public class ObservationsService
         note.Type = "note";
         note.CreatedAt = DateTime.UtcNow;
         note.UpdatedAt = DateTime.UtcNow;
+        note.CreatedByAuthUserId = createdByAuthUserId;
+        note.CreatedByName = createdByName;
 
         var response = await _notesContainer.CreateItemAsync(
             note,

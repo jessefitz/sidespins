@@ -143,11 +143,18 @@ builder.Services.AddScoped<ObservationsService>(serviceProvider =>
 // Register Blob Service for video playback URLs
 builder.Services.AddSingleton<BlobService>(serviceProvider =>
 {
+    var connectionString = Environment.GetEnvironmentVariable("BLOB_STORAGE_CONNECTION_STRING");
     var storageAccountName =
-        Environment.GetEnvironmentVariable("BLOB_STORAGE_ACCOUNT_NAME") ?? "devstoreaccount1"; // Azurite default
+        Environment.GetEnvironmentVariable("BLOB_STORAGE_ACCOUNT_NAME") ?? "devstoreaccount1";
     var containerName =
-        Environment.GetEnvironmentVariable("BLOB_CONTAINER_NAME") ?? "observations-videos";
+        Environment.GetEnvironmentVariable("BLOB_CONTAINER_NAME") ?? "videos";
 
+    // Use connection string if available (required for listing blobs)
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        return new BlobService(connectionString, storageAccountName, containerName);
+    }
+    
     return new BlobService(storageAccountName, containerName);
 });
 

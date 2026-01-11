@@ -113,19 +113,29 @@ Visit: `http://localhost:4000/observations.html`
 3. Add optional description
 4. Click "Start Observation"
 
-### 2. Manually Upload a Video
+### 2. Manually Upload Videos
 Using Azure Storage Explorer, Azure Portal, or azcopy:
-- Upload an MP4 file to the `observations-videos` container
-- Note the blob name (e.g., `practice-2026-01-08.mp4`)
+- Upload MP4 files to the `observations-videos` container
+- For best results, use naming convention: `YYYY_MMDD_HHMMSS_SEQ.mp4`
+  - Example: `2026_0109_143000_001.mp4`
+- Run `ffmpeg -i input.mp4 -c copy -movflags faststart output.mp4` for web streaming optimization
 
-### 3. Attach Video to Observation
+### 3. Attach Videos to Observation (New Blob Picker Workflow)
 1. Open the observation
 2. Click "Attach Recording"
-3. Enter:
-   - Container name: `observations-videos`
-   - Blob name: `practice-2026-01-08.mp4`
-   - Offset seconds: `0` (adjust if recording started before/after observation)
-4. Click "Save Recording"
+3. Enter container name (default: `observations-videos`)
+4. Click "Load Videos" - displays all available video files
+5. **Select multiple videos** using checkboxes:
+   - Use search box to filter files
+   - Click "Select All" for bulk selection
+   - System shows "X videos selected" count
+6. Click "Add Selected Videos"
+7. **Automatic processing**:
+   - System parses filenames for timestamps and sequence numbers
+   - Calculates start offsets based on observation start time
+   - Calculates durations from consecutive file timestamps
+   - Creates all recording parts with proper timeline alignment
+8. **Alternative**: Click "Manual Entry" for non-standard filenames
 
 ### 4. Add Notes
 1. Watch the video
@@ -216,6 +226,51 @@ dotnet build
 
 ## Next Steps (Post-MVP)
 
+### Immediate Priority
+
+1. **Test Multi-Part Video Functionality**
+   - Test filename parsing with format `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT`
+   - Verify auto-calculation of part numbers, offsets, and durations
+   - Test video auto-transition between parts
+   - Verify note timestamp navigation across multiple parts
+   - Test edge cases (non-standard filenames, missing parts, etc.)
+
+2. **Video Processing with ffmpeg (CRITICAL)**
+   
+   **Why This Is Required**: HTML5 video players need the moov atom (metadata) at the beginning of MP4 files to enable seeking/scrubbing. Files from cameras typically have the moov atom at the end, which breaks browser playback.
+   
+   **Process all videos before uploading** using ffmpeg's faststart flag:
+   
+   ```bash
+   # Basic command - remuxes file with moov atom at start
+   ffmpeg -i input.mp4 -c copy -movflags faststart output.mp4
+   
+   # Batch process multiple files (PowerShell)
+   Get-ChildItem *.mp4 | ForEach-Object {
+     ffmpeg -i $_.FullName -c copy -movflags faststart "remux_$($_.Name)"
+   }
+   
+   # Batch process multiple files (Bash)
+   for file in *.mp4; do
+     ffmpeg -i "$file" -c copy -movflags faststart "remux_${file}"
+   done
+   ```
+   
+   **Important Notes**:
+   - Use `-c copy` to avoid re-encoding (fast, lossless)
+   - The `faststart` flag moves the moov atom to the beginning
+   - Without this step, browser seeking will fail or be severely limited
+   - Process files locally before uploading to Azure Blob Storage
+
+3. **Automate Multi-File Upload Process**
+   - Create upload utility/script to batch-process multiple video files for an observation
+   - Parse filenames to extract timestamps and sequence numbers
+   - Automatically calculate durations based on consecutive file timestamps
+   - Upload processed files to Azure Blob Storage
+   - Auto-create RecordingParts via API with calculated metadata
+
+### Future Enhancements
+
 1. **Direct Upload from UI** - Add file picker and multipart upload
 2. **SAS Token Security** - Move to private container with SAS tokens
 3. **Video Thumbnails** - Generate preview thumbnails for observations list
@@ -271,3 +326,45 @@ Invoke-RestMethod -Uri "$baseUrl/GetObservations" `
     -Method GET `
     -Headers @{ "Authorization" = "Bearer $token" }
 ```
+
+## CDN (Azure Front Door) key configuration
+
+Usage of CDN eliminates the issue with the non-presence of the "Accepted-Ranges: bytes" header that was preventing browser playback from allong seeking to different parts of a video.  
+
+### Front Door profile
+
+* Azure Front Door (Standard)
+* Default `*.azurefd.net` endpoint
+
+### Origin configuration
+
+* Origin type: Azure Blob Storage
+* Origin host name: `jessefitzblob.blob.core.windows.net`
+* Origin host header: `jessefitzblob.blob.core.windows.net`
+* Protocol: HTTPS
+
+### Origin group
+
+* Single origin
+* Session affinity: disabled
+* Health probes:
+
+  * Enabled
+  * Method: **GET**
+  * Probe path: real blob object (e.g. `/videos/<known-file>.mp4`)
+
+### Route configuration
+
+* Route enabled
+* Domain: Front Door endpoint (`*.azurefd.net`)
+* Patterns to match: `/videos/*`
+* Accepted protocols: HTTPS only
+* Forwarding protocol: HTTPS only
+* Origin path: blank
+* Redirect HTTP to HTTPS: enabled
+
+### Media-specific outcome
+
+* Range requests preserved and forwarded
+* `Accept-Ranges: bytes` advertised to clients
+* Browser video seeking enabled

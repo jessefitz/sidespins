@@ -25,8 +25,8 @@ public class Observation
     [JsonProperty("description")]
     public string Description { get; set; } = string.Empty;
 
-    [JsonProperty("recordingRef")]
-    public RecordingRef? RecordingRef { get; set; }
+    [JsonProperty("recordingParts")]
+    public List<RecordingPart> RecordingParts { get; set; } = new List<RecordingPart>();
 
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
@@ -35,8 +35,11 @@ public class Observation
     public DateTime UpdatedAt { get; set; }
 }
 
-public class RecordingRef
+public class RecordingPart
 {
+    [JsonProperty("partNumber")]
+    public int PartNumber { get; set; }
+
     [JsonProperty("provider")]
     public string Provider { get; set; } = "azure_blob";
 
@@ -52,8 +55,11 @@ public class RecordingRef
     [JsonProperty("contentType")]
     public string ContentType { get; set; } = "video/mp4";
 
-    [JsonProperty("recordingStartOffsetSeconds")]
-    public int RecordingStartOffsetSeconds { get; set; } = 0;
+    [JsonProperty("startOffsetSeconds")]
+    public int StartOffsetSeconds { get; set; } = 0;
+
+    [JsonProperty("durationSeconds")]
+    public int? DurationSeconds { get; set; }
 }
 
 public class Note
@@ -72,6 +78,12 @@ public class Note
 
     [JsonProperty("text")]
     public string Text { get; set; } = string.Empty;
+
+    [JsonProperty("createdByAuthUserId")]
+    public string? CreatedByAuthUserId { get; set; }
+
+    [JsonProperty("createdByName")]
+    public string? CreatedByName { get; set; }
 
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }

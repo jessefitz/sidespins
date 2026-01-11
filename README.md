@@ -130,6 +130,44 @@ Interactive tool for experimenting with player combinations:
 - Captain-level administrative functions
 - APA number integration
 
+### 🎥 Observations (Pool Practice & Match Recording)
+
+Video observation tool for capturing and reviewing pool play sessions:
+
+- **Observation Management**:
+  - Create observations for practice or match sessions
+  - Track start/end times with automatic duration calculation
+  - Active/completed status workflow
+  
+- **Multi-Part Video Support**:
+  - Attach multiple sequential video recordings to single observation
+  - Automatic filename parsing for timestamp-based sequencing
+  - Smart timeline alignment and duration calculation
+  - Seamless auto-transition between video parts during playback
+  
+- **Timestamped Notes**:
+  - Add notes during or after observation
+  - Click note timestamps to jump to specific moments in video
+  - General notes (not tied to specific time) also supported
+  - "Use Current Video Time" button for quick timestamping
+  
+- **Video Playback**:
+  - HTML5 video player with full seeking/scrubbing controls
+  - Multi-part video selector for easy navigation
+  - Note-based bookmarking for quick review of key moments
+  - Azure CDN delivery for optimal streaming performance
+  
+- **Azure Integration**:
+  - Video storage in Azure Blob Storage with CDN
+  - Blob picker UI for easy video attachment
+  - Bulk selection and processing of multiple video files
+  - Cosmos DB storage for observation metadata and notes
+
+**Technical Notes**:
+- Videos must be processed with ffmpeg's `faststart` flag before upload to enable browser seeking
+- Supports structured filename convention: `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT`
+- See `_docs/OBSERVATIONS_SETUP.md` for detailed setup and usage instructions
+
 ## Deployment
 
 ### Frontend Deployment

@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-The Pool Observation Tool helps a player capture an **Observation** of play (practice or match), write **timestamped notes** with minimal friction, and later **review selectively** by using notes as bookmarks into a single video recording.
+The Pool Observation Tool helps a player capture an **Observation** of play (practice or match), write **timestamped notes** with minimal friction, and later **review selectively** by using notes as bookmarks into one or more video recordings.
 
 This MVP is cloud-native for the web app and storage. Video files are stored in **Azure Blob Storage**, but the upload process is manual (outside the app) for MVP simplicity.
 
@@ -19,7 +19,7 @@ An Observation has:
 * A beginning time
 * An end time
 * Zero or more notes
-* Zero or one associated recording reference
+* Zero or more associated recording parts (sequential video segments)
 
 ---
 
@@ -60,17 +60,17 @@ An Observation has:
 
 ### Observation
 
-| Field         | Type      | Notes                  |
-| ------------- | --------- | ---------------------- |
-| id            | UUID      | Primary identifier     |
-| label         | Enum      | `practice` | `match`   |
-| start_time    | Timestamp | Set at creation        |
-| end_time      | Timestamp | Null while active      |
-| status        | Enum      | `active` | `completed` |
-| description   | Text      | Optional free text     |
-| recording_ref | Object    | Nullable, 0..1         |
-| created_at    | Timestamp | Audit                  |
-| updated_at    | Timestamp | Audit                  |
+| Field           | Type      | Notes                      |
+| --------------- | --------- | -------------------------- |
+| id              | UUID      | Primary identifier         |
+| label           | Enum      | `practice` | `match`     |
+| start_time      | Timestamp | Set at creation            |
+| end_time        | Timestamp | Null while active          |
+| status          | Enum      | `active` | `completed`   |
+| description     | Text      | Optional free text         |
+| recording_parts | Array     | List of RecordingPart, 0..n |
+| created_at      | Timestamp | Audit                      |
+| updated_at      | Timestamp | Audit                      |
 
 Derived:
 
@@ -98,30 +98,49 @@ Constraints:
 
 ---
 
-### RecordingRef (embedded on Observation)
+### RecordingPart (array on Observation)
 
-A lightweight pointer to a blob-stored video.
+Supports **multiple sequential video recordings** for a single observation. Each part represents a continuous recording segment that begins where the previous part left off in the observation timeline.
 
-| Field                          | Type    | Notes                                               |
-| ------------------------------ | ------- | --------------------------------------------------- |
-| provider                       | Enum    | Always `azure_blob` in MVP                          |
-| storage_account                | String  | Optional if implied by environment                  |
-| container                      | String  | Required                                            |
-| blob_name                      | String  | Required (full path within container)               |
-| content_type                   | String  | Optional metadata for display; expected `video/mp4` |
-| recording_start_offset_seconds | Integer | Optional, default 0                                 |
+| Field                | Type    | Notes                                                   |
+| -------------------- | ------- | ------------------------------------------------------- |
+| part_number          | Integer | Sequential identifier (1, 2, 3...)                      |
+| provider             | Enum    | Always `azure_blob` in MVP                              |
+| storage_account      | String  | Optional if implied by environment                      |
+| container            | String  | Required                                                |
+| blob_name            | String  | Required (full path within container)                   |
+| content_type         | String  | Optional metadata; expected `video/mp4`                 |
+| start_offset_seconds | Integer | When this part begins in observation timeline (default 0) |
+| duration_seconds     | Integer | Optional duration of this part in seconds               |
 
-Notes on `recording_start_offset_seconds`:
+**Multi-Part Timeline Model:**
 
-* Represents how many seconds after Observation start the recording begins.
-* Used to align note offsets to the video timeline when seeking:
+* Parts are ordered by `start_offset_seconds`
+* Each part begins where the previous ended in the observation timeline
+* Example: 
+  - Part 1: start_offset_seconds = 0, duration_seconds = 300 (covers 0-300s)
+  - Part 2: start_offset_seconds = 300, duration_seconds = 240 (covers 300-540s)
+  - Part 3: start_offset_seconds = 540 (covers 540s onward)
 
-  * `seek_time = max(0, note.offset_seconds - recording_start_offset_seconds)`
+**Note Timestamp Navigation:**
 
-MVP assumption:
+When seeking to a note timestamp:
 
-* Most users start recording close enough to Observation start that this is 0.
-* Field exists to future-proof without requiring UI in MVP (can be hidden or advanced).
+1. Find which part contains the note's `offset_seconds`:
+   - Sort parts by `start_offset_seconds`
+   - Find part where `offset_seconds >= part.start_offset_seconds` and `offset_seconds < next_part.start_offset_seconds`
+   - Last part handles all timestamps from its start onward
+
+2. Calculate seek position within that part:
+   - `seek_time = note.offset_seconds - part.start_offset_seconds`
+
+3. Switch video source if needed and seek to calculated position
+
+**Auto-Transition:**
+
+* When a video part ends, automatically load and play the next sequential part
+* Provides seamless playback across multiple recording segments
+* Part indicator shows current part (e.g., "Part 2 of 3")
 
 ---
 
@@ -171,7 +190,7 @@ Rules:
 
 * start_time and end_time become immutable
 * Notes remain editable
-* RecordingRef can be attached/edited after completion
+* RecordingParts can be added/edited/deleted after completion
 
 ---
 
@@ -229,37 +248,107 @@ User ensures:
 
 ---
 
-### 8.2 Attach Recording to Observation (in-app)
+### 8.2 Attach Recording Parts to Observation (in-app)
 
-In the Observation detail view, the user selects “Attach Recording” and provides:
+In the Observation detail view, the user can manage multiple recording parts.
 
-* Container
-* Blob name (path)
-  Optional:
-* Recording start offset seconds (advanced)
-* Storage account (if multiple)
+**Blob Picker Workflow (Implemented):**
 
-System stores these values in `recording_ref`.
+1. **User clicks "Attach Recording"** - Opens recording management form
+2. **User enters container name** (default: observations-videos) and clicks "Load Videos"
+3. **System fetches available video files** via `GET /api/blobs/list?container={name}`
+4. **Blob picker displays all video files** (MP4, MOV, AVI) with:
+   - Checkbox for multi-select
+   - File name
+   - File size and last modified date
+   - Search box for filtering
+   - Select All / Clear Selection buttons
+5. **User selects one or more videos** - Can select multiple sequential recordings at once
+6. **System auto-parses filenames** matching convention `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT`:
+   - Extracts part number from sequence field
+   - Calculates start offset from timestamp relative to observation start
+   - Calculates duration based on next file's timestamp (if multiple selected)
+7. **User clicks "Add Selected Videos"** - All selected parts added simultaneously
+8. **Manual override available** - "Manual Entry" button reveals fields for non-standard filenames
 
-Constraints:
+**Filename Convention (Auto-parsing):**
 
-* Only one recording_ref per Observation
-* Attaching a new recording_ref replaces the previous one (confirm in UI)
+The system automatically parses structured filenames to extract metadata:
+
+Format: `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT`
+
+Example: `2018_0102_025808_002_faststart.MP4`
+
+Field breakdown:
+- `YYYY`: 4-digit year (2018)
+- `MMDD`: 2-digit month + 2-digit day (0102 = January 2)
+- `HHMMSS`: Time in 24-hour format (025808 = 02:58:08)
+- `SEQ`: Zero-padded sequence number (002 = part 2)
+- `_custom`: Optional suffix (faststart)
+- `.EXT`: File extension (MP4)
+
+When filenames match this format:
+- **Part number** is auto-populated from SEQ field
+- **Start offset** is auto-calculated from timestamp relative to observation start
+- **Duration** is auto-calculated for sequential selections (next timestamp - current timestamp)
+
+**Multi-Select Benefits:**
+
+* **Bulk addition** - Select 10 video parts, click once to add all
+* **Automatic sequencing** - Parts numbered and timed based on filename timestamps
+* **Duration calculation** - System calculates recording duration between consecutive files
+* **Timeline alignment** - All parts positioned correctly in observation timeline
+
+**UI Features:**
+
+* **Blob Picker**:
+  - Scrollable list with checkboxes
+  - Real-time search/filter
+  - Selected count display
+  - Batch select/deselect controls
+* **Parts List**:
+  - Shows all attached parts with metadata
+  - Part number and parsed timestamp
+  - Blob name, start offset, and duration
+  - Individual delete buttons
+* **Manual Override**:
+  - Available via toggle button
+  - For non-standard filenames
+  - All fields editable
+
+**Constraints:**
+
+* Multiple recording parts supported per Observation
+* Parts are ordered by start_offset_seconds for playback
+* Each part represents a continuous segment in the observation timeline
+* Blob listing requires read access to storage container
 
 ---
 
 ## 9. Playback and Bookmarks
 
-### 9.1 When recording_ref is present
+### 9.1 When recording_parts are present
 
 Observation detail view includes:
 
-* Embedded HTML5 video player
+* Embedded HTML5 video player showing current part
+* Part indicator (e.g., "Part 2 of 3") when multiple parts exist
 * Notes list (sorted by offset, then created time)
-* Clicking a timestamped note seeks the player:
+* Clicking a timestamped note:
+  1. Finds which part contains the timestamp
+  2. Switches video source if needed
+  3. Seeks within that part: `seek_time = note.offset_seconds - part.start_offset_seconds`
+  4. Auto-plays
 
-  * `seek_time = max(0, note.offset_seconds - recording_ref.recording_start_offset_seconds)`
-* Optionally auto-play after seek (MVP choice; default recommended: seek + play)
+**Auto-Transition:**
+
+* When a video part ends, automatically loads and plays the next sequential part
+* Provides seamless viewing across multiple recording segments
+
+**Part Navigation:**
+
+* Video player maintains `requestAnimationFrame` pattern when switching parts
+* Ensures proper initialization even when container was previously hidden
 
 General notes (offset null):
 
@@ -267,7 +356,7 @@ General notes (offset null):
 
 ---
 
-### 9.2 When recording_ref is absent
+### 9.2 When recording_parts is empty
 
 Observation detail view shows:
 

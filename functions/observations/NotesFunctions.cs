@@ -13,11 +13,17 @@ public class NotesFunctions
 {
     private readonly ILogger<NotesFunctions> _logger;
     private readonly ObservationsService _observationsService;
+    private readonly LeagueService _leagueService;
 
-    public NotesFunctions(ILogger<NotesFunctions> logger, ObservationsService observationsService)
+    public NotesFunctions(
+        ILogger<NotesFunctions> logger,
+        ObservationsService observationsService,
+        LeagueService leagueService
+    )
     {
         _logger = logger;
         _observationsService = observationsService;
+        _leagueService = leagueService;
     }
 
     [Function("GetNotes")]
@@ -125,7 +131,22 @@ public class NotesFunctions
             // Ensure observationId matches route
             note.ObservationId = observationId;
 
-            var createdNote = await _observationsService.CreateNoteAsync(note);
+            // Capture author information from authenticated user
+            var userId = context.GetUserId();
+            var userClaims = context.GetUserClaims();
+            string? authorName = null;
+
+            // Fetch player name if available
+            if (!string.IsNullOrEmpty(userClaims?.PlayerId))
+            {
+                var player = await _leagueService.GetPlayerByIdAsync(userClaims.PlayerId);
+                if (player != null)
+                {
+                    authorName = $"{player.FirstName} {player.LastName}";
+                }
+            }
+
+            var createdNote = await _observationsService.CreateNoteAsync(note, userId, authorName);
             return new OkObjectResult(createdNote);
         }
         catch (Exception ex)

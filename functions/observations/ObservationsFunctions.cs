@@ -192,15 +192,26 @@ public class ObservationsFunctions
                 return new NotFoundObjectResult(new { error = "Observation not found" });
             }
 
-            if (observation.RecordingRef == null)
+            if (observation.RecordingParts == null || observation.RecordingParts.Count == 0)
             {
                 return new BadRequestObjectResult(
-                    new { error = "No recording attached to this observation" }
+                    new { error = "No recording parts attached to this observation" }
                 );
             }
 
-            var videoUrl = _blobService.GetPublicBlobUrl(observation.RecordingRef);
-            return new OkObjectResult(new { videoUrl });
+            // Return URLs for all parts
+            var videoParts = observation
+                .RecordingParts.Select(part => new
+                {
+                    partNumber = part.PartNumber,
+                    videoUrl = _blobService.GetPublicBlobUrl(part),
+                    startOffsetSeconds = part.StartOffsetSeconds,
+                    durationSeconds = part.DurationSeconds,
+                })
+                .OrderBy(p => p.startOffsetSeconds)
+                .ToList();
+
+            return new OkObjectResult(new { videoParts });
         }
         catch (Exception ex)
         {
@@ -208,4 +219,29 @@ public class ObservationsFunctions
             return new StatusCodeResult(500);
         }
     }
-}
+
+    [Function("ListBlobs")]
+    [RequireAuthentication("player")]
+    public async Task<IActionResult> ListBlobs(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "blobs/list")]
+            HttpRequest req,
+        FunctionContext context
+    )
+    {
+        try
+        {
+            // Get container name from query parameter, default to configured container
+            var containerName = req.Query["container"].FirstOrDefault() 
+                ?? Environment.GetEnvironmentVariable("BLOB_CONTAINER_NAME") 
+                ?? "videos";
+
+            var blobs = await _blobService.ListBlobsAsync(containerName);
+
+            return new OkObjectResult(new { blobs, container = containerName });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error listing blobs in container");
+            return new StatusCodeResult(500);
+        }
+    }}

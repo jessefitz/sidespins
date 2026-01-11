@@ -32,6 +32,26 @@ title: Observations - SideSpins
         margin-bottom: 2rem;
       }
 
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .btn-back {
+        background: transparent;
+        color: #666;
+        border: 1px solid #e1e5e9;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-back:hover {
+        background: #f8f9fa;
+        border-color: #007cba;
+        color: #007cba;
+      }
+
       h1 {
         margin: 0;
         color: #333;
@@ -339,6 +359,86 @@ title: Observations - SideSpins
         color: #666;
       }
 
+      /* Blob Picker Styles */
+      .blob-picker {
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+      }
+
+      .blob-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e1e5e9;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .blob-item:last-child {
+        border-bottom: none;
+      }
+
+      .blob-item:hover {
+        background: #f8f9fa;
+      }
+
+      .blob-item.selected {
+        background: #e3f2fd;
+        border-color: #007cba;
+      }
+
+      .blob-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .blob-info {
+        flex: 1;
+      }
+
+      .blob-name {
+        font-weight: 500;
+        color: #333;
+        word-break: break-all;
+      }
+
+      .blob-meta {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+      }
+
+      .blob-picker-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .selected-count {
+        color: #007cba;
+        font-weight: 600;
+        padding: 0.5rem;
+      }
+
+      .search-box {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+      }
+
+      .search-box:focus {
+        outline: none;
+        border-color: #007cba;
+      }
+
       .error-message {
         background: #fee;
         border: 1px solid #fcc;
@@ -355,6 +455,84 @@ title: Observations - SideSpins
         padding: 1rem;
         border-radius: 6px;
         margin-bottom: 1rem;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 700px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        margin: 2rem auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e1e5e9;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .video-part-dropdown {
+        margin-bottom: 1rem;
+      }
+
+      .video-part-dropdown label {
+        font-weight: 600;
+        margin-right: 0.5rem;
+      }
+
+      .video-part-dropdown select {
+        padding: 0.5rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 1rem;
       }
 
       /* Responsive */
@@ -375,7 +553,10 @@ title: Observations - SideSpins
     <div class="container">
       <!-- Header -->
       <div class="header-actions">
-        <h1>📹 Observations</h1>
+        <div class="header-left">
+          <a href="/app.html" class="btn btn-back btn-sm">← Dashboard</a>
+          <h1>📹 Observations</h1>
+        </div>
         <button class="btn btn-primary" id="newObservationBtn">
           + New Observation
         </button>
@@ -441,62 +622,6 @@ title: Observations - SideSpins
           </div>
         </div>
 
-        <!-- Recording Form -->
-        <div class="recording-form" id="recordingForm">
-          <h3>Attach Video Recording</h3>
-          <form id="attachRecordingForm">
-            <div class="form-group">
-              <label for="containerName">Container Name</label>
-              <input
-                type="text"
-                id="containerName"
-                class="form-control"
-                value="observations-videos"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="blobName">Blob Name (filename in container)</label>
-              <input
-                type="text"
-                id="blobName"
-                class="form-control"
-                placeholder="e.g., practice-2026-01-08.mp4"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="offsetSeconds"
-                >Recording Start Offset (seconds)</label
-              >
-              <input
-                type="number"
-                id="offsetSeconds"
-                class="form-control"
-                value="0"
-                min="-3600"
-                max="3600"
-              />
-              <small
-                >Use negative if recording started before observation, positive
-                if after</small
-              >
-            </div>
-            <div class="form-row">
-              <button type="submit" class="btn btn-primary">
-                Save Recording
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                id="cancelRecordingBtn"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-
         <!-- Video Player -->
         <div class="video-section">
           <div id="videoPlayer"></div>
@@ -506,42 +631,9 @@ title: Observations - SideSpins
         <div class="notes-section">
           <div class="notes-header">
             <h3>Notes</h3>
-          </div>
-
-          <!-- Note Form -->
-          <div class="note-form">
-            <form id="addNoteForm">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="noteText">Note Text</label>
-                  <textarea
-                    id="noteText"
-                    class="form-control"
-                    rows="2"
-                    placeholder="Add a note..."
-                    required
-                  ></textarea>
-                </div>
-                <div class="form-group" style="max-width: 200px">
-                  <label for="noteOffset">Timestamp (seconds)</label>
-                  <input
-                    type="number"
-                    id="noteOffset"
-                    class="form-control"
-                    placeholder="Optional"
-                    min="0"
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                class="btn btn-sm btn-secondary"
-                id="useCurrentTimeBtn"
-              >
-                Use Current Video Time
-              </button>
-              <button type="submit" class="btn btn-primary">Add Note</button>
-            </form>
+            <button class="btn btn-primary btn-sm" id="addNoteBtn">
+              + Add Note
+            </button>
           </div>
 
           <!-- Notes List -->
@@ -549,6 +641,151 @@ title: Observations - SideSpins
             <p class="loading">No notes yet.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Add Note</h3>
+          <button class="modal-close" onclick="hideNoteModal()">&times;</button>
+        </div>
+        <form id="noteModalForm">
+          <div class="form-group">
+            <label for="noteTypeSelect">Note Type</label>
+            <select id="noteTypeSelect" class="form-control" required>
+              <option value="moment">Moment in Time</option>
+              <option value="general">General Observation</option>
+            </select>
+          </div>
+          <div class="form-group" id="timestampGroup">
+            <label for="timestampSelect">Timestamp</label>
+            <select id="timestampSelect" class="form-control">
+              <option value="now">Now</option>
+              <option value="30">Now Minus 30 Seconds</option>
+              <option value="60">Now Minus 1 Minute</option>
+              <option value="120">Now Minus 2 Minutes</option>
+              <option value="180">Now Minus 3 Minutes</option>
+              <option value="240">Now Minus 4 Minutes</option>
+              <option value="300">Now Minus 5 Minutes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="noteModalText">Note Text</label>
+            <textarea
+              id="noteModalText"
+              class="form-control"
+              rows="3"
+              placeholder="Enter your note..."
+              required
+            ></textarea>
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+            <button type="submit" class="btn btn-primary">Add Note</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="hideNoteModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recording Modal -->
+    <div id="recordingModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Manage Video Recordings</h3>
+          <button class="modal-close" onclick="hideRecordingModal()">
+            &times;
+          </button>
+        </div>
+
+        <!-- List of existing parts -->
+        <div id="modalRecordingPartsList" class="mb-3"></div>
+
+        <!-- Add new part form -->
+        <form id="modalAttachRecordingForm">
+          <h4>Add Recording Parts</h4>
+
+          <div class="form-group">
+            <label for="modalContainerName">Container Name</label>
+            <input
+              type="text"
+              id="modalContainerName"
+              class="form-control"
+              value="videos"
+              required
+            />
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              id="modalLoadBlobsBtn"
+              style="margin-top: 0.5rem"
+            >
+              Load Videos
+            </button>
+          </div>
+
+          <!-- Blob Picker -->
+          <div id="modalBlobPickerContainer" style="display: none">
+            <div class="form-group">
+              <label>Select Video Files (multiple selection supported)</label>
+              <input
+                type="text"
+                id="modalBlobSearch"
+                class="search-box"
+                placeholder="Search videos..."
+              />
+              <div id="modalBlobPicker" class="blob-picker">
+                <div class="loading">
+                  Click "Load Videos" to see available files
+                </div>
+              </div>
+              <div class="blob-picker-actions">
+                <span id="modalSelectedCount" class="selected-count"
+                  >0 videos selected</span
+                >
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  id="modalSelectAllBtn"
+                >
+                  Select All
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  id="modalClearSelectionBtn"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="modalAddPartsBtn"
+              disabled
+            >
+              Add Selected Videos
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="hideRecordingModal()"
+            >
+              Close
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -560,6 +797,8 @@ title: Observations - SideSpins
       let notes = [];
       let videoElement = null;
       let activeTimer = null;
+      let availableBlobs = [];
+      let selectedBlobs = new Set();
 
       // Initialize
       document.addEventListener("DOMContentLoaded", async () => {
@@ -596,13 +835,22 @@ title: Observations - SideSpins
           .addEventListener("submit", handleCreateObservation);
         document
           .getElementById("attachRecordingBtn")
-          .addEventListener("click", showRecordingForm);
+          .addEventListener("click", showRecordingModal);
         document
-          .getElementById("cancelRecordingBtn")
-          .addEventListener("click", hideRecordingForm);
+          .getElementById("modalAttachRecordingForm")
+          .addEventListener("submit", handleAttachRecordingModal);
         document
-          .getElementById("attachRecordingForm")
-          .addEventListener("submit", handleAttachRecording);
+          .getElementById("modalLoadBlobsBtn")
+          .addEventListener("click", loadBlobsModal);
+        document
+          .getElementById("modalSelectAllBtn")
+          .addEventListener("click", selectAllBlobsModal);
+        document
+          .getElementById("modalClearSelectionBtn")
+          .addEventListener("click", clearSelectionModal);
+        document
+          .getElementById("modalBlobSearch")
+          .addEventListener("input", filterBlobsModal);
         document
           .getElementById("closeDetailBtn")
           .addEventListener("click", closeDetail);
@@ -613,11 +861,29 @@ title: Observations - SideSpins
           .getElementById("toggleStatusBtn")
           .addEventListener("click", handleToggleStatus);
         document
-          .getElementById("addNoteForm")
-          .addEventListener("submit", handleAddNote);
+          .getElementById("addNoteBtn")
+          .addEventListener("click", showNoteModal);
         document
-          .getElementById("useCurrentTimeBtn")
-          .addEventListener("click", useCurrentVideoTime);
+          .getElementById("noteModalForm")
+          .addEventListener("submit", handleAddNoteModal);
+        document
+          .getElementById("noteTypeSelect")
+          .addEventListener("change", handleNoteTypeChange);
+
+        // Modal background click handlers
+        document.getElementById("noteModal").addEventListener("click", (e) => {
+          if (e.target.id === "noteModal") {
+            hideNoteModal();
+          }
+        });
+
+        document
+          .getElementById("recordingModal")
+          .addEventListener("click", (e) => {
+            if (e.target.id === "recordingModal") {
+              hideRecordingModal();
+            }
+          });
       });
 
       // Load all observations
@@ -730,6 +996,14 @@ title: Observations - SideSpins
           }
         `;
 
+        // Show/hide Attach Recording button based on observation status
+        const attachBtn = document.getElementById("attachRecordingBtn");
+        if (obs.status === "completed") {
+          attachBtn.style.display = "inline-block";
+        } else {
+          attachBtn.style.display = "none";
+        }
+
         // Update toggle status button
         const toggleBtn = document.getElementById("toggleStatusBtn");
         toggleBtn.textContent =
@@ -743,96 +1017,182 @@ title: Observations - SideSpins
         renderNotes();
       }
 
+      // Global state for multi-part video
+      let currentVideoPart = null;
+      let sortedParts = [];
+
       function renderVideoPlayer() {
         const playerEl = document.getElementById("videoPlayer");
 
-        if (!currentObservation.recordingRef) {
+        if (
+          !currentObservation.recordingParts ||
+          currentObservation.recordingParts.length === 0
+        ) {
           playerEl.innerHTML =
             '<div class="no-video-message">No video recording attached yet.</div>';
           videoElement = null;
+          currentVideoPart = null;
+          sortedParts = [];
           return;
         }
 
-        const videoUrl = `https://${
-          currentObservation.recordingRef.storageAccount || "devstoreaccount1"
-        }.blob.core.windows.net/${currentObservation.recordingRef.container}/${
-          currentObservation.recordingRef.blobName
-        }`;
+        // Sort parts by startOffsetSeconds
+        sortedParts = [...currentObservation.recordingParts].sort(
+          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds
+        );
 
-        // Reuse the same video element if it already exists
-        let v = document.getElementById("videoEl");
-        if (!v) {
-          playerEl.innerHTML = "";
-          v = document.createElement("video");
-          v.id = "videoEl";
-          v.controls = true;
-          v.preload = "metadata";
-          v.playsInline = true; // harmless on desktop, helpful on mobile
-          v.crossOrigin = "anonymous";
-          playerEl.appendChild(v);
+        // Build HTML with dropdown if multiple parts
+        let html = "";
+
+        // Debug logging
+        console.log(
+          "Recording parts:",
+          sortedParts.map((p) => ({
+            blobName: p.blobName,
+            startOffsetSeconds: p.startOffsetSeconds,
+            durationSeconds: p.durationSeconds,
+          }))
+        );
+
+        if (sortedParts.length > 1) {
+          html += '<div class="video-part-dropdown">';
+          html += "<label>Select Part:</label>";
+          html += '<select id="partSelector" onchange="handlePartSelection()">';
+          sortedParts.forEach((part, index) => {
+            // Show observation timeline offsets (where this part starts and ends in the observation)
+            const startOffset = formatTime(part.startOffsetSeconds);
+            let endOffset;
+
+            if (index < sortedParts.length - 1) {
+              // End offset is where the next part starts
+              endOffset = formatTime(sortedParts[index + 1].startOffsetSeconds);
+            } else {
+              // Last part - show as "End"
+              endOffset = "End";
+            }
+
+            console.log(
+              `Part ${index + 1}: ${startOffset} - ${endOffset} (raw: ${
+                part.startOffsetSeconds
+              } - ${
+                index < sortedParts.length - 1
+                  ? sortedParts[index + 1].startOffsetSeconds
+                  : "end"
+              })`
+            );
+
+            html += `<option value="${index}">Part ${
+              index + 1
+            } (${startOffset} - ${endOffset})</option>`;
+          });
+          html += "</select>";
+          html += "</div>";
         }
 
-        // Hard reset the element before swapping sources
-        v.pause();
-        v.removeAttribute("src");
-        v.load();
+        html += '<div id="videoContainer"></div>';
+        playerEl.innerHTML = html;
 
-        // Set the URL directly (no <source> tag)
-        v.src = videoUrl;
+        // Load first part
+        loadVideoPart(sortedParts[0], 0);
+      }
 
-        // Force the browser to (re)initialize media pipeline
-        v.load();
+      function handlePartSelection() {
+        const selector = document.getElementById("partSelector");
+        const selectedIndex = parseInt(selector.value);
+        const selectedPart = sortedParts[selectedIndex];
 
-        // Keep your global ref
-        videoElement = v;
+        if (selectedPart) {
+          loadVideoPart(selectedPart, selectedIndex, { autoplay: false });
+        }
+      }
 
-        // Debug
-        v.addEventListener(
-          "loadedmetadata",
-          () => {
-            console.log("currentSrc:", v.currentSrc);
-            console.log("duration:", v.duration);
+      function loadVideoPart(
+        part,
+        partIndex,
+        { autoplay = false, seekTo = null } = {}
+      ) {
+        const containerEl = document.getElementById("videoContainer");
 
-            const ranges = [];
-            for (let i = 0; i < v.seekable.length; i++) {
-              ranges.push([v.seekable.start(i), v.seekable.end(i)]);
-            }
-            console.log("seekable.length after loadedmetadata:", v.seekable.length);
-            console.log("seekable ranges:", ranges);
+        // Use Azure Front Door CDN for video playback
+        const videoUrl = `https://storage-cdn-d0egdudcfacwdeh7.z03.azurefd.net/${part.container}/${part.blobName}`;
 
-            // Test range request
-            fetch(v.currentSrc, { headers: { Range: "bytes=0-1" } })
-              .then((r) => {
-                console.log("status", r.status);
-                console.log("Content-Range", r.headers.get("content-range"));
-                return r.arrayBuffer();
-              })
-              .then((b) => console.log("bytes", b.byteLength))
-              .catch(console.error);
-          },
-          { once: true }
+        if (!videoElement) {
+          // Create video element on first load
+          videoElement = document.createElement("video");
+          videoElement.id = "videoEl";
+          videoElement.controls = true;
+          videoElement.preload = "metadata";
+          videoElement.playsInline = true;
+          videoElement.crossOrigin = "anonymous";
+
+          containerEl.innerHTML = "";
+          containerEl.appendChild(videoElement);
+
+          // Auto-transition to next part when current part ends
+          videoElement.addEventListener("ended", handleVideoEnded);
+        }
+
+        // Update source
+        videoElement.src = videoUrl;
+        currentVideoPart = part;
+        updatePartIndicator(partIndex);
+
+        // Update dropdown selection if it exists
+        const selector = document.getElementById("partSelector");
+        if (selector) {
+          selector.value = partIndex;
+        }
+
+        // Wait for metadata before seeking or playing
+        const onReady = () => {
+          if (typeof seekTo === "number") {
+            videoElement.currentTime = seekTo;
+          }
+
+          if (autoplay) {
+            videoElement.play().catch(() => {});
+          }
+
+          videoElement.removeEventListener("loadedmetadata", onReady);
+        };
+
+        videoElement.addEventListener("loadedmetadata", onReady);
+        videoElement.load();
+      }
+
+      function handleVideoEnded() {
+        if (!currentVideoPart || !sortedParts.length) return;
+
+        const currentIndex = sortedParts.findIndex(
+          (p) => p.partNumber === currentVideoPart.partNumber
         );
 
-        v.addEventListener(
-          "canplay",
-          () => {
-            console.log("seekable.length after canplay:", v.seekable.length);
-            const ranges = [];
-            for (let i = 0; i < v.seekable.length; i++) {
-              ranges.push([v.seekable.start(i), v.seekable.end(i)]);
-            }
-            console.log("seekable ranges after canplay:", ranges);
-          },
-          { once: true }
-        );
+        if (currentIndex >= 0 && currentIndex < sortedParts.length - 1) {
+          // Auto-transition to next part
+          const nextPart = sortedParts[currentIndex + 1];
+          loadVideoPart(nextPart, currentIndex + 1, { autoplay: true });
+        }
+      }
 
-        v.addEventListener(
-          "error",
-          () => {
-            console.log("video error:", v.error);
-          },
-          { once: true }
-        );
+      function updatePartIndicator(partIndex) {
+        // Add visual indicator of current part (if multiple parts exist)
+        if (!sortedParts || sortedParts.length <= 1) return;
+
+        const containerEl = document.getElementById("videoContainer");
+        let indicator = document.getElementById("partIndicator");
+
+        if (!indicator) {
+          indicator = document.createElement("div");
+          indicator.id = "partIndicator";
+          indicator.style.cssText =
+            "position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; z-index: 10;";
+          containerEl.style.position = "relative";
+          containerEl.appendChild(indicator);
+        }
+
+        indicator.textContent = `Part ${partIndex + 1} of ${
+          sortedParts.length
+        }`;
       }
 
       // Load notes for observation
@@ -866,18 +1226,28 @@ title: Observations - SideSpins
             const hasTimestamp =
               note.offsetSeconds !== null && note.offsetSeconds !== undefined;
 
+            // Build author display
+            const authorInfo = note.createdByName
+              ? `<span style="color: #666; font-size: 0.875rem;">By ${escapeHtml(
+                  note.createdByName
+                )}</span>`
+              : "";
+
             return `
             <div class="note-card ${hasTimestamp ? "clickable" : ""}" ${
               hasTimestamp ? `onclick="seekToNote('${note.id}')"` : ""
             }>
               <div class="note-header">
-                ${
-                  hasTimestamp
-                    ? `<span class="note-timestamp">${formatTime(
-                        note.offsetSeconds
-                      )}</span>`
-                    : "<span>General Note</span>"
-                }
+                <div>
+                  ${
+                    hasTimestamp
+                      ? `<span class="note-timestamp">${formatTime(
+                          note.offsetSeconds
+                        )}</span>`
+                      : "<span>General Note</span>"
+                  }
+                  ${authorInfo ? ` • ${authorInfo}` : ""}
+                </div>
                 <div class="note-actions">
                   <button class="btn btn-danger btn-sm" onclick="handleDeleteNote(event, '${
                     note.id
@@ -894,24 +1264,75 @@ title: Observations - SideSpins
       // Seek video to note timestamp
       function seekToNote(noteId) {
         const note = notes.find((n) => n.id === noteId);
-        if (!note || !videoElement || note.offsetSeconds === null) return;
+        if (!note || note.offsetSeconds === null) return;
 
-        const recordingStartOffset =
-          currentObservation.recordingRef?.recordingStartOffsetSeconds || 0;
-        const seekTime = Math.max(0, note.offsetSeconds - recordingStartOffset);
+        // Find which part contains this timestamp
+        const result = findPartForTimestamp(note.offsetSeconds);
+        if (!result) {
+          console.warn(
+            `No video part found for timestamp ${note.offsetSeconds}`
+          );
+          return;
+        }
 
-        videoElement.currentTime = seekTime;
-        videoElement.play();
+        // Calculate seek time within the video part
+        const seekTime = note.offsetSeconds - result.part.startOffsetSeconds;
+
+        console.log(
+          `Seeking to note: offset=${note.offsetSeconds}, part=${
+            result.index + 1
+          }, seekTime=${seekTime}`
+        );
+
+        // Check if we need to switch to a different part
+        if (
+          !currentVideoPart ||
+          currentVideoPart.partNumber !== result.part.partNumber
+        ) {
+          // Switch to the correct part and seek
+          loadVideoPart(result.part, result.index, {
+            autoplay: true,
+            seekTo: Math.max(0, seekTime),
+          });
+        } else {
+          // Same part, just seek
+          videoElement.currentTime = Math.max(0, seekTime);
+          videoElement.play();
+        }
+      }
+
+      function findPartForTimestamp(offsetSeconds) {
+        if (!sortedParts || sortedParts.length === 0) return null;
+
+        for (let i = 0; i < sortedParts.length; i++) {
+          const part = sortedParts[i];
+          const nextPart = sortedParts[i + 1];
+
+          if (!nextPart) {
+            // Last part handles everything from its start onward
+            if (offsetSeconds >= part.startOffsetSeconds) {
+              return { part, index: i };
+            }
+          } else {
+            // This part handles from its start to next part's start
+            if (
+              offsetSeconds >= part.startOffsetSeconds &&
+              offsetSeconds < nextPart.startOffsetSeconds
+            ) {
+              return { part, index: i };
+            }
+          }
+        }
+
+        return null;
       }
 
       // Use current video time for note
       function useCurrentVideoTime() {
-        if (!videoElement) return;
+        if (!videoElement || !currentVideoPart) return;
 
-        const recordingStartOffset =
-          currentObservation.recordingRef?.recordingStartOffsetSeconds || 0;
         const offsetSeconds = Math.floor(
-          videoElement.currentTime + recordingStartOffset
+          videoElement.currentTime + currentVideoPart.startOffsetSeconds
         );
 
         document.getElementById("noteOffset").value = offsetSeconds;
@@ -961,46 +1382,350 @@ title: Observations - SideSpins
         }
       }
 
-      // Show recording form
-      function showRecordingForm() {
-        document.getElementById("recordingForm").classList.add("active");
+      // Parse filename format: YYYY_MMDD_HHMMSS_SEQ[_custom].EXT
+      // Example: 2018_0102_025808_002_faststart.MP4
+      function parseRecordingFilename(filename) {
+        const pattern = /^(\d{4})_(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_(\d{3})/;
+        const match = filename.match(pattern);
 
-        // Pre-fill with existing values if available
-        if (currentObservation.recordingRef) {
-          document.getElementById("containerName").value =
-            currentObservation.recordingRef.container;
-          document.getElementById("blobName").value =
-            currentObservation.recordingRef.blobName;
-          document.getElementById("offsetSeconds").value =
-            currentObservation.recordingRef.recordingStartOffsetSeconds || 0;
+        if (!match) return null;
+
+        const [, year, month, day, hour, minute, second, seq] = match;
+
+        return {
+          timestamp: new Date(
+            parseInt(year),
+            parseInt(month) - 1, // JS months are 0-indexed
+            parseInt(day),
+            parseInt(hour),
+            parseInt(minute),
+            parseInt(second)
+          ),
+          sequenceNumber: parseInt(seq),
+          year: parseInt(year),
+          month: parseInt(month),
+          day: parseInt(day),
+          hour: parseInt(hour),
+          minute: parseInt(minute),
+          second: parseInt(second),
+        };
+      }
+
+      // Show recording modal
+      function showRecordingModal() {
+        document.getElementById("recordingModal").classList.add("active");
+        document.getElementById("modalContainerName").value = "videos";
+        selectedBlobs.clear();
+        availableBlobs = [];
+        renderModalRecordingPartsList();
+      }
+
+      // Hide recording modal
+      function hideRecordingModal() {
+        document.getElementById("recordingModal").classList.remove("active");
+        document.getElementById("modalAttachRecordingForm").reset();
+        document.getElementById("modalBlobPickerContainer").style.display =
+          "none";
+        selectedBlobs.clear();
+        availableBlobs = [];
+      }
+
+      // Render recording parts list in modal
+      function renderModalRecordingPartsList() {
+        const listEl = document.getElementById("modalRecordingPartsList");
+
+        if (
+          !currentObservation.recordingParts ||
+          currentObservation.recordingParts.length === 0
+        ) {
+          listEl.innerHTML =
+            "<p><em>No recording parts yet. Add one below.</em></p>";
+          return;
+        }
+
+        const sortedParts = [...currentObservation.recordingParts].sort(
+          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds
+        );
+
+        listEl.innerHTML = `
+          <h4>Current Parts</h4>
+          <div class="parts-list">
+            ${sortedParts
+              .map((part, index) => {
+                const parsed = parseRecordingFilename(part.blobName);
+                const timestampInfo = parsed
+                  ? `<span style="color: #28a745;">📹 ${parsed.year}-${String(
+                      parsed.month
+                    ).padStart(2, "0")}-${String(parsed.day).padStart(
+                      2,
+                      "0"
+                    )} ${String(parsed.hour).padStart(2, "0")}:${String(
+                      parsed.minute
+                    ).padStart(2, "0")}:${String(parsed.second).padStart(
+                      2,
+                      "0"
+                    )}</span>`
+                  : "";
+
+                return `
+              <div class="part-card" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>Part ${index + 1}</strong> ${timestampInfo}
+                    <div style="font-size: 12px; color: #666;">
+                      ${part.blobName}<br>
+                      Start: ${formatTime(part.startOffsetSeconds)}
+                      ${
+                        part.durationSeconds
+                          ? ` | Duration: ${formatTime(part.durationSeconds)}`
+                          : ""
+                      }
+                    </div>
+                  </div>
+                  <button class="btn btn-danger btn-sm" onclick="handleDeleteRecordingPartModal(${index})">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            `;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      // Load available blobs in modal
+      async function loadBlobsModal() {
+        const container = document.getElementById("modalContainerName").value;
+        const pickerEl = document.getElementById("modalBlobPicker");
+        const pickerContainer = document.getElementById(
+          "modalBlobPickerContainer"
+        );
+
+        pickerEl.innerHTML = '<div class="loading">Loading videos...</div>';
+        pickerContainer.style.display = "block";
+
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/blobs/list?container=${encodeURIComponent(
+              container
+            )}`,
+            { method: "GET" }
+          );
+
+          if (!response.ok) throw new Error("Failed to load blobs");
+
+          const data = await response.json();
+          availableBlobs = data.blobs || [];
+
+          renderBlobPickerModal();
+        } catch (error) {
+          console.error("Error loading blobs:", error);
+          pickerEl.innerHTML =
+            '<div class="error-message">Failed to load videos. Check container name.</div>';
         }
       }
 
-      // Hide recording form
-      function hideRecordingForm() {
-        document.getElementById("recordingForm").classList.remove("active");
-        document.getElementById("attachRecordingForm").reset();
+      // Render blob picker in modal
+      function renderBlobPickerModal(filteredBlobs = null) {
+        const pickerEl = document.getElementById("modalBlobPicker");
+        const blobs = filteredBlobs || availableBlobs;
+
+        if (blobs.length === 0) {
+          pickerEl.innerHTML =
+            '<div class="loading">No video files found in this container.</div>';
+          return;
+        }
+
+        pickerEl.innerHTML = blobs
+          .map((blob) => {
+            const isSelected = selectedBlobs.has(blob.name);
+            const sizeMB = (blob.sizeBytes / 1024 / 1024).toFixed(2);
+            const date = new Date(blob.lastModified).toLocaleString();
+
+            return `
+              <div class="blob-item ${
+                isSelected ? "selected" : ""
+              }" data-blob-name="${blob.name}">
+                <input 
+                  type="checkbox" 
+                  class="blob-checkbox" 
+                  ${isSelected ? "checked" : ""} 
+                  onchange="toggleBlobSelectionModal('${blob.name}')"
+                />
+                <div class="blob-info">
+                  <div class="blob-name">${blob.name}</div>
+                  <div class="blob-meta">${sizeMB} MB • ${date}</div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+
+        updateSelectedCountModal();
       }
 
-      // Handle attach recording
-      async function handleAttachRecording(e) {
+      // Toggle blob selection in modal
+      function toggleBlobSelectionModal(blobName) {
+        if (selectedBlobs.has(blobName)) {
+          selectedBlobs.delete(blobName);
+        } else {
+          selectedBlobs.add(blobName);
+        }
+
+        updateSelectedCountModal();
+        updateAddButtonModal();
+
+        // Update UI
+        const blobItem = document.querySelector(
+          `[data-blob-name="${blobName}"]`
+        );
+        if (blobItem) {
+          blobItem.classList.toggle("selected");
+        }
+      }
+
+      // Select all visible blobs in modal
+      function selectAllBlobsModal() {
+        const searchTerm = document
+          .getElementById("modalBlobSearch")
+          .value.toLowerCase();
+        const visibleBlobs = searchTerm
+          ? availableBlobs.filter((b) =>
+              b.name.toLowerCase().includes(searchTerm)
+            )
+          : availableBlobs;
+
+        visibleBlobs.forEach((blob) => selectedBlobs.add(blob.name));
+        renderBlobPickerModal(searchTerm ? visibleBlobs : null);
+      }
+
+      // Clear all selections in modal
+      function clearSelectionModal() {
+        selectedBlobs.clear();
+        renderBlobPickerModal();
+      }
+
+      // Filter blobs by search term in modal
+      function filterBlobsModal() {
+        const searchTerm = document
+          .getElementById("modalBlobSearch")
+          .value.toLowerCase();
+        if (!searchTerm) {
+          renderBlobPickerModal();
+          return;
+        }
+
+        const filtered = availableBlobs.filter((blob) =>
+          blob.name.toLowerCase().includes(searchTerm)
+        );
+        renderBlobPickerModal(filtered);
+      }
+
+      // Update selected count display in modal
+      function updateSelectedCountModal() {
+        document.getElementById("modalSelectedCount").textContent = `${
+          selectedBlobs.size
+        } video${selectedBlobs.size !== 1 ? "s" : ""} selected`;
+      }
+
+      // Update add button state in modal
+      function updateAddButtonModal() {
+        const addBtn = document.getElementById("modalAddPartsBtn");
+        addBtn.disabled = selectedBlobs.size === 0;
+      }
+
+      // Handle attach recording from modal
+      async function handleAttachRecordingModal(e) {
         e.preventDefault();
 
-        const container = document.getElementById("containerName").value;
-        const blobName = document.getElementById("blobName").value;
-        const offsetSeconds =
-          parseInt(document.getElementById("offsetSeconds").value) || 0;
+        const container = document.getElementById("modalContainerName").value;
+
+        // Multi-select mode - process selected blobs
+        if (selectedBlobs.size === 0) {
+          alert("Please select at least one video file");
+          return;
+        }
 
         try {
-          const updatedObs = {
-            ...currentObservation,
-            recordingRef: {
+          let newParts = [];
+
+          // Convert selected blob names to array and sort
+          const selectedBlobNames = Array.from(selectedBlobs).sort();
+
+          // Parse each filename and create parts
+          const parsedBlobs = selectedBlobNames.map((name) => ({
+            name,
+            parsed: parseRecordingFilename(name),
+          }));
+
+          // Sort by timestamp (earliest first)
+          parsedBlobs.sort((a, b) => {
+            if (!a.parsed || !b.parsed) return 0;
+            return a.parsed.timestamp - b.parsed.timestamp;
+          });
+
+          // Calculate part numbers and offsets
+          const existingParts = currentObservation.recordingParts || [];
+          let nextPartNumber = 1;
+          if (existingParts.length > 0) {
+            nextPartNumber =
+              Math.max(...existingParts.map((p) => p.partNumber)) + 1;
+          }
+
+          let cumulativeOffsetSeconds = 0;
+
+          for (let i = 0; i < parsedBlobs.length; i++) {
+            const { name, parsed } = parsedBlobs[i];
+            let startOffsetSeconds = cumulativeOffsetSeconds;
+            let durationSeconds = null;
+
+            if (parsed) {
+              // Calculate duration from timestamp difference to next video
+              if (i < parsedBlobs.length - 1 && parsedBlobs[i + 1].parsed) {
+                const currentTimestamp = parsed.timestamp;
+                const nextTimestamp = parsedBlobs[i + 1].parsed.timestamp;
+                durationSeconds = Math.floor(
+                  (nextTimestamp - currentTimestamp) / 1000
+                );
+
+                // Update cumulative offset for next part
+                cumulativeOffsetSeconds += durationSeconds;
+              }
+            }
+
+            newParts.push({
+              partNumber: parsed ? parsed.sequenceNumber : nextPartNumber + i,
               provider: "azure_blob",
               container,
-              blobName,
+              blobName: name,
               contentType: "video/mp4",
-              recordingStartOffsetSeconds: offsetSeconds,
-            },
+              startOffsetSeconds,
+              durationSeconds,
+            });
+          }
+
+          // Merge with existing parts
+          const existingPartsCopy = currentObservation.recordingParts || [];
+          const updatedParts = [...existingPartsCopy];
+
+          // Add or replace parts
+          for (const newPart of newParts) {
+            const existingIndex = updatedParts.findIndex(
+              (p) => p.partNumber === newPart.partNumber
+            );
+            if (existingIndex >= 0) {
+              // Replace existing
+              updatedParts[existingIndex] = newPart;
+            } else {
+              // Add new
+              updatedParts.push(newPart);
+            }
+          }
+
+          const updatedObs = {
+            ...currentObservation,
+            recordingParts: updatedParts,
           };
 
           const response = await authManager.makeAuthenticatedRequest(
@@ -1012,16 +1737,70 @@ title: Observations - SideSpins
             }
           );
 
-          if (!response.ok) throw new Error("Failed to attach recording");
+          if (!response.ok) throw new Error("Failed to add recording parts");
 
           currentObservation = await response.json();
 
-          // Hide form and refresh view
-          hideRecordingForm();
-          renderObservationDetail();
+          // Reset and refresh
+          selectedBlobs.clear();
+          renderModalRecordingPartsList();
+
+          // Refresh video player
+          requestAnimationFrame(() => {
+            renderVideoPlayer();
+          });
+
+          alert(
+            `Successfully added ${newParts.length} recording part${
+              newParts.length !== 1 ? "s" : ""
+            }`
+          );
         } catch (error) {
-          console.error("Error attaching recording:", error);
-          alert("Failed to attach recording");
+          console.error("Error adding recording parts:", error);
+          alert("Failed to add recording parts");
+        }
+      }
+
+      // Handle delete recording part from modal
+      async function handleDeleteRecordingPartModal(partIndex) {
+        const sortedParts = [...currentObservation.recordingParts].sort(
+          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds
+        );
+        const partToDelete = sortedParts[partIndex];
+
+        if (!confirm(`Delete Part ${partIndex + 1}?`)) return;
+
+        try {
+          const updatedParts = currentObservation.recordingParts.filter(
+            (p) => p.partNumber !== partToDelete.partNumber
+          );
+
+          const updatedObs = {
+            ...currentObservation,
+            recordingParts: updatedParts,
+          };
+
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedObs),
+            }
+          );
+
+          if (!response.ok) throw new Error("Failed to delete recording part");
+
+          currentObservation = await response.json();
+
+          // Refresh list and video player
+          renderModalRecordingPartsList();
+          requestAnimationFrame(() => {
+            renderVideoPlayer();
+          });
+        } catch (error) {
+          console.error("Error deleting recording part:", error);
+          alert("Failed to delete recording part");
         }
       }
 
@@ -1095,44 +1874,6 @@ title: Observations - SideSpins
         }
       }
 
-      // Handle add note
-      async function handleAddNote(e) {
-        e.preventDefault();
-
-        const text = document.getElementById("noteText").value;
-        const offsetInput = document.getElementById("noteOffset").value;
-        const offsetSeconds = offsetInput ? parseInt(offsetInput) : null;
-
-        try {
-          const response = await authManager.makeAuthenticatedRequest(
-            `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                text,
-                offsetSeconds,
-              }),
-            }
-          );
-
-          if (!response.ok) throw new Error("Failed to add note");
-
-          const newNote = await response.json();
-          notes.push(newNote);
-          notes.sort(
-            (a, b) => (a.offsetSeconds || 999999) - (b.offsetSeconds || 999999)
-          );
-
-          // Reset form and refresh
-          document.getElementById("addNoteForm").reset();
-          renderNotes();
-        } catch (error) {
-          console.error("Error adding note:", error);
-          alert("Failed to add note");
-        }
-      }
-
       // Handle delete note
       async function handleDeleteNote(event, noteId) {
         event.stopPropagation();
@@ -1161,6 +1902,106 @@ title: Observations - SideSpins
         currentObservation = null;
         notes = [];
         videoElement = null;
+      }
+
+      // Show note modal
+      function showNoteModal() {
+        document.getElementById("noteModal").classList.add("active");
+        document.getElementById("noteModalForm").reset();
+        document.getElementById("timestampGroup").style.display = "block";
+      }
+
+      // Hide note modal
+      function hideNoteModal() {
+        document.getElementById("noteModal").classList.remove("active");
+        document.getElementById("noteModalForm").reset();
+      }
+
+      // Handle note type change
+      function handleNoteTypeChange() {
+        const noteType = document.getElementById("noteTypeSelect").value;
+        const timestampGroup = document.getElementById("timestampGroup");
+
+        if (noteType === "general") {
+          timestampGroup.style.display = "none";
+        } else {
+          timestampGroup.style.display = "block";
+        }
+      }
+
+      // Handle add note from modal
+      async function handleAddNoteModal(e) {
+        e.preventDefault();
+
+        const text = document.getElementById("noteModalText").value;
+        const noteType = document.getElementById("noteTypeSelect").value;
+        let offsetSeconds = null;
+
+        if (noteType === "moment") {
+          const timestampValue =
+            document.getElementById("timestampSelect").value;
+
+          if (timestampValue === "now") {
+            // Use current video time if available
+            if (videoElement && currentVideoPart) {
+              offsetSeconds = Math.floor(
+                videoElement.currentTime + currentVideoPart.startOffsetSeconds
+              );
+            } else {
+              // No video, use observation elapsed time
+              const obsStart = new Date(currentObservation.startTime);
+              const now = new Date();
+              offsetSeconds = Math.floor((now - obsStart) / 1000);
+            }
+          } else {
+            // Calculate "now minus X seconds"
+            const subtractSeconds = parseInt(timestampValue);
+            if (videoElement && currentVideoPart) {
+              offsetSeconds = Math.floor(
+                videoElement.currentTime +
+                  currentVideoPart.startOffsetSeconds -
+                  subtractSeconds
+              );
+            } else {
+              const obsStart = new Date(currentObservation.startTime);
+              const now = new Date();
+              offsetSeconds =
+                Math.floor((now - obsStart) / 1000) - subtractSeconds;
+            }
+          }
+
+          // Ensure offset is not negative
+          offsetSeconds = Math.max(0, offsetSeconds);
+        }
+
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                text,
+                offsetSeconds,
+              }),
+            }
+          );
+
+          if (!response.ok) throw new Error("Failed to add note");
+
+          const newNote = await response.json();
+          notes.push(newNote);
+          notes.sort(
+            (a, b) => (a.offsetSeconds || 999999) - (b.offsetSeconds || 999999)
+          );
+
+          // Close modal and refresh
+          hideNoteModal();
+          renderNotes();
+        } catch (error) {
+          console.error("Error adding note:", error);
+          alert("Failed to add note");
+        }
       }
 
       // Utility: Format time in seconds to MM:SS

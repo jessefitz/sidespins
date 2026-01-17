@@ -1458,8 +1458,11 @@ title: Observations - SideSpins
       // Parse filename format: YYYY_MMDD_HHMMSS_SEQ[_custom].EXT
       // Example: 2018_0102_025808_002_faststart.MP4
       function parseRecordingFilename(filename) {
+        // Support virtual folders in blob names by stripping any prefix before the leaf name
+        const leafName = filename.split("/").pop();
+
         const pattern = /^(\d{4})_(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_(\d{3})/;
-        const match = filename.match(pattern);
+        const match = leafName.match(pattern);
 
         if (!match) return null;
 

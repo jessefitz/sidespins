@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using SideSpins.Api.Observations;
 using SideSpins.Api.Services;
 using SidesSpins.Functions;
 
@@ -117,6 +118,44 @@ builder.Services.AddScoped<IMembershipService, CosmosMembershipService>(serviceP
         databaseName,
         containerName
     );
+});
+
+// Register Observations Service
+builder.Services.AddScoped<ObservationsService>(serviceProvider =>
+{
+    var cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
+    var logger = serviceProvider.GetRequiredService<ILogger<ObservationsService>>();
+    var databaseName = Environment.GetEnvironmentVariable("COSMOS_DB") ?? "sidespins";
+    var storageAccountName =
+        Environment.GetEnvironmentVariable("BLOB_STORAGE_ACCOUNT_NAME") ?? "devstoreaccount1";
+    var containerName =
+        Environment.GetEnvironmentVariable("BLOB_CONTAINER_NAME") ?? "observations-videos";
+
+    return new ObservationsService(
+        cosmosClient,
+        databaseName,
+        storageAccountName,
+        containerName,
+        logger
+    );
+});
+
+// Register Blob Service for video playback URLs
+builder.Services.AddSingleton<BlobService>(serviceProvider =>
+{
+    var connectionString = Environment.GetEnvironmentVariable("BLOB_STORAGE_CONNECTION_STRING");
+    var storageAccountName =
+        Environment.GetEnvironmentVariable("BLOB_STORAGE_ACCOUNT_NAME") ?? "devstoreaccount1";
+    var containerName =
+        Environment.GetEnvironmentVariable("BLOB_CONTAINER_NAME") ?? "videos";
+
+    // Use connection string if available (required for listing blobs)
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        return new BlobService(connectionString, storageAccountName, containerName);
+    }
+    
+    return new BlobService(storageAccountName, containerName);
 });
 
 // Register HttpClient for Stytch API

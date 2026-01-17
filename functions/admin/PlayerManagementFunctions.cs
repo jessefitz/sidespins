@@ -121,7 +121,7 @@ public class PlayerManagementFunctions
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
             "delete",
-            Route = "admin/players/{playerId}/link-auth"
+            Route = "admin/players/{playerId}/unlink-auth"
         )]
             HttpRequest req,
         FunctionContext context,

@@ -383,13 +383,10 @@ function Start-AzureUpload {
     # Get the date folder name from the local path
     $folderName = Split-Path $LocalPath -Leaf
     
-    # Build remote path components (prefix + folder name) to mirror manual azcopy usage
+    # Build remote path components. AzCopy preserves the source folder name, so we only append the configured prefix.
     $remotePathParts = @()
     if ($AzCopyConfig.RemotePrefix) {
         $remotePathParts += $AzCopyConfig.RemotePrefix.Trim('/')
-    }
-    if ($folderName) {
-        $remotePathParts += $folderName.Trim('/')
     }
     $remotePath = ($remotePathParts -join '/')
 
@@ -414,78 +411,99 @@ function Start-AzureUpload {
     
     Write-Log "Uploading from: $LocalPath" -Level INFO
     if ($remotePath) {
-        Write-Log "Destination: $baseUrl/$containerName/$remotePath" -Level INFO
+        Write-Log "Destination: $baseUrl/$containerName/$remotePath/$folderName" -Level INFO
     }
     else {
-        Write-Log "Destination: $baseUrl/$containerName" -Level INFO
-    }
-    $azcopyArgs = @(
-        'copy',
-        $LocalPath,
-        $destinationUrl
-    )
-    
-    if ($AzCopyConfig.Recursive) {
-        $azcopyArgs += '--recursive=true'
+        Write-Log "Destination: $baseUrl/$containerName/$folderName" -Level INFO
     }
     
-    if ($AzCopyConfig.IncludePattern) {
-        $azcopyArgs += "--include-pattern=$($AzCopyConfig.IncludePattern)"
+    # Get list of files matching the include pattern
+    $includePatterns = if ($AzCopyConfig.IncludePattern) {
+        $AzCopyConfig.IncludePattern -split ';'
+    } else {
+        @('*')
     }
     
-    if ($AzCopyConfig.OverwritePolicy) {
-        $azcopyArgs += "--overwrite=$($AzCopyConfig.OverwritePolicy)"
+    $filesToUpload = @()
+    foreach ($pattern in $includePatterns) {
+        $filesToUpload += Get-ChildItem -Path $LocalPath -Filter $pattern -File
     }
     
-    if ($WhatIfPreference) {
-        Write-Log "[WhatIf] Would run: $($AzCopyConfig.AzCopyPath) $($azcopyArgs -join ' ')" -Level INFO
+    if ($filesToUpload.Count -eq 0) {
+        Write-Log "No files found to upload in $LocalPath" -Level WARN
+        return $false
+    }
+    
+    Write-Log "Found $($filesToUpload.Count) file(s) to upload" -Level INFO
+    
+    # Build remote folder URL including the date folder
+    if ($remotePath) {
+        $remoteFolder = "$baseUrl/$containerName/$remotePath/$folderName"
+    }
+    else {
+        $remoteFolder = "$baseUrl/$containerName/$folderName"
+    }
+    
+    $successCount = 0
+    $failCount = 0
+    
+    foreach ($file in $filesToUpload) {
+        Write-Log "Uploading file: $($file.Name)..." -Level INFO
+        
+        # Build destination URL for this specific file
+        $fileDestUrl = "$remoteFolder/$($file.Name)?$sasToken"
+        
+        $azcopyArgs = @(
+            'copy',
+            $file.FullName,
+            $fileDestUrl
+        )
+        
+        if ($AzCopyConfig.OverwritePolicy) {
+            $azcopyArgs += "--overwrite=$($AzCopyConfig.OverwritePolicy)"
+        }
+        
+        if ($WhatIfPreference) {
+            Write-Log "[WhatIf] Would run: $($AzCopyConfig.AzCopyPath) $($azcopyArgs -join ' ')" -Level INFO
+            continue
+        }
+        
+        try {
+            # Run azcopy for this file
+            & $AzCopyConfig.AzCopyPath @azcopyArgs 2>&1 | Out-Null
+            $exitCode = $LASTEXITCODE
+            
+            if ($exitCode -eq 0) {
+                Write-Log "  ✓ Success: $($file.Name)" -Level SUCCESS
+                $successCount++
+            }
+            else {
+                Write-Log "  ✗ Failed: $($file.Name) (exit code $exitCode)" -Level ERROR
+                $failCount++
+                $Script:Stats.Errors += "Failed to upload $($file.Name): exit code $exitCode"
+            }
+        }
+        catch {
+            Write-Log "  ✗ Exception uploading $($file.Name): $_" -Level ERROR
+            $failCount++
+            $Script:Stats.Errors += "Exception uploading $($file.Name): $_"
+        }
+    }
+    
+    Write-Log "" -Level INFO
+    Write-Log "Upload summary: $successCount succeeded, $failCount failed" -Level INFO
+    
+    # Update marker based on results
+    if ($failCount -eq 0) {
+        Write-Log "All files uploaded successfully" -Level SUCCESS
+        Remove-Item $markerInProgress -ErrorAction SilentlyContinue
+        Set-Content -Path $markerComplete -Value "Upload completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n$successCount files uploaded successfully"
         return $true
     }
-    
-    try {
-        Write-Log "Starting azcopy (output will stream in real-time)..." -Level INFO
-        Write-Log "" -Level INFO
-        
-        # Run azcopy without redirection to show real-time output
-        & $AzCopyConfig.AzCopyPath @azcopyArgs
-        $exitCode = $LASTEXITCODE
-        
-        Write-Log "" -Level INFO
-        Write-Log "AzCopy completed with exit code: $exitCode" -Level INFO
-        
-        # Capture output for logging (azcopy writes to its own log files)
-        $output = "Check azcopy logs in: $env:USERPROFILE\.azcopy\"
-        $errorOutput = ""
-        
-        if ($exitCode -eq 0) {
-            Write-Log "Upload completed successfully" -Level SUCCESS
-            
-            # Update marker
-            Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-            Set-Content -Path $markerComplete -Value "Upload completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n`nCheck azcopy logs for details"
-            
-            return $true
-        }
-        else {
-            Write-Log "AzCopy failed with exit code $exitCode" -Level ERROR
-            Write-Log "Check detailed logs in: $env:USERPROFILE\.azcopy\" -Level ERROR
-            
-            # Update marker
-            Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-            Set-Content -Path $markerFailed -Value "Upload failed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`nExit code: $exitCode`nCheck azcopy logs for details"
-            
-            $Script:Stats.Errors += "AzCopy upload failed with exit code $exitCode"
-            return $false
-        }
-    }
-    catch {
-        Write-Log "Exception during upload: $_" -Level ERROR
-        
-        # Update marker
+    else {
+        Write-Log "Upload completed with errors" -Level ERROR
         Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-        Set-Content -Path $markerFailed -Value "Upload exception: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n`n$_"
-        
-        $Script:Stats.Errors += "Upload exception: $_"
+        Set-Content -Path $markerFailed -Value "Upload completed with errors: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n$successCount succeeded, $failCount failed"
         return $false
     }
 }

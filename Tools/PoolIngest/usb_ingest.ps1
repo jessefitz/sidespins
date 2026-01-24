@@ -429,6 +429,9 @@ function Start-AzureUpload {
         $filesToUpload += Get-ChildItem -Path $LocalPath -Filter $pattern -File
     }
     
+    # Deduplicate files (Windows is case-insensitive, so *.mp4 and *.MP4 match the same files)
+    $filesToUpload = $filesToUpload | Sort-Object -Property FullName -Unique
+    
     if ($filesToUpload.Count -eq 0) {
         Write-Log "No files found to upload in $LocalPath" -Level WARN
         return $false
@@ -439,72 +442,150 @@ function Start-AzureUpload {
     # Build remote folder URL including the date folder
     if ($remotePath) {
         $remoteFolder = "$baseUrl/$containerName/$remotePath/$folderName"
+        $remoteFolderForList = "$remotePath/$folderName"
     }
     else {
         $remoteFolder = "$baseUrl/$containerName/$folderName"
+        $remoteFolderForList = $folderName
     }
     
-    $successCount = 0
-    $failCount = 0
+    # Retry logic: up to 3 attempts
+    $maxAttempts = 3
+    $attempt = 1
+    $allFilesUploaded = $false
     
-    foreach ($file in $filesToUpload) {
-        Write-Log "Uploading file: $($file.Name)..." -Level INFO
-        
-        # Build destination URL for this specific file
-        $fileDestUrl = "$remoteFolder/$($file.Name)?$sasToken"
-        
-        $azcopyArgs = @(
-            'copy',
-            $file.FullName,
-            $fileDestUrl
-        )
-        
-        if ($AzCopyConfig.OverwritePolicy) {
-            $azcopyArgs += "--overwrite=$($AzCopyConfig.OverwritePolicy)"
+    while ($attempt -le $maxAttempts -and -not $allFilesUploaded) {
+        if ($attempt -gt 1) {
+            Write-Log "" -Level INFO
+            Write-Log "=== Upload Attempt $attempt of $maxAttempts ===" -Level WARN
         }
         
-        if ($WhatIfPreference) {
-            Write-Log "[WhatIf] Would run: $($AzCopyConfig.AzCopyPath) $($azcopyArgs -join ' ')" -Level INFO
-            continue
-        }
+        # Check which files already exist remotely
+        Write-Log "Checking remote files..." -Level INFO
+        $remoteFiles = @{}
         
         try {
-            # Run azcopy for this file
-            & $AzCopyConfig.AzCopyPath @azcopyArgs 2>&1 | Out-Null
-            $exitCode = $LASTEXITCODE
+            $listUrl = "$baseUrl/$containerName/$remoteFolderForList`?$sasToken"
+            $listOutput = & $AzCopyConfig.AzCopyPath list $listUrl 2>&1
             
-            if ($exitCode -eq 0) {
-                Write-Log "  ✓ Success: $($file.Name)" -Level SUCCESS
-                $successCount++
-            }
-            else {
-                Write-Log "  ✗ Failed: $($file.Name) (exit code $exitCode)" -Level ERROR
-                $failCount++
-                $Script:Stats.Errors += "Failed to upload $($file.Name): exit code $exitCode"
+            if ($LASTEXITCODE -eq 0) {
+                # Parse azcopy list output to find file names
+                $listOutput | ForEach-Object {
+                    if ($_ -match '; Content Length: ') {
+                        # Extract filename from the line (format varies, but filename is typically at the start)
+                        $line = $_.ToString()
+                        $parts = $line -split ';'
+                        if ($parts.Count -gt 0) {
+                            $filename = ($parts[0].Trim() -split '/')[-1]
+                            if ($filename) {
+                                $remoteFiles[$filename] = $true
+                            }
+                        }
+                    }
+                }
+                Write-Log "Found $($remoteFiles.Count) file(s) already in remote location" -Level INFO
             }
         }
         catch {
-            Write-Log "  ✗ Exception uploading $($file.Name): $_" -Level ERROR
-            $failCount++
-            $Script:Stats.Errors += "Exception uploading $($file.Name): $_"
+            Write-Log "Could not list remote files (will attempt all uploads): $_" -Level WARN
+        }
+        
+        # Determine which files need uploading
+        $filesToAttempt = @()
+        foreach ($file in $filesToUpload) {
+            if ($file.Name -and -not $remoteFiles.ContainsKey($file.Name)) {
+                $filesToAttempt += $file
+            }
+            elseif (-not $file.Name) {
+                Write-Log "Skipping file with null/empty name" -Level WARN
+            }
+        }
+        
+        if ($filesToAttempt.Count -eq 0) {
+            Write-Log "All files already exist remotely!" -Level SUCCESS
+            $allFilesUploaded = $true
+            break
+        }
+        
+        Write-Log "Need to upload $($filesToAttempt.Count) file(s)" -Level INFO
+        
+        $successCount = 0
+        $failCount = 0
+        
+        foreach ($file in $filesToAttempt) {
+            Write-Log "Uploading file: $($file.Name)..." -Level INFO
+            
+            # Build destination URL for this specific file
+            $fileDestUrl = "$remoteFolder/$($file.Name)?$sasToken"
+            
+            $azcopyArgs = @(
+                'copy',
+                $file.FullName,
+                $fileDestUrl
+            )
+            
+            if ($AzCopyConfig.OverwritePolicy) {
+                $azcopyArgs += "--overwrite=$($AzCopyConfig.OverwritePolicy)"
+            }
+            
+            if ($WhatIfPreference) {
+                Write-Log "[WhatIf] Would run: $($AzCopyConfig.AzCopyPath) $($azcopyArgs -join ' ')" -Level INFO
+                $successCount++
+                continue
+            }
+            
+            try {
+                # Run azcopy for this file
+                & $AzCopyConfig.AzCopyPath @azcopyArgs 2>&1 | Out-Null
+                $exitCode = $LASTEXITCODE
+                
+                if ($exitCode -eq 0) {
+                    Write-Log "  ✓ Success: $($file.Name)" -Level SUCCESS
+                    $successCount++
+                }
+                else {
+                    Write-Log "  ✗ Failed: $($file.Name) (exit code $exitCode)" -Level ERROR
+                    $failCount++
+                    $Script:Stats.Errors += "Failed to upload $($file.Name): exit code $exitCode"
+                }
+            }
+            catch {
+                Write-Log "  ✗ Exception uploading $($file.Name): $_" -Level ERROR
+                $failCount++
+                $Script:Stats.Errors += "Exception uploading $($file.Name): $_"
+            }
+        }
+        
+        Write-Log "" -Level INFO
+        Write-Log "Attempt $attempt summary: $successCount succeeded, $failCount failed" -Level INFO
+        
+        # Check if all files are now uploaded
+        if ($failCount -eq 0) {
+            $allFilesUploaded = $true
+        }
+        else {
+            $attempt++
+            if ($attempt -le $maxAttempts) {
+                Write-Log "Waiting 5 seconds before retry..." -Level INFO
+                Start-Sleep -Seconds 5
+            }
         }
     }
     
-    Write-Log "" -Level INFO
-    Write-Log "Upload summary: $successCount succeeded, $failCount failed" -Level INFO
-    
-    # Update marker based on results
-    if ($failCount -eq 0) {
-        Write-Log "All files uploaded successfully" -Level SUCCESS
+    # Final verification
+    if (-not $allFilesUploaded) {
+        Write-Log "" -Level ERROR
+        Write-Log "Upload incomplete after $maxAttempts attempts" -Level ERROR
         Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-        Set-Content -Path $markerComplete -Value "Upload completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n$successCount files uploaded successfully"
-        return $true
+        Set-Content -Path $markerFailed -Value "Upload incomplete after $maxAttempts attempts: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        return $false
     }
     else {
-        Write-Log "Upload completed with errors" -Level ERROR
+        Write-Log "" -Level SUCCESS
+        Write-Log "All files uploaded successfully" -Level SUCCESS
         Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-        Set-Content -Path $markerFailed -Value "Upload completed with errors: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n$successCount succeeded, $failCount failed"
-        return $false
+        Set-Content -Path $markerComplete -Value "Upload completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`nAll files uploaded successfully"
+        return $true
     }
 }
 #endregion
@@ -535,21 +616,21 @@ function Start-Ingest {
         if (-not (Test-FfmpegAvailable -FfmpegPath $Config.FfmpegPath)) {
             throw "FFmpeg is not available. Please install ffmpeg and ensure it's in PATH or configure FfmpegPath in config.json"
         }
-    $remotePathParts = @()
-    if ($AzCopyConfig.RemotePrefix) {
-        $remotePathParts += $AzCopyConfig.RemotePrefix.Trim('/')
-    }
-    if ($folderName) {
-        $remotePathParts += $folderName.Trim('/')
-    }
-    $remotePath = ($remotePathParts -join '/')
-                                   -Extensions $Config.FileExtensions `
-                                   -ExcludePaths $Config.ExcludePaths
+        
+        # Create output directory
+        $outputDir = New-OutputDirectory -OutputRoot $Config.OutputRoot `
+                                         -IncludeTimestamp $Config.IncludeTimestampInFolder
+        
+        # Find video files
+        $drivePath = "${DriveLetter}:\"
+        $videoFiles = Find-VideoFiles -RootPath $drivePath `
+                                       -Extensions $Config.FileExtensions `
+                                       -ExcludePaths $Config.ExcludePaths
     
-    if ($videoFiles.Count -eq 0) {
-        Write-Log "No video files found on drive $drivePath" -Level WARN
-        return
-    }
+        if ($videoFiles.Count -eq 0) {
+            Write-Log "No video files found on drive $drivePath" -Level WARN
+            return
+        }
     
         # Process each file
         Write-Log "Beginning conversion of $($videoFiles.Count) file(s)..." -Level INFO

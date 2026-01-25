@@ -246,4 +246,85 @@ public class TeamsFunctions
             return new StatusCodeResult(500);
         }
     }
+
+    /// <summary>
+    /// Updates the active session for a team. Captains can only select from active sessions in their division.
+    /// </summary>
+    [Function("UpdateTeamActiveSession")]
+    [RequireAuthentication]
+    [RequireTeamRole("captain")]
+    public async Task<IActionResult> UpdateTeamActiveSession(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "patch",
+            Route = "teams/{teamId}/active-session"
+        )]
+            HttpRequest req,
+        FunctionContext context,
+        string teamId
+    )
+    {
+        try
+        {
+            var divisionId = req.Query["divisionId"].FirstOrDefault();
+            if (string.IsNullOrEmpty(divisionId))
+            {
+                return new BadRequestObjectResult("divisionId query parameter is required");
+            }
+
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var payload = JsonConvert.DeserializeObject<UpdateActiveSessionRequest>(requestBody);
+
+            if (payload == null)
+            {
+                return new BadRequestObjectResult("Invalid request body");
+            }
+
+            // If sessionId is provided, validate it exists and is active
+            if (!string.IsNullOrEmpty(payload.SessionId))
+            {
+                var session = await _cosmosService.GetSessionByIdAsync(
+                    payload.SessionId,
+                    divisionId
+                );
+                if (session == null)
+                {
+                    return new NotFoundObjectResult("Session not found");
+                }
+                if (!session.IsActive)
+                {
+                    return new BadRequestObjectResult(
+                        "Cannot set inactive session as team's active session"
+                    );
+                }
+            }
+
+            var updatedTeam = await _cosmosService.UpdateTeamActiveSessionAsync(
+                teamId,
+                divisionId,
+                payload.SessionId
+            );
+
+            if (updatedTeam == null)
+            {
+                return new NotFoundObjectResult("Team not found");
+            }
+
+            return new OkObjectResult(updatedTeam);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating active session for team {TeamId}", teamId);
+            return new StatusCodeResult(500);
+        }
+    }
+}
+
+/// <summary>
+/// Request model for updating team's active session
+/// </summary>
+public class UpdateActiveSessionRequest
+{
+    [JsonProperty("sessionId")]
+    public string? SessionId { get; set; }
 }

@@ -1,0 +1,867 @@
+[
+  {
+    "data": {
+      "division": {
+        "id": 418320,
+        "teams": [
+          {
+            "isBye": false,
+            "id": 12874756,
+            "name": "GR\"8\"Balls Afire (T # 1)",
+            "number": "03301",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91125245,
+                "memberNumber": "21273226",
+                "displayName": "Michael Hayes",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.2222222222222222,
+                "ppm": 0.6666666666666666,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2293264, "__typename": "Member" }
+              },
+              {
+                "id": 91125247,
+                "memberNumber": "21213547",
+                "displayName": "Carl Capello",
+                "matchesWon": 0,
+                "matchesPlayed": 3,
+                "pa": 0.1111111111111111,
+                "ppm": 0.3333333333333333,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2955133, "__typename": "Member" }
+              },
+              {
+                "id": 91125243,
+                "memberNumber": "21253538",
+                "displayName": "Tram Pham",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 7,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1507859, "__typename": "Member" }
+              },
+              {
+                "id": 91125244,
+                "memberNumber": "21260017",
+                "displayName": "Marc Bulleri",
+                "matchesWon": 0,
+                "matchesPlayed": 2,
+                "pa": 0.16666666666666666,
+                "ppm": 0.5,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1712687, "__typename": "Member" }
+              },
+              {
+                "id": 91125248,
+                "memberNumber": "21280671",
+                "displayName": "Anthony Crumpton",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.2222222222222222,
+                "ppm": 0.6666666666666666,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3370440, "__typename": "Member" }
+              },
+              {
+                "id": 91125249,
+                "memberNumber": "21280903",
+                "displayName": "Mark Dyce",
+                "matchesWon": 2,
+                "matchesPlayed": 4,
+                "pa": 0.5833333333333334,
+                "ppm": 1.75,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3388294, "__typename": "Member" }
+              },
+              {
+                "id": 91439914,
+                "memberNumber": "21273227",
+                "displayName": "Linda Hayes",
+                "matchesWon": 2,
+                "matchesPlayed": 4,
+                "pa": 0.5,
+                "ppm": 1.5,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2293265, "__typename": "Member" }
+              },
+              {
+                "id": 91654060,
+                "memberNumber": "21280364",
+                "displayName": "Taiwo Badaru",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3349614, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": false,
+            "id": 12874757,
+            "name": "Johnnies Crushers (T # 1)",
+            "number": "03302",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91125251,
+                "memberNumber": "21235283",
+                "displayName": "Joe Wojciechowski",
+                "matchesWon": 2,
+                "matchesPlayed": 2,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 7,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 958261, "__typename": "Member" }
+              },
+              {
+                "id": 91125252,
+                "memberNumber": "21240172",
+                "displayName": "Eric Raaen",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.4444444444444444,
+                "ppm": 1.3333333333333333,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1027840, "__typename": "Member" }
+              },
+              {
+                "id": 91125254,
+                "memberNumber": "21276878",
+                "displayName": "John Sennett",
+                "matchesWon": 3,
+                "matchesPlayed": 5,
+                "pa": 0.5333333333333333,
+                "ppm": 1.6,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2418326, "__typename": "Member" }
+              },
+              {
+                "id": 91125257,
+                "memberNumber": "21203158",
+                "displayName": "Wesley Gordon",
+                "matchesWon": 3,
+                "matchesPlayed": 5,
+                "pa": 0.5333333333333333,
+                "ppm": 1.6,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2662874, "__typename": "Member" }
+              },
+              {
+                "id": 91125258,
+                "memberNumber": "21237866",
+                "displayName": "Tony Harris",
+                "matchesWon": 2,
+                "matchesPlayed": 5,
+                "pa": 0.39999999999999997,
+                "ppm": 1.2,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3158796, "__typename": "Member" }
+              },
+              {
+                "id": 91125256,
+                "memberNumber": "21277584",
+                "displayName": "Nauman Khokhar",
+                "matchesWon": 1,
+                "matchesPlayed": 2,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2451219, "__typename": "Member" }
+              },
+              {
+                "id": 91125255,
+                "memberNumber": "21277360",
+                "displayName": "Bilal Ahmed",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2427866, "__typename": "Member" }
+              },
+              {
+                "id": 91443747,
+                "memberNumber": "21250015",
+                "displayName": "Jim Lerch",
+                "matchesWon": 4,
+                "matchesPlayed": 5,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3412191, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": false,
+            "id": 12874758,
+            "name": "\"Wildcards\" (T # 2)",
+            "number": "03303",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91125260,
+                "memberNumber": "21204163",
+                "displayName": "Mary Meehan",
+                "matchesWon": 2,
+                "matchesPlayed": 4,
+                "pa": 0.5833333333333334,
+                "ppm": 1.75,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2689075, "__typename": "Member" }
+              },
+              {
+                "id": 91125264,
+                "memberNumber": "21231230",
+                "displayName": "Jassi Singh",
+                "matchesWon": 3,
+                "matchesPlayed": 3,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 6,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3074870, "__typename": "Member" }
+              },
+              {
+                "id": 91125261,
+                "memberNumber": "21279064",
+                "displayName": "Susan Marks",
+                "matchesWon": 2,
+                "matchesPlayed": 4,
+                "pa": 0.5833333333333334,
+                "ppm": 1.75,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2841235, "__typename": "Member" }
+              },
+              {
+                "id": 91125263,
+                "memberNumber": "21220179",
+                "displayName": "Nemat Baltaev",
+                "matchesWon": 1,
+                "matchesPlayed": 4,
+                "pa": 0.16666666666666666,
+                "ppm": 0.5,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2965580, "__typename": "Member" }
+              },
+              {
+                "id": 91125259,
+                "memberNumber": "21257097",
+                "displayName": "Muzaffar Mirazizov",
+                "matchesWon": 1,
+                "matchesPlayed": 5,
+                "pa": 0.26666666666666666,
+                "ppm": 0.8,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1621198, "__typename": "Member" }
+              },
+              {
+                "id": 91125265,
+                "memberNumber": "21232763",
+                "displayName": "Ben Akintoye",
+                "matchesWon": 1,
+                "matchesPlayed": 2,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3100403, "__typename": "Member" }
+              },
+              {
+                "id": 91125262,
+                "memberNumber": "21212684",
+                "displayName": "Jay Lee",
+                "matchesWon": 0,
+                "matchesPlayed": 0,
+                "pa": 0,
+                "ppm": 0,
+                "skillLevel": 7,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2942893, "__typename": "Member" }
+              },
+              {
+                "id": 91671702,
+                "memberNumber": "21210950",
+                "displayName": "Tim Harwood",
+                "matchesWon": 1,
+                "matchesPlayed": 1,
+                "pa": 1,
+                "ppm": 3,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2889924, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": false,
+            "id": 12874759,
+            "name": "Screwballs (T # 2)",
+            "number": "03304",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91125271,
+                "memberNumber": "21225524",
+                "displayName": "Maurice Carpenter",
+                "matchesWon": 0,
+                "matchesPlayed": 4,
+                "pa": 0.25,
+                "ppm": 0.75,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3014161, "__typename": "Member" }
+              },
+              {
+                "id": 91125272,
+                "memberNumber": "21244871",
+                "displayName": "Bee Edlow",
+                "matchesWon": 3,
+                "matchesPlayed": 5,
+                "pa": 0.39999999999999997,
+                "ppm": 1.2,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3273005, "__typename": "Member" }
+              },
+              {
+                "id": 91125268,
+                "memberNumber": "21269769",
+                "displayName": "Denis Pogozhev",
+                "matchesWon": 1,
+                "matchesPlayed": 1,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 6,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2191223, "__typename": "Member" }
+              },
+              {
+                "id": 91125273,
+                "memberNumber": "21280655",
+                "displayName": "Glenwood Anderson",
+                "matchesWon": 2,
+                "matchesPlayed": 4,
+                "pa": 0.4166666666666667,
+                "ppm": 1.25,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3366986, "__typename": "Member" }
+              },
+              {
+                "id": 91125274,
+                "memberNumber": "21280709",
+                "displayName": "Rodney Winmond",
+                "matchesWon": 1,
+                "matchesPlayed": 2,
+                "pa": 0.5,
+                "ppm": 1.5,
+                "skillLevel": 2,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3367044, "__typename": "Member" }
+              },
+              {
+                "id": 91125269,
+                "memberNumber": "21200812",
+                "displayName": "Dave Stone",
+                "matchesWon": 3,
+                "matchesPlayed": 3,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2614409, "__typename": "Member" }
+              },
+              {
+                "id": 91601871,
+                "memberNumber": "21236170",
+                "displayName": "Richard Staton",
+                "matchesWon": 2,
+                "matchesPlayed": 2,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 958861, "__typename": "Member" }
+              },
+              {
+                "id": 91666682,
+                "memberNumber": "21281616",
+                "displayName": "Christopher Massey",
+                "matchesWon": 0,
+                "matchesPlayed": 1,
+                "pa": 0,
+                "ppm": 0,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3447859, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": false,
+            "id": 12874760,
+            "name": "Pound For Pound (T # 3)",
+            "number": "03305",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91125278,
+                "memberNumber": "21248184",
+                "displayName": "Chris Nash",
+                "matchesWon": 0,
+                "matchesPlayed": 2,
+                "pa": 0.16666666666666666,
+                "ppm": 0.5,
+                "skillLevel": 6,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1316748, "__typename": "Member" }
+              },
+              {
+                "id": 91125276,
+                "memberNumber": "21268466",
+                "displayName": "Ed Yarborough",
+                "matchesWon": 2,
+                "matchesPlayed": 5,
+                "pa": 0.26666666666666666,
+                "ppm": 0.8,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2145600, "__typename": "Member" }
+              },
+              {
+                "id": 91125277,
+                "memberNumber": "21257718",
+                "displayName": "Doug Brown",
+                "matchesWon": 0,
+                "matchesPlayed": 3,
+                "pa": 0.1111111111111111,
+                "ppm": 0.3333333333333333,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1654898, "__typename": "Member" }
+              },
+              {
+                "id": 91125280,
+                "memberNumber": "21247772",
+                "displayName": "Keshava Dasarathy",
+                "matchesWon": 3,
+                "matchesPlayed": 5,
+                "pa": 0.4666666666666666,
+                "ppm": 1.4,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3325468, "__typename": "Member" }
+              },
+              {
+                "id": 91125275,
+                "memberNumber": "21269056",
+                "displayName": "Tyrone Nichols",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2157728, "__typename": "Member" }
+              },
+              {
+                "id": 91125279,
+                "memberNumber": "21229808",
+                "displayName": "Brian Deleonardo",
+                "matchesWon": 3,
+                "matchesPlayed": 4,
+                "pa": 0.5833333333333334,
+                "ppm": 1.75,
+                "skillLevel": 6,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 889685, "__typename": "Member" }
+              },
+              {
+                "id": 91125281,
+                "memberNumber": "21249005",
+                "displayName": "Jesse Fitzgibbon",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2432945, "__typename": "Member" }
+              },
+              {
+                "id": 91375018,
+                "memberNumber": "21249810",
+                "displayName": "Brenda Marshall",
+                "matchesWon": 3,
+                "matchesPlayed": 5,
+                "pa": 0.4666666666666666,
+                "ppm": 1.4,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2545169, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": false,
+            "id": 12891064,
+            "name": "We Dem Boyz (T # 3)",
+            "number": "03306",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91238284,
+                "memberNumber": "21249806",
+                "displayName": "Hank Jackson",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.5555555555555556,
+                "ppm": 1.6666666666666667,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2392598, "__typename": "Member" }
+              },
+              {
+                "id": 91238286,
+                "memberNumber": "21250173",
+                "displayName": "Wilder Reed",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.4444444444444444,
+                "ppm": 1.3333333333333333,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2278698, "__typename": "Member" }
+              },
+              {
+                "id": 91238287,
+                "memberNumber": "21250014",
+                "displayName": "Ty Jackson",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2451430, "__typename": "Member" }
+              },
+              {
+                "id": 91238288,
+                "memberNumber": "21281543",
+                "displayName": "Eldorado Anderson",
+                "matchesWon": 3,
+                "matchesPlayed": 4,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3441904, "__typename": "Member" }
+              },
+              {
+                "id": 91238289,
+                "memberNumber": "21281547",
+                "displayName": "Jared Valentin",
+                "matchesWon": 2,
+                "matchesPlayed": 3,
+                "pa": 0.5555555555555556,
+                "ppm": 1.6666666666666667,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3442047, "__typename": "Member" }
+              },
+              {
+                "id": 91378481,
+                "memberNumber": "21281539",
+                "displayName": "Garry Smith",
+                "matchesWon": 1,
+                "matchesPlayed": 2,
+                "pa": 0.5,
+                "ppm": 1.5,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3442324, "__typename": "Member" }
+              },
+              {
+                "id": 91416295,
+                "memberNumber": "21281558",
+                "displayName": "Jay Finney",
+                "matchesWon": 1,
+                "matchesPlayed": 4,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 2,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3444012, "__typename": "Member" }
+              },
+              {
+                "id": 91443701,
+                "memberNumber": "21281629",
+                "displayName": "Patrick Williams",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.4444444444444444,
+                "ppm": 1.3333333333333333,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3443179, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": false,
+            "id": 12893372,
+            "name": "The Nightmare Collective",
+            "number": "03307",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [
+              {
+                "id": 91252690,
+                "memberNumber": "21235481",
+                "displayName": "Chuck Shaw",
+                "matchesWon": 4,
+                "matchesPlayed": 4,
+                "pa": 0.6666666666666666,
+                "ppm": 2,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3122270, "__typename": "Member" }
+              },
+              {
+                "id": 91252691,
+                "memberNumber": "21239024",
+                "displayName": "Bryan Shaw",
+                "matchesWon": 1,
+                "matchesPlayed": 4,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3172031, "__typename": "Member" }
+              },
+              {
+                "id": 91252692,
+                "memberNumber": "21265029",
+                "displayName": "Tammy Bush",
+                "matchesWon": 1,
+                "matchesPlayed": 3,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2040814, "__typename": "Member" }
+              },
+              {
+                "id": 91252693,
+                "memberNumber": "21239307",
+                "displayName": "Michael Cousins",
+                "matchesWon": 0,
+                "matchesPlayed": 2,
+                "pa": 0,
+                "ppm": 0,
+                "skillLevel": 3,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 3186876, "__typename": "Member" }
+              },
+              {
+                "id": 91292274,
+                "memberNumber": "21237156",
+                "displayName": "Paul Clement",
+                "matchesWon": 2,
+                "matchesPlayed": 4,
+                "pa": 0.4166666666666667,
+                "ppm": 1.25,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1025779, "__typename": "Member" }
+              },
+              {
+                "id": 91572577,
+                "memberNumber": "21242295",
+                "displayName": "Sean Shaw",
+                "matchesWon": 1,
+                "matchesPlayed": 2,
+                "pa": 0.3333333333333333,
+                "ppm": 1,
+                "skillLevel": 4,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 1349504, "__typename": "Member" }
+              },
+              {
+                "id": 91599784,
+                "memberNumber": "21208744",
+                "displayName": "Carl Tunnell",
+                "matchesWon": 0,
+                "matchesPlayed": 0,
+                "pa": 0,
+                "ppm": 0,
+                "skillLevel": 5,
+                "__typename": "EightBallPlayer",
+                "member": { "id": 2829951, "__typename": "Member" }
+              }
+            ],
+            "__typename": "Team",
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "address": {
+                "id": 48046,
+                "name": "Nottingham's",
+                "__typename": "Address"
+              },
+              "__typename": "HostLocation"
+            }
+          },
+          {
+            "isBye": true,
+            "id": 12874761,
+            "name": "Bye",
+            "number": "03308",
+            "league": { "id": 319, "slug": "Maryland", "__typename": "League" },
+            "division": {
+              "id": 418320,
+              "type": "EIGHT",
+              "__typename": "Division"
+            },
+            "roster": [],
+            "__typename": "Team",
+            "location": {
+              "id": 87357,
+              "name": "No Match This Week",
+              "address": null,
+              "__typename": "HostLocation"
+            }
+          }
+        ],
+        "__typename": "Division"
+      }
+    }
+  }
+]

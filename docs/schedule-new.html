@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -69,8 +69,8 @@
       }
 
       .player-cards {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 0.75rem;
         margin-bottom: 1rem;
       }
@@ -185,6 +185,70 @@
         gap: 0.5rem;
       }
 
+      .volunteer-alternate-container {
+        margin-top: 1rem;
+        text-align: center;
+        padding-top: 0.75rem;
+        border-top: 2px solid #e9ecef;
+      }
+
+      .volunteer-alternate-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .volunteer-alternate-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      }
+
+      .volunteer-alternate-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .player-result-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 1.5rem;
+      }
+
+      .result-status {
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+      }
+
+      .result-status.win {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .result-status.loss {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .result-status.forfeit {
+        background: #e2e3e5;
+        color: #383d41;
+      }
+
       .lineup-placeholder,
       .lineup-empty {
         text-align: center;
@@ -235,6 +299,10 @@
           gap: 1rem;
         }
 
+        .player-cards {
+          grid-template-columns: 1fr;
+        }
+
         .match-header {
           flex-direction: column;
           align-items: flex-start;
@@ -258,8 +326,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -469,6 +537,118 @@
         margin-top: 0;
         color: #495057;
         font-size: 1.1rem;
+      }
+
+      .schedule-summary {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e9ecef;
+      }
+
+      .schedule-summary-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        user-select: none;
+        padding: 0.5rem 0;
+      }
+
+      .schedule-summary-header:hover {
+        opacity: 0.8;
+      }
+
+      .schedule-summary-header h4 {
+        margin: 0;
+        color: #495057;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .toggle-icon {
+        font-size: 1.2rem;
+        color: #007cba;
+        transition: transform 0.3s ease;
+        font-weight: bold;
+      }
+
+      .toggle-icon.expanded {
+        transform: rotate(90deg);
+      }
+
+      .schedule-summary-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .schedule-summary-content.expanded {
+        max-height: 2000px;
+      }
+
+      .session-count-group {
+        margin-bottom: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .session-count-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .session-count-header {
+        font-weight: 600;
+        color: #007cba;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+      }
+
+      .player-count-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .player-count-list li {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .player-count-list li:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-color: #007cba;
+        transform: translateY(-2px);
+      }
+
+      .player-name {
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .game-count {
+        color: #007cba;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-top: 0.25rem;
+      }
+
+      .game-count-label {
+        color: #666;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.15rem;
       }
 
       .schedule-content {
@@ -985,6 +1165,155 @@
           margin-left: 0;
         }
       }
+
+      /* Tabbed Interface Styles */
+      .schedule-tabs {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .tab-nav {
+        display: flex;
+        border-bottom: 1px solid #e1e5e9;
+        border-radius: 8px 8px 0 0;
+        background: #f8f9fa;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .tab-button:first-child {
+        border-right: 1px solid #e1e5e9;
+      }
+
+      .tab-button:hover {
+        color: #007cba;
+        background: rgba(0, 124, 186, 0.05);
+      }
+
+      .tab-button.active {
+        color: #007cba;
+        background: white;
+        border-bottom: 2px solid #007cba;
+      }
+
+      .tab-button.active:hover {
+        background: white;
+      }
+
+      .tab-content {
+        padding: 1.5rem;
+      }
+
+      .tab-pane {
+        display: none;
+      }
+
+      .tab-pane.active {
+        display: block;
+      }
+
+      .match-nav-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .match-nav-item {
+        background: #f8f9fa;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+      }
+
+      .match-nav-item:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 124, 186, 0.1);
+      }
+
+      .match-nav-link {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .match-nav-link:hover {
+        color: #007cba;
+        background: rgba(0, 124, 186, 0.05);
+      }
+
+      .match-nav-link.active {
+        background: #007cba;
+        color: white;
+      }
+
+      .tab-empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+        font-style: italic;
+      }
+
+      .tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #007cba;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 10px;
+        min-width: 20px;
+        height: 20px;
+        margin-left: 0.5rem;
+        padding: 0 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .tab-nav {
+          flex-direction: column;
+        }
+
+        .tab-button:first-child {
+          border-right: none;
+          border-bottom: 1px solid #e1e5e9;
+        }
+
+        .tab-content {
+          padding: 1rem;
+        }
+
+        .match-nav-list {
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .match-nav-link {
+          padding: 1rem;
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body>
@@ -995,8 +1324,8 @@
         <!-- Desktop Navigation -->
         <div class="nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html" class="active">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2" class="active">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -1050,8 +1379,8 @@
 
         <div class="mobile-nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html" class="active">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2" class="active">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -1085,18 +1414,76 @@
         <div class="page-header">
           <h1>Team Schedule</h1>
           <div class="team-info">
-            <h3>Schedule for <span id="team-name">Team</span></h3>
-            <p>Division: <span id="division-name">Loading...</span></p>
+            <h3><span id="team-name">Team</span></h3>
+            <div
+              class="schedule-summary"
+              id="schedule-summary"
+              style="display: none"
+            >
+              <div class="schedule-summary-header" id="schedule-summary-toggle">
+                <span class="toggle-icon" id="toggle-icon">▶</span>
+                <h4>Schedule Summary</h4>
+              </div>
+              <div
+                class="schedule-summary-content"
+                id="schedule-summary-content"
+              >
+                <div id="session-player-counts"></div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="schedule-content">
-          <nav class="schedule-nav" id="schedule-nav">
-            <span class="label">Jump to:</span>
-            <ul id="nav-list">
-              <!-- Navigation items will be added by JavaScript -->
-            </ul>
-          </nav>
+          <!-- Tabbed Interface for Match Navigation -->
+          <div class="schedule-tabs">
+            <div class="tab-nav">
+              <button
+                class="tab-button active"
+                id="upcoming-tab-btn"
+                onclick="switchTab('upcoming')"
+              >
+                Upcoming Matches
+                <span class="tab-badge" id="upcoming-count">0</span>
+              </button>
+              <button
+                class="tab-button"
+                id="past-tab-btn"
+                onclick="switchTab('past')"
+              >
+                Past Matches
+                <span class="tab-badge" id="past-count">0</span>
+              </button>
+            </div>
+
+            <div class="tab-content">
+              <div id="upcoming-tab" class="tab-pane active">
+                <ul class="match-nav-list" id="upcoming-nav-list">
+                  <!-- Upcoming match links will be populated by JavaScript -->
+                </ul>
+                <div
+                  id="upcoming-empty"
+                  class="tab-empty-state"
+                  style="display: none"
+                >
+                  No upcoming matches scheduled
+                </div>
+              </div>
+
+              <div id="past-tab" class="tab-pane">
+                <ul class="match-nav-list" id="past-nav-list">
+                  <!-- Past match links will be populated by JavaScript -->
+                </ul>
+                <div
+                  id="past-empty"
+                  class="tab-empty-state"
+                  style="display: none"
+                >
+                  No past matches found
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div id="schedule-days">
             <!-- Schedule content will be added by JavaScript -->
@@ -1105,7 +1492,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916002"></script>
+    <script src="/assets/auth.js?v=202601251504"></script>
     <script>
       class ScheduleApp {
         constructor() {
@@ -1209,7 +1596,7 @@
                   this.authManager.currentUser.playerId;
                 console.log(
                   "Current user player ID:",
-                  this.currentUserPlayerId
+                  this.currentUserPlayerId,
                 );
               }
             } catch (error) {
@@ -1234,23 +1621,33 @@
             // Update captain badge based on role
             this.updateCaptainBadge(activeMembership.role);
 
-            // TODO: Get division ID from team data or user preferences
-            // For now, use a hardcoded fallback
-            this.divisionId = "div_nottingham_wed_9b_311";
+            // Get division ID from team membership
+            this.divisionId = activeMembership.divisionId;
+
+            if (!this.divisionId) {
+              this.showError(
+                "Team division information is missing. Please contact support.",
+              );
+              return;
+            }
 
             // Update team display
             document.getElementById("team-name").textContent = this.teamName;
-            document.getElementById("division-name").textContent =
-              this.divisionId;
 
             // Load schedule data
             await this.loadSchedule();
+
+            // Update active sessions display after loading
+            this.updateActiveSessionsDisplay();
 
             // Setup logout handler
             this.setupLogoutHandler();
 
             // Listen for team changes
             this.setupTeamChangeListener();
+
+            // Apply conditional UI based on permissions
+            UIPermissions.applyConditionalUI();
           } catch (error) {
             console.error("Schedule app initialization failed:", error);
             this.showError("Failed to initialize schedule. Please try again.");
@@ -1401,20 +1798,232 @@
           document.getElementById("schedule-container").style.display = "block";
         }
 
+        updateActiveSessionsDisplay() {
+          // No longer needed - removed display element
+        }
+
+        initializeScheduleSummaryToggle() {
+          const toggle = document.getElementById("schedule-summary-toggle");
+          const content = document.getElementById("schedule-summary-content");
+          const icon = document.getElementById("toggle-icon");
+
+          toggle.addEventListener("click", () => {
+            const isExpanded = content.classList.contains("expanded");
+
+            if (isExpanded) {
+              content.classList.remove("expanded");
+              icon.classList.remove("expanded");
+            } else {
+              content.classList.add("expanded");
+              icon.classList.add("expanded");
+            }
+          });
+        }
+
+        calculatePlayerGameCounts(matches, playerSkills) {
+          // Structure: { sessionId: { playerId: { played: count, scheduled: count } } }
+          const sessionPlayerCounts = {};
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set to start of day
+
+          // Filter matches for our team and active sessions
+          const teamMatches = matches.filter(
+            (match) =>
+              (match.homeTeamId === this.teamId ||
+                match.awayTeamId === this.teamId) &&
+              match.sessionId &&
+              this.activeSessionIds.has(match.sessionId),
+          );
+
+          // Iterate through each match and count player appearances
+          teamMatches.forEach((match) => {
+            const sessionId = match.sessionId;
+            const matchDate = new Date(match.scheduledAt);
+            matchDate.setHours(0, 0, 0, 0);
+            const isFutureOrToday = matchDate >= today;
+
+            if (!sessionPlayerCounts[sessionId]) {
+              sessionPlayerCounts[sessionId] = {};
+            }
+
+            // Helper function to process a lineup
+            const processLineup = (lineup) => {
+              if (!lineup) return;
+
+              lineup.forEach((lineupPlayer) => {
+                // Exclude alternates
+                if (!lineupPlayer.isAlternate && lineupPlayer.playerId) {
+                  const playerId = lineupPlayer.playerId;
+
+                  if (!sessionPlayerCounts[sessionId][playerId]) {
+                    sessionPlayerCounts[sessionId][playerId] = {
+                      played: 0,
+                      scheduled: 0,
+                    };
+                  }
+
+                  // Count scheduled games (future + today)
+                  if (isFutureOrToday) {
+                    sessionPlayerCounts[sessionId][playerId].scheduled++;
+                  }
+                }
+              });
+            };
+
+            // Process home lineup
+            if (match.lineupPlan && match.lineupPlan.home) {
+              processLineup(match.lineupPlan.home);
+            }
+
+            // Process away lineup
+            if (match.lineupPlan && match.lineupPlan.away) {
+              processLineup(match.lineupPlan.away);
+            }
+
+            // Count games played (matches with recorded results)
+            if (match.playerMatches && Array.isArray(match.playerMatches)) {
+              match.playerMatches.forEach((playerMatch) => {
+                if (playerMatch.playerId && playerMatch.result) {
+                  const playerId = playerMatch.playerId;
+
+                  if (!sessionPlayerCounts[sessionId][playerId]) {
+                    sessionPlayerCounts[sessionId][playerId] = {
+                      played: 0,
+                      scheduled: 0,
+                    };
+                  }
+
+                  sessionPlayerCounts[sessionId][playerId].played++;
+                }
+              });
+            }
+          });
+
+          return sessionPlayerCounts;
+        }
+
+        displayScheduleSummary(sessionPlayerCounts, playerSkills) {
+          const container = document.getElementById("session-player-counts");
+          const summarySection = document.getElementById("schedule-summary");
+
+          // Clear previous content
+          container.innerHTML = "";
+
+          // Check if we have any counts to display
+          const hasCounts = Object.keys(sessionPlayerCounts).length > 0;
+
+          if (!hasCounts) {
+            summarySection.style.display = "none";
+            return;
+          }
+
+          summarySection.style.display = "block";
+
+          // Sort sessions by name for consistent display
+          const sortedSessions = this.activeSessions
+            .filter((session) => sessionPlayerCounts[session.id])
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+          sortedSessions.forEach((session) => {
+            const playerCounts = sessionPlayerCounts[session.id];
+
+            // Create session group
+            const sessionGroup = document.createElement("div");
+            sessionGroup.className = "session-count-group";
+
+            // Session header
+            const header = document.createElement("div");
+            header.className = "session-count-header";
+            header.textContent = session.name;
+            sessionGroup.appendChild(header);
+
+            // Player list
+            const playerList = document.createElement("ul");
+            playerList.className = "player-count-list";
+
+            // Convert to array and sort by player name
+            const playerEntries = Object.entries(playerCounts)
+              .map(([playerId, counts]) => ({
+                playerId,
+                played: counts.played || 0,
+                scheduled: counts.scheduled || 0,
+                name: playerSkills[playerId]?.name || "Unknown Player",
+              }))
+              .sort((a, b) => a.name.localeCompare(b.name));
+
+            playerEntries.forEach(({ playerId, played, scheduled, name }) => {
+              const listItem = document.createElement("li");
+
+              const nameSpan = document.createElement("span");
+              nameSpan.className = "player-name";
+              nameSpan.textContent = name;
+
+              // Games Played section
+              const playedCountSpan = document.createElement("span");
+              playedCountSpan.className = "game-count";
+              playedCountSpan.textContent = played;
+
+              const playedLabelSpan = document.createElement("span");
+              playedLabelSpan.className = "game-count-label";
+              playedLabelSpan.textContent = `${
+                played === 1 ? "Game" : "Games"
+              } Played`;
+
+              // Scheduled Games section
+              const scheduledCountSpan = document.createElement("span");
+              scheduledCountSpan.className = "game-count";
+              scheduledCountSpan.style.marginTop = "0.5rem";
+              scheduledCountSpan.textContent = scheduled;
+
+              const scheduledLabelSpan = document.createElement("span");
+              scheduledLabelSpan.className = "game-count-label";
+              scheduledLabelSpan.textContent = `${
+                scheduled === 1
+                  ? "Scheduled Game Remaining"
+                  : "Scheduled Games Remaining"
+              }`;
+
+              listItem.appendChild(nameSpan);
+              listItem.appendChild(playedCountSpan);
+              listItem.appendChild(playedLabelSpan);
+              listItem.appendChild(scheduledCountSpan);
+              listItem.appendChild(scheduledLabelSpan);
+              playerList.appendChild(listItem);
+            });
+
+            sessionGroup.appendChild(playerList);
+            container.appendChild(sessionGroup);
+          });
+        }
+
         async loadSchedule() {
           try {
-            // Fetch matches and team data using authenticated requests
-            const [matches, players, memberships] = await Promise.all([
-              this.fetchMatches(),
-              this.fetchPlayers(),
-              this.fetchMemberships(),
-            ]);
+            // Fetch matches, team data, and active sessions using authenticated requests
+            const [matches, players, memberships, activeSessions] =
+              await Promise.all([
+                this.fetchMatches(),
+                this.fetchPlayers(),
+                this.fetchMemberships(),
+                this.fetchActiveSessions(),
+              ]);
+
+            // Store active session IDs and full session objects for filtering and display
+            this.activeSessionIds = new Set(activeSessions.map((s) => s.id));
+            this.activeSessions = activeSessions;
 
             // Create player lookup with skill levels
             const playerSkills = this.createPlayerSkillMap(
               players,
-              memberships
+              memberships,
             );
+
+            // Calculate and display schedule summary
+            const sessionPlayerCounts = this.calculatePlayerGameCounts(
+              matches,
+              playerSkills,
+            );
+            this.displayScheduleSummary(sessionPlayerCounts, playerSkills);
+            this.initializeScheduleSummaryToggle();
 
             // Group matches by date
             const matchesByDate = this.groupMatchesByDate(matches);
@@ -1434,15 +2043,23 @@
 
         async fetchMatches() {
           const response = await this.authManager.makeAuthenticatedRequest(
-            `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`
+            `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`,
           );
           if (!response.ok) throw new Error("Failed to fetch matches");
           return response.json();
         }
 
+        async fetchActiveSessions() {
+          const response = await this.authManager.makeAuthenticatedRequest(
+            `${this.authManager.baseUrl}/divisions/${this.divisionId}/sessions/active`,
+          );
+          if (!response.ok) throw new Error("Failed to fetch active sessions");
+          return response.json();
+        }
+
         async fetchPlayers() {
           const response = await this.authManager.makeAuthenticatedRequest(
-            `${this.authManager.baseUrl}/GetPlayers`
+            `${this.authManager.baseUrl}/GetPlayers`,
           );
           if (!response.ok) throw new Error("Failed to fetch players");
           return response.json();
@@ -1453,7 +2070,7 @@
           const allMemberships = await this.authManager.loadUserMemberships();
           // Filter to get memberships for the current team
           return allMemberships.filter(
-            (membership) => membership.teamId === this.teamId
+            (membership) => membership.teamId === this.teamId,
           );
         }
 
@@ -1486,11 +2103,13 @@
         groupMatchesByDate(matches) {
           const matchesByDate = {};
 
-          // Filter matches for our team
+          // Filter matches for our team AND that have a sessionId in active sessions
           const teamMatches = matches.filter(
             (match) =>
-              match.homeTeamId === this.teamId ||
-              match.awayTeamId === this.teamId
+              (match.homeTeamId === this.teamId ||
+                match.awayTeamId === this.teamId) &&
+              match.sessionId && // Exclude matches without sessionId
+              this.activeSessionIds.has(match.sessionId), // Only include matches from active sessions
           );
 
           teamMatches.forEach((match) => {
@@ -1512,37 +2131,87 @@
 
         renderSchedule(matchesByDate, playerSkills) {
           const scheduleContainer = document.getElementById("schedule-days");
-          const navList = document.getElementById("nav-list");
+          const upcomingNavList = document.getElementById("upcoming-nav-list");
+          const pastNavList = document.getElementById("past-nav-list");
+          const upcomingEmpty = document.getElementById("upcoming-empty");
+          const pastEmpty = document.getElementById("past-empty");
+          const upcomingCount = document.getElementById("upcoming-count");
+          const pastCount = document.getElementById("past-count");
 
           scheduleContainer.innerHTML = "";
-          navList.innerHTML = "";
+          upcomingNavList.innerHTML = "";
+          pastNavList.innerHTML = "";
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
 
           const sortedDates = Object.keys(matchesByDate).sort();
+          let upcomingMatches = 0;
+          let pastMatches = 0;
 
           sortedDates.forEach((dateKey) => {
             const dayData = matchesByDate[dateKey];
+            const matchDate = dayData.date;
+            matchDate.setHours(0, 0, 0, 0); // Ensure consistent comparison
+
             const dayElement = this.createDayElement(
               dateKey,
               dayData,
-              playerSkills
+              playerSkills,
             );
             scheduleContainer.appendChild(dayElement);
 
-            // Add navigation item
+            // Create navigation item
             const navItem = document.createElement("li");
+            navItem.className = "match-nav-item";
+
             const navLink = document.createElement("a");
-            navLink.href = `#date-${dateKey}`; // Use same prefix as the ID
+            navLink.className = "match-nav-link";
+            navLink.href = `#date-${dateKey}`;
             navLink.textContent = dayData.date.toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",
               day: "numeric",
             });
+
             navItem.appendChild(navLink);
-            navList.appendChild(navItem);
+
+            // Add to appropriate tab based on date
+            if (matchDate >= today) {
+              upcomingNavList.appendChild(navItem);
+              upcomingMatches++;
+            } else {
+              pastNavList.appendChild(navItem);
+              pastMatches++;
+            }
           });
+
+          // Update badge counts
+          upcomingCount.textContent = upcomingMatches;
+          pastCount.textContent = pastMatches;
+
+          // Show/hide empty state messages
+          upcomingEmpty.style.display =
+            upcomingMatches === 0 ? "block" : "none";
+          pastEmpty.style.display = pastMatches === 0 ? "block" : "none";
 
           // Add event listeners for availability controls
           this.setupAvailabilityEventListeners();
+
+          // Add event listeners for volunteer alternate buttons
+          this.setupVolunteerEventListeners();
+
+          // Add click event listeners to navigation links for active state
+          document.querySelectorAll(".match-nav-link").forEach((link) => {
+            link.addEventListener("click", function (e) {
+              // Remove active class from all navigation links
+              document
+                .querySelectorAll(".match-nav-link")
+                .forEach((l) => l.classList.remove("active"));
+              // Add active class to clicked link
+              this.classList.add("active");
+            });
+          });
         }
 
         createDayElement(dateKey, dayData, playerSkills) {
@@ -1602,10 +2271,23 @@
             {
               hour: "numeric",
               minute: "2-digit",
-            }
+            },
           );
 
           let lineupsHtml = "";
+
+          // Check if actual results are available
+          const hasPlayerMatches =
+            match.playerMatches && match.playerMatches.length > 0;
+
+          // Render actual results section if available
+          let actualResultsHtml = "";
+          if (hasPlayerMatches) {
+            actualResultsHtml = this.renderActualResults(
+              match.playerMatches,
+              playerSkills,
+            );
+          }
 
           // Check if lineup data is available
           if (
@@ -1628,7 +2310,7 @@
                                       ourLineup,
                                       playerSkills,
                                       true,
-                                      match
+                                      match,
                                     )}
                                 </div>
                                 <div class="lineup">
@@ -1637,24 +2319,26 @@
                                       opponentLineup,
                                       playerSkills,
                                       false,
-                                      match
+                                      match,
                                     )}
                                 </div>
+                                ${actualResultsHtml}
                             </div>
                         `;
             } else {
               // Only show our lineup when opponent is TBD
               lineupsHtml = `
                             <div class="lineups">
-                                <div class="lineup" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
+                                <div class="lineup" style="grid-column: 1 / -1;">
                                     <div class="lineup-header">Our Lineup</div>
                                     ${this.renderLineupTable(
                                       ourLineup,
                                       playerSkills,
                                       true,
-                                      match
+                                      match,
                                     )}
                                 </div>
+                                ${actualResultsHtml}
                             </div>
                         `;
             }
@@ -1664,6 +2348,7 @@
                             <div class="lineup-placeholder">
                                 <em>Lineups will be available closer to match time</em>
                             </div>
+                            ${actualResultsHtml}
                         </div>
                     `;
           }
@@ -1673,6 +2358,23 @@
             ? `${ourTeamName} vs ${opponentName}`
             : `${ourTeamName} vs ${opponentName}`;
 
+          // Check if match is today or in the past (for Record Scores button)
+          const matchDate = new Date(match.scheduledAt);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          matchDate.setHours(0, 0, 0, 0);
+          const canRecordScores = matchDate <= today;
+
+          const recordScoresBtn = canRecordScores
+            ? `<a href="/match-scores.html?matchId=${match.id}&teamId=${this.teamId}&divisionId=${match.divisionId}" 
+                   class="lineup-explorer-btn"
+                   data-requires-role="captain"
+                   data-hide-if-unauthorized
+                   title="Record actual game results for this match">
+                    📝 Record Scores
+                </a>`
+            : "";
+
           matchDiv.innerHTML = `
                     <div class="match-header">
                         <div class="match-teams">
@@ -1680,11 +2382,19 @@
                         </div>
                         <div class="match-actions">
                             <div class="match-time">${matchTime}</div>
-                            <a href="/lineup-explorer-new.html?matchId=${match.id}" 
+                            <a href="/lineup-explorer-new.html?v=2&matchId=${match.id}" 
                                class="lineup-explorer-btn"
                                title="Experiment with different lineups for this match">
                                 🎯 Lineup Explorer
                             </a>
+                            <a href="/lineup-explorer-new.html?matchId=${match.id}&teamId=${this.teamId}" 
+                               class="lineup-explorer-btn"
+                               data-requires-role="captain"
+                               data-hide-if-unauthorized
+                               title="Edit your team's lineup for this match">
+                                ✏️ Edit Lineup
+                            </a>
+                            ${recordScoresBtn}
                         </div>
                     </div>
                     ${lineupsHtml}
@@ -1785,8 +2495,8 @@
                                     <button class="cancel-availability-btn" data-player-id="${
                                       lineupPlayer.playerId
                                     }" data-match-id="${
-                match.id
-              }">Cancel</button>
+                                      match.id
+                                    }">Cancel</button>
                                 </div>
                             </div>
                         `;
@@ -1826,6 +2536,28 @@
                     `;
           }
 
+          // Check if current user can volunteer as alternate for this team
+          let volunteerButton = "";
+          if (
+            isOurTeam &&
+            this.isFutureMatch(match) &&
+            this.currentUserPlayerId
+          ) {
+            const userInLineup = lineup.some(
+              (p) => p.playerId === this.currentUserPlayerId,
+            );
+            if (!userInLineup) {
+              const teamIdForButton = isOurTeam ? this.teamId : "";
+              volunteerButton = `
+                        <div class="volunteer-alternate-container">
+                            <button class="volunteer-alternate-btn" data-match-id="${match.id}" data-team-id="${teamIdForButton}">
+                                🙋‍♂️ Volunteer as Alternate
+                            </button>
+                        </div>
+                    `;
+            }
+          }
+
           return `
                     <div class="player-cards">
                         ${playerCards}
@@ -1836,6 +2568,7 @@
                         : ""
                     }
                     ${skillWarning}
+                    ${volunteerButton}
                 `;
         }
 
@@ -1846,10 +2579,65 @@
           return matchDate >= today;
         }
 
+        renderActualResults(playerMatches, playerSkills) {
+          if (!playerMatches || playerMatches.length === 0) {
+            return "";
+          }
+
+          // Build player cards matching the lineup card style
+          const playerCards = playerMatches
+            .map((pm) => {
+              const playerInfo = playerSkills[pm.playerId] || {
+                name: pm.playerName,
+                skill: pm.skillLevel,
+              };
+              const displayName = playerInfo.name || pm.playerName;
+
+              // Determine result styling
+              let resultClass = "";
+              let resultEmoji = "";
+              if (pm.result === "win") {
+                resultClass = "win";
+                resultEmoji = "✅";
+              } else if (pm.result === "loss") {
+                resultClass = "loss";
+                resultEmoji = "❌";
+              } else if (pm.result === "forfeit") {
+                resultClass = "forfeit";
+                resultEmoji = "⚠️";
+              }
+
+              return `
+              <div class="player-card">
+                <div class="player-name-row">
+                  <div class="player-name">
+                    ${displayName} (${pm.skillLevel})
+                  </div>
+                </div>
+                <div class="player-result-row">
+                  <div class="result-status ${resultClass}">${resultEmoji} ${
+                    pm.result.charAt(0).toUpperCase() + pm.result.slice(1)
+                  }</div>
+                </div>
+              </div>
+            `;
+            })
+            .join("");
+
+          return `
+            <div class="lineup" style="grid-column: 1 / -1; margin-top: 2rem;">
+              <div class="lineup-header">📊 Actual Results</div>
+              <div class="player-cards">
+                ${playerCards}
+              </div>
+            </div>
+          `;
+        }
+
         setupAvailabilityEventListeners() {
           // Handle edit button clicks
           const editButtons = document.querySelectorAll(
-            ".edit-availability-btn"
+            ".edit-availability-btn",
           );
           editButtons.forEach((button) => {
             button.addEventListener("click", (event) => {
@@ -1858,7 +2646,7 @@
 
               // Find and show the corresponding availability controls
               const controls = document.querySelector(
-                `.availability-controls-inline[data-player-id="${playerId}"][data-match-id="${matchId}"]`
+                `.availability-controls-inline[data-player-id="${playerId}"][data-match-id="${matchId}"]`,
               );
               if (controls) {
                 controls.style.display = "block";
@@ -1875,7 +2663,7 @@
 
           // Handle save button clicks
           const saveButtons = document.querySelectorAll(
-            ".save-availability-btn"
+            ".save-availability-btn",
           );
           saveButtons.forEach((button) => {
             button.addEventListener("click", async (event) => {
@@ -1884,7 +2672,7 @@
 
               // Get the selected availability
               const controls = event.target.closest(
-                ".availability-controls-inline"
+                ".availability-controls-inline",
               );
               const select = controls.querySelector(".availability-select");
               const availability = select.value;
@@ -1892,7 +2680,7 @@
               if (!availability) {
                 this.showAvailabilityUpdateStatus(
                   "error",
-                  "Please select an availability option"
+                  "Please select an availability option",
                 );
                 return;
               }
@@ -1901,20 +2689,20 @@
                 await this.updatePlayerAvailability(
                   matchId,
                   playerId,
-                  availability
+                  availability,
                 );
                 // Show a brief success message
                 this.showAvailabilityUpdateStatus(
                   "success",
                   `Availability updated to ${
                     availability === "available" ? "Available" : "Unavailable"
-                  }`
+                  }`,
                 );
 
                 // Hide the controls and show the edit button again
                 controls.style.display = "none";
                 const editButton = document.querySelector(
-                  `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`
+                  `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`,
                 );
                 if (editButton) {
                   editButton.style.display = "block";
@@ -1928,7 +2716,7 @@
                 console.error("Error updating availability:", error);
                 this.showAvailabilityUpdateStatus(
                   "error",
-                  "Failed to update availability"
+                  "Failed to update availability",
                 );
               }
             });
@@ -1936,7 +2724,7 @@
 
           // Handle cancel button clicks
           const cancelButtons = document.querySelectorAll(
-            ".cancel-availability-btn"
+            ".cancel-availability-btn",
           );
           cancelButtons.forEach((button) => {
             button.addEventListener("click", (event) => {
@@ -1945,12 +2733,12 @@
 
               // Hide the controls and show the edit button again
               const controls = event.target.closest(
-                ".availability-controls-inline"
+                ".availability-controls-inline",
               );
               controls.style.display = "none";
 
               const editButton = document.querySelector(
-                `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`
+                `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`,
               );
               if (editButton) {
                 editButton.style.display = "block";
@@ -1980,7 +2768,7 @@
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ availability }),
-            }
+            },
           );
 
           if (!response.ok) {
@@ -2044,6 +2832,83 @@
             }
           }
         }
+
+        setupVolunteerEventListeners() {
+          const volunteerButtons = document.querySelectorAll(
+            ".volunteer-alternate-btn",
+          );
+          volunteerButtons.forEach((button) => {
+            button.addEventListener("click", async (event) => {
+              const matchId = event.target.dataset.matchId;
+              const teamId = event.target.dataset.teamId;
+
+              // Disable the button to prevent double-clicks
+              button.disabled = true;
+              button.textContent = "Volunteering...";
+
+              try {
+                await this.volunteerAsAlternate(matchId, teamId);
+
+                // Show success message
+                this.showAvailabilityUpdateStatus(
+                  "success",
+                  "Successfully volunteered as alternate!",
+                );
+
+                // Reload the schedule to show the updated lineup
+                setTimeout(() => {
+                  this.loadSchedule();
+                }, 1000);
+              } catch (error) {
+                console.error("Error volunteering as alternate:", error);
+                this.showAvailabilityUpdateStatus(
+                  "error",
+                  "Failed to volunteer as alternate. Please try again.",
+                );
+
+                // Re-enable the button
+                button.disabled = false;
+                button.textContent = "🙋‍♂️ Volunteer as Alternate";
+              }
+            });
+          });
+        }
+
+        async volunteerAsAlternate(matchId, teamId) {
+          const url = `${this.authManager.baseUrl}/matches/${matchId}/volunteer-alternate?divisionId=${this.divisionId}&teamId=${teamId}`;
+
+          const response = await this.authManager.makeAuthenticatedRequest(
+            url,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`Failed to volunteer as alternate: ${errorData}`);
+          }
+
+          return response.json();
+        }
+      }
+
+      // Tab switching functionality
+      function switchTab(tabName) {
+        // Remove active class from all tabs and buttons
+        document
+          .querySelectorAll(".tab-button")
+          .forEach((btn) => btn.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-pane")
+          .forEach((pane) => pane.classList.remove("active"));
+
+        // Add active class to selected tab and button
+        document.getElementById(`${tabName}-tab-btn`).classList.add("active");
+        document.getElementById(`${tabName}-tab`).classList.add("active");
       }
 
       // Initialize the app when DOM is loaded

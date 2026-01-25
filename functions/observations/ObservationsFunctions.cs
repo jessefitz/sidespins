@@ -123,6 +123,30 @@ public class ObservationsFunctions
     {
         try
         {
+            // Check if observation exists and if it's completed
+            var existingObservation = await _observationsService.GetObservationByIdAsync(id);
+            if (existingObservation == null)
+            {
+                return new NotFoundObjectResult(new { error = "Observation not found" });
+            }
+
+            // If observation is completed, only admins can update
+            if (existingObservation.Status == "completed")
+            {
+                var userRole = context.Items.TryGetValue("SidespinsRole", out var role)
+                    ? role?.ToString()
+                    : null;
+                if (userRole != "admin")
+                {
+                    return new ObjectResult(
+                        new { error = "Only admins can update completed observations" }
+                    )
+                    {
+                        StatusCode = 403,
+                    };
+                }
+            }
+
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var observation = JsonConvert.DeserializeObject<Observation>(requestBody);
 
@@ -160,6 +184,30 @@ public class ObservationsFunctions
     {
         try
         {
+            // Check if observation exists and if it's completed
+            var existingObservation = await _observationsService.GetObservationByIdAsync(id);
+            if (existingObservation == null)
+            {
+                return new NotFoundObjectResult(new { error = "Observation not found" });
+            }
+
+            // If observation is completed, only admins can delete
+            if (existingObservation.Status == "completed")
+            {
+                var userRole = context.Items.TryGetValue("SidespinsRole", out var role)
+                    ? role?.ToString()
+                    : null;
+                if (userRole != "admin")
+                {
+                    return new ObjectResult(
+                        new { error = "Only admins can delete completed observations" }
+                    )
+                    {
+                        StatusCode = 403,
+                    };
+                }
+            }
+
             var deleted = await _observationsService.DeleteObservationAsync(id);
             if (!deleted)
             {
@@ -223,16 +271,17 @@ public class ObservationsFunctions
     [Function("ListBlobs")]
     [RequireAuthentication("player")]
     public async Task<IActionResult> ListBlobs(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "blobs/list")]
-            HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "blobs/list")] HttpRequest req,
         FunctionContext context
     )
     {
         try
         {
             // Get container name from query parameter, default to configured container
-            var containerName = req.Query["container"].FirstOrDefault() 
-                ?? Environment.GetEnvironmentVariable("BLOB_CONTAINER_NAME") 
+            var containerName =
+                req.Query["container"].FirstOrDefault() ?? Environment.GetEnvironmentVariable(
+                    "BLOB_CONTAINER_NAME"
+                )
                 ?? "videos";
 
             var blobs = await _blobService.ListBlobsAsync(containerName);
@@ -244,4 +293,5 @@ public class ObservationsFunctions
             _logger.LogError(ex, "Error listing blobs in container");
             return new StatusCodeResult(500);
         }
-    }}
+    }
+}

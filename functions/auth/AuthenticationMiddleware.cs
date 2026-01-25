@@ -66,6 +66,34 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
             context.Items["UserClaims"] = claims; // Store the full claims object
             context.Items["SidespinsRole"] = claims.SidespinsRole ?? string.Empty;
 
+            // Validate global role requirement from [RequireAuthentication("role")]
+            var requiredRole = context.Items.TryGetValue("RequiredRole", out var roleObj)
+                ? roleObj?.ToString()
+                : "player";
+            if (
+                !string.IsNullOrEmpty(requiredRole)
+                && !IsAtLeast(claims.SidespinsRole, requiredRole)
+            )
+            {
+                _logger.LogWarning(
+                    "User {UserId} has insufficient global role {UserRole}, required: {RequiredRole}",
+                    claims.Sub,
+                    claims.SidespinsRole ?? "(none)",
+                    requiredRole
+                );
+                await WriteForbiddenResponse(
+                    httpContext.Response,
+                    new AuthorizationErrorResponse
+                    {
+                        Message = $"This operation requires {requiredRole} privileges",
+                        RequiredRole = requiredRole,
+                        UserRole = claims.SidespinsRole,
+                        SuggestedAction = "Contact an administrator to request elevated privileges",
+                    }
+                );
+                return;
+            }
+
             // If team role is required, validate team membership
             if (teamRoleRequirement != null)
             {

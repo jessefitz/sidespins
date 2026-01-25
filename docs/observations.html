@@ -3,7 +3,7 @@ layout: default
 title: Observations - SideSpins
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,8 +11,8 @@ title: Observations - SideSpins
     <title>Observations - SideSpins</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -839,6 +839,10 @@ title: Observations - SideSpins
       let availableBlobs = [];
       let selectedBlobs = new Set();
 
+      // Role state
+      let isCaptainOrManager = false;
+      let isAdmin = false;
+
       // Polling state
       let pollInterval = null;
       let lastObservationCount = 0;
@@ -849,7 +853,7 @@ title: Observations - SideSpins
         // Check authentication
         const isAuthenticated = await authManager.requireAuth(
           "/login-new.html?redirect=" +
-            encodeURIComponent(window.location.pathname)
+            encodeURIComponent(window.location.pathname),
         );
         if (!isAuthenticated) return;
 
@@ -860,22 +864,20 @@ title: Observations - SideSpins
         // Load user memberships for role checks
         await authManager.loadUserMemberships();
 
-        // Hide UI elements for non-captains/managers
-        const isCaptainOrManager =
+        // Check user roles
+        isCaptainOrManager =
           authManager.hasTeamRole("captain") ||
           authManager.hasTeamRole("manager");
+        isAdmin = authManager.isGlobalAdmin();
 
-        if (!isCaptainOrManager) {
-          // Hide create observation button
+        // Hide create observation button for non-captains/managers (admins can create too)
+        if (!isCaptainOrManager && !isAdmin) {
           const newObsBtn = document.getElementById("newObservationBtn");
           if (newObsBtn) newObsBtn.style.display = "none";
-
-          // Hide delete and mark complete buttons (they'll be hidden on detail view too)
-          const deleteBtn = document.getElementById("deleteObservationBtn");
-          const toggleBtn = document.getElementById("toggleStatusBtn");
-          if (deleteBtn) deleteBtn.style.display = "none";
-          if (toggleBtn) toggleBtn.style.display = "none";
         }
+
+        // Note: Delete and toggle buttons visibility will be controlled in showDetail()
+        // based on observation status and user role
 
         // Start polling for updates
         startPolling();
@@ -963,7 +965,7 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/GetObservations`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (!response.ok) throw new Error("Failed to load observations");
@@ -1011,7 +1013,7 @@ title: Observations - SideSpins
               </div>
             </div>
           </div>
-        `
+        `,
           )
           .join("");
       }
@@ -1021,7 +1023,7 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${id}`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (!response.ok) throw new Error("Failed to load observation");
@@ -1079,6 +1081,22 @@ title: Observations - SideSpins
 
         // Update toggle status button
         const toggleBtn = document.getElementById("toggleStatusBtn");
+        const deleteBtn = document.getElementById("deleteObservationBtn");
+
+        // Determine if user can modify this observation
+        // Completed observations can only be modified by admins
+        const canModify =
+          obs.status === "active" ? isCaptainOrManager || isAdmin : isAdmin;
+
+        // Show/hide action buttons based on permissions
+        if (canModify) {
+          toggleBtn.style.display = "inline-block";
+          deleteBtn.style.display = "inline-block";
+        } else {
+          toggleBtn.style.display = "none";
+          deleteBtn.style.display = "none";
+        }
+
         toggleBtn.textContent =
           obs.status === "active" ? "Mark Complete" : "Reopen";
         toggleBtn.className =
@@ -1111,7 +1129,7 @@ title: Observations - SideSpins
 
         // Sort parts by startOffsetSeconds
         sortedParts = [...currentObservation.recordingParts].sort(
-          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds
+          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds,
         );
 
         // Build HTML with dropdown if multiple parts
@@ -1124,7 +1142,7 @@ title: Observations - SideSpins
             blobName: p.blobName,
             startOffsetSeconds: p.startOffsetSeconds,
             durationSeconds: p.durationSeconds,
-          }))
+          })),
         );
 
         if (sortedParts.length > 1) {
@@ -1151,7 +1169,7 @@ title: Observations - SideSpins
                 index < sortedParts.length - 1
                   ? sortedParts[index + 1].startOffsetSeconds
                   : "end"
-              })`
+              })`,
             );
 
             html += `<option value="${index}">Part ${
@@ -1182,7 +1200,7 @@ title: Observations - SideSpins
       function loadVideoPart(
         part,
         partIndex,
-        { autoplay = false, seekTo = null } = {}
+        { autoplay = false, seekTo = null } = {},
       ) {
         const containerEl = document.getElementById("videoContainer");
 
@@ -1237,7 +1255,7 @@ title: Observations - SideSpins
         if (!currentVideoPart || !sortedParts.length) return;
 
         const currentIndex = sortedParts.findIndex(
-          (p) => p.partNumber === currentVideoPart.partNumber
+          (p) => p.partNumber === currentVideoPart.partNumber,
         );
 
         if (currentIndex >= 0 && currentIndex < sortedParts.length - 1) {
@@ -1273,7 +1291,7 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${observationId}/notes`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (!response.ok) throw new Error("Failed to load notes");
@@ -1302,7 +1320,7 @@ title: Observations - SideSpins
             // Build author display
             const authorInfo = note.createdByName
               ? `<span style="color: #666; font-size: 0.875rem;">By ${escapeHtml(
-                  note.createdByName
+                  note.createdByName,
                 )}</span>`
               : "";
 
@@ -1315,7 +1333,7 @@ title: Observations - SideSpins
                   ${
                     hasTimestamp
                       ? `<span class="note-timestamp">${formatTime(
-                          note.offsetSeconds
+                          note.offsetSeconds,
                         )}</span>`
                       : "<span>General Note</span>"
                   }
@@ -1343,7 +1361,7 @@ title: Observations - SideSpins
         const result = findPartForTimestamp(note.offsetSeconds);
         if (!result) {
           console.warn(
-            `No video part found for timestamp ${note.offsetSeconds}`
+            `No video part found for timestamp ${note.offsetSeconds}`,
           );
           return;
         }
@@ -1354,7 +1372,7 @@ title: Observations - SideSpins
         console.log(
           `Seeking to note: offset=${note.offsetSeconds}, part=${
             result.index + 1
-          }, seekTime=${seekTime}`
+          }, seekTime=${seekTime}`,
         );
 
         // Check if we need to switch to a different part
@@ -1405,7 +1423,7 @@ title: Observations - SideSpins
         if (!videoElement || !currentVideoPart) return;
 
         const offsetSeconds = Math.floor(
-          videoElement.currentTime + currentVideoPart.startOffsetSeconds
+          videoElement.currentTime + currentVideoPart.startOffsetSeconds,
         );
 
         document.getElementById("noteOffset").value = offsetSeconds;
@@ -1417,7 +1435,7 @@ title: Observations - SideSpins
 
         const label = document.getElementById("observationLabel").value;
         const description = document.getElementById(
-          "observationDescription"
+          "observationDescription",
         ).value;
 
         try {
@@ -1432,7 +1450,7 @@ title: Observations - SideSpins
                 startTime: new Date().toISOString(),
                 status: "active",
               }),
-            }
+            },
           );
 
           if (!response.ok) throw new Error("Failed to create observation");
@@ -1475,7 +1493,7 @@ title: Observations - SideSpins
             parseInt(day),
             parseInt(hour),
             parseInt(minute),
-            parseInt(second)
+            parseInt(second),
           ),
           sequenceNumber: parseInt(seq),
           year: parseInt(year),
@@ -1520,7 +1538,7 @@ title: Observations - SideSpins
         }
 
         const sortedParts = [...currentObservation.recordingParts].sort(
-          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds
+          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds,
         );
 
         listEl.innerHTML = `
@@ -1531,15 +1549,15 @@ title: Observations - SideSpins
                 const parsed = parseRecordingFilename(part.blobName);
                 const timestampInfo = parsed
                   ? `<span style="color: #28a745;">📹 ${parsed.year}-${String(
-                      parsed.month
+                      parsed.month,
                     ).padStart(2, "0")}-${String(parsed.day).padStart(
                       2,
-                      "0"
+                      "0",
                     )} ${String(parsed.hour).padStart(2, "0")}:${String(
-                      parsed.minute
+                      parsed.minute,
                     ).padStart(2, "0")}:${String(parsed.second).padStart(
                       2,
-                      "0"
+                      "0",
                     )}</span>`
                   : "";
 
@@ -1575,7 +1593,7 @@ title: Observations - SideSpins
         const container = document.getElementById("modalContainerName").value;
         const pickerEl = document.getElementById("modalBlobPicker");
         const pickerContainer = document.getElementById(
-          "modalBlobPickerContainer"
+          "modalBlobPickerContainer",
         );
 
         pickerEl.innerHTML = '<div class="loading">Loading videos...</div>';
@@ -1584,9 +1602,9 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/blobs/list?container=${encodeURIComponent(
-              container
+              container,
             )}`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (!response.ok) throw new Error("Failed to load blobs");
@@ -1654,7 +1672,7 @@ title: Observations - SideSpins
 
         // Update UI
         const blobItem = document.querySelector(
-          `[data-blob-name="${blobName}"]`
+          `[data-blob-name="${blobName}"]`,
         );
         if (blobItem) {
           blobItem.classList.toggle("selected");
@@ -1668,7 +1686,7 @@ title: Observations - SideSpins
           .value.toLowerCase();
         const visibleBlobs = searchTerm
           ? availableBlobs.filter((b) =>
-              b.name.toLowerCase().includes(searchTerm)
+              b.name.toLowerCase().includes(searchTerm),
             )
           : availableBlobs;
 
@@ -1693,7 +1711,7 @@ title: Observations - SideSpins
         }
 
         const filtered = availableBlobs.filter((blob) =>
-          blob.name.toLowerCase().includes(searchTerm)
+          blob.name.toLowerCase().includes(searchTerm),
         );
         renderBlobPickerModal(filtered);
       }
@@ -1762,7 +1780,7 @@ title: Observations - SideSpins
                 const currentTimestamp = parsed.timestamp;
                 const nextTimestamp = parsedBlobs[i + 1].parsed.timestamp;
                 durationSeconds = Math.floor(
-                  (nextTimestamp - currentTimestamp) / 1000
+                  (nextTimestamp - currentTimestamp) / 1000,
                 );
 
                 // Update cumulative offset for next part
@@ -1788,7 +1806,7 @@ title: Observations - SideSpins
           // Add or replace parts
           for (const newPart of newParts) {
             const existingIndex = updatedParts.findIndex(
-              (p) => p.partNumber === newPart.partNumber
+              (p) => p.partNumber === newPart.partNumber,
             );
             if (existingIndex >= 0) {
               // Replace existing
@@ -1810,7 +1828,7 @@ title: Observations - SideSpins
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updatedObs),
-            }
+            },
           );
 
           if (!response.ok) throw new Error("Failed to add recording parts");
@@ -1829,7 +1847,7 @@ title: Observations - SideSpins
           alert(
             `Successfully added ${newParts.length} recording part${
               newParts.length !== 1 ? "s" : ""
-            }`
+            }`,
           );
         } catch (error) {
           console.error("Error adding recording parts:", error);
@@ -1840,7 +1858,7 @@ title: Observations - SideSpins
       // Handle delete recording part from modal
       async function handleDeleteRecordingPartModal(partIndex) {
         const sortedParts = [...currentObservation.recordingParts].sort(
-          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds
+          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds,
         );
         const partToDelete = sortedParts[partIndex];
 
@@ -1848,7 +1866,7 @@ title: Observations - SideSpins
 
         try {
           const updatedParts = currentObservation.recordingParts.filter(
-            (p) => p.partNumber !== partToDelete.partNumber
+            (p) => p.partNumber !== partToDelete.partNumber,
           );
 
           const updatedObs = {
@@ -1862,7 +1880,7 @@ title: Observations - SideSpins
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updatedObs),
-            }
+            },
           );
 
           if (!response.ok) throw new Error("Failed to delete recording part");
@@ -1884,7 +1902,7 @@ title: Observations - SideSpins
       async function handleDeleteObservation() {
         if (
           !confirm(
-            "Are you sure you want to delete this observation? This will also delete all associated notes."
+            "Are you sure you want to delete this observation? This will also delete all associated notes.",
           )
         ) {
           return;
@@ -1893,14 +1911,23 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${currentObservation.id}`,
-            { method: "DELETE" }
+            { method: "DELETE" },
           );
+
+          if (response.status === 403) {
+            const errorData = await response.json();
+            alert(
+              errorData.error ||
+                "You don't have permission to delete this observation",
+            );
+            return;
+          }
 
           if (!response.ok) throw new Error("Failed to delete observation");
 
           // Remove from list and close detail
           observations = observations.filter(
-            (o) => o.id !== currentObservation.id
+            (o) => o.id !== currentObservation.id,
           );
           renderObservationsList();
           closeDetail();
@@ -1928,8 +1955,17 @@ title: Observations - SideSpins
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updatedObs),
-            }
+            },
           );
+
+          if (response.status === 403) {
+            const errorData = await response.json();
+            alert(
+              errorData.error ||
+                "You don't have permission to update this observation",
+            );
+            return;
+          }
 
           if (!response.ok) throw new Error("Failed to update status");
 
@@ -1937,7 +1973,7 @@ title: Observations - SideSpins
 
           // Update in list
           const index = observations.findIndex(
-            (o) => o.id === currentObservation.id
+            (o) => o.id === currentObservation.id,
           );
           if (index !== -1) observations[index] = currentObservation;
 
@@ -1959,7 +1995,7 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${currentObservation.id}/notes/${noteId}`,
-            { method: "DELETE" }
+            { method: "DELETE" },
           );
 
           if (!response.ok) throw new Error("Failed to delete note");
@@ -2022,7 +2058,7 @@ title: Observations - SideSpins
             // Use current video time if available
             if (videoElement && currentVideoPart) {
               offsetSeconds = Math.floor(
-                videoElement.currentTime + currentVideoPart.startOffsetSeconds
+                videoElement.currentTime + currentVideoPart.startOffsetSeconds,
               );
             } else {
               // No video, use observation elapsed time
@@ -2037,7 +2073,7 @@ title: Observations - SideSpins
               offsetSeconds = Math.floor(
                 videoElement.currentTime +
                   currentVideoPart.startOffsetSeconds -
-                  subtractSeconds
+                  subtractSeconds,
               );
             } else {
               const obsStart = new Date(currentObservation.startTime);
@@ -2061,7 +2097,7 @@ title: Observations - SideSpins
                 text,
                 offsetSeconds,
               }),
-            }
+            },
           );
 
           if (!response.ok) throw new Error("Failed to add note");
@@ -2069,7 +2105,7 @@ title: Observations - SideSpins
           const newNote = await response.json();
           notes.push(newNote);
           notes.sort(
-            (a, b) => (a.offsetSeconds || 999999) - (b.offsetSeconds || 999999)
+            (a, b) => (a.offsetSeconds || 999999) - (b.offsetSeconds || 999999),
           );
 
           // Close modal and refresh
@@ -2179,7 +2215,7 @@ title: Observations - SideSpins
         try {
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/GetObservations`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (!response.ok) return;
@@ -2190,7 +2226,7 @@ title: Observations - SideSpins
           if (newObservations.length > lastObservationCount) {
             const newCount = newObservations.length - lastObservationCount;
             showToast(
-              `${newCount} new observation${newCount !== 1 ? "s" : ""} added`
+              `${newCount} new observation${newCount !== 1 ? "s" : ""} added`,
             );
           }
 
@@ -2210,7 +2246,7 @@ title: Observations - SideSpins
           // Fetch latest observation data
           const obsResponse = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${currentObservation.id}`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (!obsResponse.ok) return;
@@ -2226,7 +2262,7 @@ title: Observations - SideSpins
 
           // Update in main observations list
           const index = observations.findIndex(
-            (o) => o.id === currentObservation.id
+            (o) => o.id === currentObservation.id,
           );
           if (index !== -1) observations[index] = currentObservation;
 
@@ -2243,7 +2279,7 @@ title: Observations - SideSpins
           // Update notes
           const notesResponse = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           if (notesResponse.ok) {
@@ -2253,7 +2289,7 @@ title: Observations - SideSpins
             if (newNotes.length > lastNotesCount) {
               const newCount = newNotes.length - lastNotesCount;
               showToast(
-                `${newCount} new note${newCount !== 1 ? "s" : ""} added`
+                `${newCount} new note${newCount !== 1 ? "s" : ""} added`,
               );
             }
 

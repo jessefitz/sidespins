@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -326,8 +326,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -1596,7 +1596,7 @@
                   this.authManager.currentUser.playerId;
                 console.log(
                   "Current user player ID:",
-                  this.currentUserPlayerId
+                  this.currentUserPlayerId,
                 );
               }
             } catch (error) {
@@ -1621,9 +1621,15 @@
             // Update captain badge based on role
             this.updateCaptainBadge(activeMembership.role);
 
-            // TODO: Get division ID from team data or user preferences
-            // For now, use a hardcoded fallback
-            this.divisionId = "div_nottingham_wed_9b_311";
+            // Get division ID from team membership
+            this.divisionId = activeMembership.divisionId;
+
+            if (!this.divisionId) {
+              this.showError(
+                "Team division information is missing. Please contact support.",
+              );
+              return;
+            }
 
             // Update team display
             document.getElementById("team-name").textContent = this.teamName;
@@ -1826,7 +1832,7 @@
               (match.homeTeamId === this.teamId ||
                 match.awayTeamId === this.teamId) &&
               match.sessionId &&
-              this.activeSessionIds.has(match.sessionId)
+              this.activeSessionIds.has(match.sessionId),
           );
 
           // Iterate through each match and count player appearances
@@ -2008,13 +2014,13 @@
             // Create player lookup with skill levels
             const playerSkills = this.createPlayerSkillMap(
               players,
-              memberships
+              memberships,
             );
 
             // Calculate and display schedule summary
             const sessionPlayerCounts = this.calculatePlayerGameCounts(
               matches,
-              playerSkills
+              playerSkills,
             );
             this.displayScheduleSummary(sessionPlayerCounts, playerSkills);
             this.initializeScheduleSummaryToggle();
@@ -2037,7 +2043,7 @@
 
         async fetchMatches() {
           const response = await this.authManager.makeAuthenticatedRequest(
-            `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`
+            `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`,
           );
           if (!response.ok) throw new Error("Failed to fetch matches");
           return response.json();
@@ -2045,7 +2051,7 @@
 
         async fetchActiveSessions() {
           const response = await this.authManager.makeAuthenticatedRequest(
-            `${this.authManager.baseUrl}/divisions/${this.divisionId}/sessions/active`
+            `${this.authManager.baseUrl}/divisions/${this.divisionId}/sessions/active`,
           );
           if (!response.ok) throw new Error("Failed to fetch active sessions");
           return response.json();
@@ -2053,7 +2059,7 @@
 
         async fetchPlayers() {
           const response = await this.authManager.makeAuthenticatedRequest(
-            `${this.authManager.baseUrl}/GetPlayers`
+            `${this.authManager.baseUrl}/GetPlayers`,
           );
           if (!response.ok) throw new Error("Failed to fetch players");
           return response.json();
@@ -2064,7 +2070,7 @@
           const allMemberships = await this.authManager.loadUserMemberships();
           // Filter to get memberships for the current team
           return allMemberships.filter(
-            (membership) => membership.teamId === this.teamId
+            (membership) => membership.teamId === this.teamId,
           );
         }
 
@@ -2103,7 +2109,7 @@
               (match.homeTeamId === this.teamId ||
                 match.awayTeamId === this.teamId) &&
               match.sessionId && // Exclude matches without sessionId
-              this.activeSessionIds.has(match.sessionId) // Only include matches from active sessions
+              this.activeSessionIds.has(match.sessionId), // Only include matches from active sessions
           );
 
           teamMatches.forEach((match) => {
@@ -2151,7 +2157,7 @@
             const dayElement = this.createDayElement(
               dateKey,
               dayData,
-              playerSkills
+              playerSkills,
             );
             scheduleContainer.appendChild(dayElement);
 
@@ -2265,7 +2271,7 @@
             {
               hour: "numeric",
               minute: "2-digit",
-            }
+            },
           );
 
           let lineupsHtml = "";
@@ -2279,7 +2285,7 @@
           if (hasPlayerMatches) {
             actualResultsHtml = this.renderActualResults(
               match.playerMatches,
-              playerSkills
+              playerSkills,
             );
           }
 
@@ -2304,7 +2310,7 @@
                                       ourLineup,
                                       playerSkills,
                                       true,
-                                      match
+                                      match,
                                     )}
                                 </div>
                                 <div class="lineup">
@@ -2313,7 +2319,7 @@
                                       opponentLineup,
                                       playerSkills,
                                       false,
-                                      match
+                                      match,
                                     )}
                                 </div>
                                 ${actualResultsHtml}
@@ -2329,7 +2335,7 @@
                                       ourLineup,
                                       playerSkills,
                                       true,
-                                      match
+                                      match,
                                     )}
                                 </div>
                                 ${actualResultsHtml}
@@ -2489,8 +2495,8 @@
                                     <button class="cancel-availability-btn" data-player-id="${
                                       lineupPlayer.playerId
                                     }" data-match-id="${
-                match.id
-              }">Cancel</button>
+                                      match.id
+                                    }">Cancel</button>
                                 </div>
                             </div>
                         `;
@@ -2538,7 +2544,7 @@
             this.currentUserPlayerId
           ) {
             const userInLineup = lineup.some(
-              (p) => p.playerId === this.currentUserPlayerId
+              (p) => p.playerId === this.currentUserPlayerId,
             );
             if (!userInLineup) {
               const teamIdForButton = isOurTeam ? this.teamId : "";
@@ -2610,8 +2616,8 @@
                 </div>
                 <div class="player-result-row">
                   <div class="result-status ${resultClass}">${resultEmoji} ${
-                pm.result.charAt(0).toUpperCase() + pm.result.slice(1)
-              }</div>
+                    pm.result.charAt(0).toUpperCase() + pm.result.slice(1)
+                  }</div>
                 </div>
               </div>
             `;
@@ -2631,7 +2637,7 @@
         setupAvailabilityEventListeners() {
           // Handle edit button clicks
           const editButtons = document.querySelectorAll(
-            ".edit-availability-btn"
+            ".edit-availability-btn",
           );
           editButtons.forEach((button) => {
             button.addEventListener("click", (event) => {
@@ -2640,7 +2646,7 @@
 
               // Find and show the corresponding availability controls
               const controls = document.querySelector(
-                `.availability-controls-inline[data-player-id="${playerId}"][data-match-id="${matchId}"]`
+                `.availability-controls-inline[data-player-id="${playerId}"][data-match-id="${matchId}"]`,
               );
               if (controls) {
                 controls.style.display = "block";
@@ -2657,7 +2663,7 @@
 
           // Handle save button clicks
           const saveButtons = document.querySelectorAll(
-            ".save-availability-btn"
+            ".save-availability-btn",
           );
           saveButtons.forEach((button) => {
             button.addEventListener("click", async (event) => {
@@ -2666,7 +2672,7 @@
 
               // Get the selected availability
               const controls = event.target.closest(
-                ".availability-controls-inline"
+                ".availability-controls-inline",
               );
               const select = controls.querySelector(".availability-select");
               const availability = select.value;
@@ -2674,7 +2680,7 @@
               if (!availability) {
                 this.showAvailabilityUpdateStatus(
                   "error",
-                  "Please select an availability option"
+                  "Please select an availability option",
                 );
                 return;
               }
@@ -2683,20 +2689,20 @@
                 await this.updatePlayerAvailability(
                   matchId,
                   playerId,
-                  availability
+                  availability,
                 );
                 // Show a brief success message
                 this.showAvailabilityUpdateStatus(
                   "success",
                   `Availability updated to ${
                     availability === "available" ? "Available" : "Unavailable"
-                  }`
+                  }`,
                 );
 
                 // Hide the controls and show the edit button again
                 controls.style.display = "none";
                 const editButton = document.querySelector(
-                  `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`
+                  `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`,
                 );
                 if (editButton) {
                   editButton.style.display = "block";
@@ -2710,7 +2716,7 @@
                 console.error("Error updating availability:", error);
                 this.showAvailabilityUpdateStatus(
                   "error",
-                  "Failed to update availability"
+                  "Failed to update availability",
                 );
               }
             });
@@ -2718,7 +2724,7 @@
 
           // Handle cancel button clicks
           const cancelButtons = document.querySelectorAll(
-            ".cancel-availability-btn"
+            ".cancel-availability-btn",
           );
           cancelButtons.forEach((button) => {
             button.addEventListener("click", (event) => {
@@ -2727,12 +2733,12 @@
 
               // Hide the controls and show the edit button again
               const controls = event.target.closest(
-                ".availability-controls-inline"
+                ".availability-controls-inline",
               );
               controls.style.display = "none";
 
               const editButton = document.querySelector(
-                `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`
+                `.edit-availability-btn[data-player-id="${playerId}"][data-match-id="${matchId}"]`,
               );
               if (editButton) {
                 editButton.style.display = "block";
@@ -2762,7 +2768,7 @@
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ availability }),
-            }
+            },
           );
 
           if (!response.ok) {
@@ -2829,7 +2835,7 @@
 
         setupVolunteerEventListeners() {
           const volunteerButtons = document.querySelectorAll(
-            ".volunteer-alternate-btn"
+            ".volunteer-alternate-btn",
           );
           volunteerButtons.forEach((button) => {
             button.addEventListener("click", async (event) => {
@@ -2846,7 +2852,7 @@
                 // Show success message
                 this.showAvailabilityUpdateStatus(
                   "success",
-                  "Successfully volunteered as alternate!"
+                  "Successfully volunteered as alternate!",
                 );
 
                 // Reload the schedule to show the updated lineup
@@ -2857,7 +2863,7 @@
                 console.error("Error volunteering as alternate:", error);
                 this.showAvailabilityUpdateStatus(
                   "error",
-                  "Failed to volunteer as alternate. Please try again."
+                  "Failed to volunteer as alternate. Please try again.",
                 );
 
                 // Re-enable the button
@@ -2878,7 +2884,7 @@
               headers: {
                 "Content-Type": "application/json",
               },
-            }
+            },
           );
 
           if (!response.ok) {

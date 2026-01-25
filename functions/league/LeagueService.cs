@@ -1028,4 +1028,67 @@ public class LeagueService
 
         return 0;
     }
+
+    /// <summary>
+    /// Updates only the activeSessionId field for a team (partial update)
+    /// </summary>
+    public async Task<Team?> UpdateTeamActiveSessionAsync(
+        string teamId,
+        string divisionId,
+        string? sessionId
+    )
+    {
+        try
+        {
+            // First get the existing team
+            var team = await GetTeamByIdAsync(teamId, divisionId);
+            if (team == null)
+            {
+                return null;
+            }
+
+            // Update only the activeSessionId
+            team.ActiveSessionId = sessionId;
+
+            var response = await _teamsContainer.ReplaceItemAsync(
+                team,
+                teamId,
+                new PartitionKey(divisionId)
+            );
+            return response.Resource;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets all teams that have a specific session as their active session
+    /// </summary>
+    public async Task<List<Team>> GetTeamsUsingActiveSessionAsync(
+        string sessionId,
+        string divisionId
+    )
+    {
+        var query =
+            "SELECT * FROM c WHERE c.type = 'team' AND c.divisionId = @divisionId AND c.activeSessionId = @sessionId";
+        var queryDefinition = new QueryDefinition(query)
+            .WithParameter("@divisionId", divisionId)
+            .WithParameter("@sessionId", sessionId);
+
+        var resultSet = _teamsContainer.GetItemQueryIterator<Team>(
+            queryDefinition,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(divisionId) }
+        );
+
+        var teams = new List<Team>();
+        while (resultSet.HasMoreResults)
+        {
+            var response = await resultSet.ReadNextAsync();
+            teams.AddRange(response);
+        }
+
+        return teams;
+    }
 }

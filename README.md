@@ -37,7 +37,10 @@ This is a full-stack application with three main components:
 
 - **Secure REST API** with JWT authentication middleware and Stytch integration
 - **Authentication**: Two-stage flow (Stytch session JWT → App JWT → API access)
-- **Authorization**: Role-based access control (player, manager, admin) with team-scoped permissions
+- **Authorization**: Role-based access control with hierarchy (player < captain/manager < admin)
+  - **Admin**: Full system access including session management (create/edit/delete)
+  - **Captain/Manager**: Team-scoped permissions for roster and match management
+  - **Player**: Read access and personal availability updates
 - **CRUD Operations** for:
   - Players management
   - Team memberships
@@ -116,6 +119,8 @@ Interactive tool for experimenting with player combinations:
 - Direct links to lineup planning tools
 - Match status and results tracking
 - Automatic match assignment to newest active session
+- **Admin-only Session Management**: Create, edit, and delete sessions via Admin Dashboard
+- **Team Active Session**: Captains can select which active session their team participates in
 - **Match Outcome Recording** (Captain-only):
   - Record Win/Loss/Forfeit for any team member
   - Available for matches on or after scheduled date
@@ -127,8 +132,9 @@ Interactive tool for experimenting with player combinations:
 
 - Player roster management with skill levels
 - Team membership tracking
-- Captain-level administrative functions
+- Captain-level administrative functions (roster, active session selection)
 - APA number integration
+- **Admin Dashboard** (`/admin.html`): Global session management for administrators
 
 ### 🎥 Observations (Pool Practice & Match Recording)
 
@@ -200,8 +206,11 @@ The Azure Functions API provides secure endpoints for all CRUD operations. See `
 
 - **User Authentication**: Stytch integration for SMS/Email-based user login and signup
 - **API Security**: JWT middleware validates all requests with role-based authorization
-- **Authorization Levels**: Three-tier access control (player → manager → admin)
-- **Team Scoping**: Users can only access data for their assigned teams
+- **Authorization Levels**: Hierarchical access control (player < captain/manager < admin)
+  - Session CRUD operations restricted to admin role
+  - Team roster and match management available to captains
+  - Admin role set via Stytch `trusted_metadata.sidespins_role`
+- **Team Scoping**: Users can only access data for their assigned teams (admins have global access)
 - **CORS Policy**: Configured to allow requests only from authorized domains
 - **Environment Variables**: Sensitive configuration stored securely
 - **Testing**: Dedicated test scripts for authentication flows (`test-auth-middleware.ps1`, `test-signup-flow.ps1`)

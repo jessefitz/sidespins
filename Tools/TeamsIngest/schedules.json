@@ -1,0 +1,4356 @@
+[
+  {
+    "data": {
+      "viewer": {
+        "id": 2432945,
+        "__typename": "Member"
+      },
+      "division": {
+        "id": 418320,
+        "contacts": [
+          {
+            "phone": "+14105629409",
+            "alias": {
+              "id": 34719,
+              "displayName": "Joe Wojciechowski",
+              "__typename": "Alias"
+            },
+            "__typename": "DivisionContact"
+          },
+          {
+            "phone": "+14104990718",
+            "alias": {
+              "id": 2157085,
+              "displayName": "Dave Stone",
+              "__typename": "Alias"
+            },
+            "__typename": "DivisionContact"
+          }
+        ],
+        "teams": [
+          {
+            "id": 12874756,
+            "name": "GR\"8\"Balls Afire (T # 1)",
+            "active": true,
+            "number": "03301",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12874757,
+            "name": "Johnnies Crushers (T # 1)",
+            "active": true,
+            "number": "03302",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12874758,
+            "name": "\"Wildcards\" (T # 2)",
+            "active": true,
+            "number": "03303",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12874759,
+            "name": "Screwballs (T # 2)",
+            "active": true,
+            "number": "03304",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12874760,
+            "name": "Pound For Pound (T # 3)",
+            "active": true,
+            "number": "03305",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12891064,
+            "name": "We Dem Boyz (T # 3)",
+            "active": true,
+            "number": "03306",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12893372,
+            "name": "The Nightmare Collective",
+            "active": true,
+            "number": "03307",
+            "isBye": false,
+            "location": {
+              "id": 31800,
+              "name": "Nottingham's",
+              "phone": "+14102900077",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          },
+          {
+            "id": 12874761,
+            "name": "Bye",
+            "active": true,
+            "number": "03308",
+            "isBye": true,
+            "location": {
+              "id": 87357,
+              "name": "No Match This Week",
+              "phone": "",
+              "__typename": "HostLocation"
+            },
+            "__typename": "Team"
+          }
+        ],
+        "schedule": [
+          {
+            "id": 11469227,
+            "description": "1-2 5-6 7-8 4-3",
+            "date": "2025-12-08T00:00:00Z",
+            "weekOfPlay": 1,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543631,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-08T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543632,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-08T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": true,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 5,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 13,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [
+                  {
+                    "id": 1525356,
+                    "order": {
+                      "id": 2155195,
+                      "member": {
+                        "id": 1316748,
+                        "firstName": "Chris",
+                        "lastName": "Nash",
+                        "__typename": "Member"
+                      },
+                      "__typename": "Order"
+                    },
+                    "__typename": "MatchOrder"
+                  }
+                ],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543633,
+                "isBye": true,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-08T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 0,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543634,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-08T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 8,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469228,
+            "description": "5-1 7-4 3-8 2-6",
+            "date": "2025-12-15T00:00:00Z",
+            "weekOfPlay": 2,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543635,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-15T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": true,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 11,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 7,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [
+                  {
+                    "id": 1535568,
+                    "order": {
+                      "id": 2180733,
+                      "member": {
+                        "id": 1316748,
+                        "firstName": "Chris",
+                        "lastName": "Nash",
+                        "__typename": "Member"
+                      },
+                      "__typename": "Order"
+                    },
+                    "__typename": "MatchOrder"
+                  }
+                ],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543636,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-15T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 6,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543637,
+                "isBye": true,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-15T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 0,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543638,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-15T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 7,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469229,
+            "description": "8-1 6-3 4-5 2-7",
+            "date": "2025-12-22T00:00:00Z",
+            "weekOfPlay": 3,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543639,
+                "isBye": true,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-22T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 0,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543640,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-22T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 5,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 12,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543641,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-22T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": true,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 8,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [
+                  {
+                    "id": 1543789,
+                    "order": {
+                      "id": 2201236,
+                      "member": {
+                        "id": 1316748,
+                        "firstName": "Chris",
+                        "lastName": "Nash",
+                        "__typename": "Member"
+                      },
+                      "__typename": "Order"
+                    },
+                    "__typename": "MatchOrder"
+                  }
+                ],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543642,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2025-12-22T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 12,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 5,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469230,
+            "description": "No Play",
+            "date": "2025-12-29T00:00:00Z",
+            "weekOfPlay": null,
+            "skip": true,
+            "matches": [],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469231,
+            "description": "1-4 5-7 8-6 3-2",
+            "date": "2026-01-05T00:00:00Z",
+            "weekOfPlay": 4,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543643,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-05T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 8,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543644,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-05T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": true,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 7,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [
+                  {
+                    "id": 1551988,
+                    "order": {
+                      "id": 2247235,
+                      "member": {
+                        "id": 1316748,
+                        "firstName": "Chris",
+                        "lastName": "Nash",
+                        "__typename": "Member"
+                      },
+                      "__typename": "Order"
+                    },
+                    "__typename": "MatchOrder"
+                  }
+                ],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543645,
+                "isBye": true,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-05T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 0,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543646,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-05T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 8,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469232,
+            "description": "2-1 4-3 6-5 8-7",
+            "date": "2026-01-12T00:00:00Z",
+            "weekOfPlay": 5,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543647,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-12T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 13,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 6,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543648,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-12T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 11,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 4,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543649,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-12T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": true,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 8,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [
+                  {
+                    "id": 1564120,
+                    "order": {
+                      "id": 2285505,
+                      "member": {
+                        "id": 1316748,
+                        "firstName": "Chris",
+                        "lastName": "Nash",
+                        "__typename": "Member"
+                      },
+                      "__typename": "Order"
+                    },
+                    "__typename": "MatchOrder"
+                  }
+                ],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543650,
+                "isBye": true,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-12T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 0,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469233,
+            "description": "1-6 5-2 3-7 8-4",
+            "date": "2026-01-19T00:00:00Z",
+            "weekOfPlay": 6,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543651,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-19T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 4,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 14,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543652,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-19T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": true,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 8,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [
+                  {
+                    "id": 1575340,
+                    "order": {
+                      "id": 2309979,
+                      "member": {
+                        "id": 1316748,
+                        "firstName": "Chris",
+                        "lastName": "Nash",
+                        "__typename": "Member"
+                      },
+                      "__typename": "Order"
+                    },
+                    "__typename": "MatchOrder"
+                  }
+                ],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543653,
+                "isBye": false,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-19T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 9,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543654,
+                "isBye": true,
+                "status": "COMPLETED",
+                "scoresheet": null,
+                "startTime": "2026-01-19T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": true,
+                "isFinalized": true,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [
+                  {
+                    "homeAway": "HOME",
+                    "points": {
+                      "total": 0,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  },
+                  {
+                    "homeAway": "AWAY",
+                    "points": {
+                      "total": 10,
+                      "__typename": "MatchResultPoints"
+                    },
+                    "__typename": "MatchResult"
+                  }
+                ],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469234,
+            "description": "7-1 2-8 5-3 4-6",
+            "date": "2026-01-26T00:00:00Z",
+            "weekOfPlay": 7,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543655,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-01-26T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543656,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-01-26T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543657,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": "https://api.poolplayers.com/scoresheets/PrintOMSScoresheet/48543657/2432945/3",
+                "startTime": "2026-01-26T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543658,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-01-26T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469235,
+            "description": "3-1 8-5 6-7 2-4",
+            "date": "2026-02-02T00:00:00Z",
+            "weekOfPlay": 8,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543659,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-02T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543660,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-02T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543661,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-02T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543662,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-02T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469236,
+            "description": "1-5 4-7 8-3 6-2",
+            "date": "2026-02-09T00:00:00Z",
+            "weekOfPlay": 9,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543663,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-09T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543664,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-09T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543665,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-09T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543666,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-09T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469237,
+            "description": "1-8 3-6 5-4 7-2",
+            "date": "2026-02-16T00:00:00Z",
+            "weekOfPlay": 10,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543667,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-16T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543668,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-16T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543669,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-16T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543670,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-16T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469238,
+            "description": "4-1 7-5 6-8 2-3",
+            "date": "2026-02-23T00:00:00Z",
+            "weekOfPlay": 11,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543671,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-23T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543672,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-23T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543673,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-23T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543674,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-02-23T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469239,
+            "description": "1-2 3-4 5-6 7-8",
+            "date": "2026-03-02T00:00:00Z",
+            "weekOfPlay": 12,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543675,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-02T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543676,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-02T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543677,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-02T19:00:00-05:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543678,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-02T19:00:00-05:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469240,
+            "description": "6-1 2-5 7-3 4-8",
+            "date": "2026-03-09T00:00:00Z",
+            "weekOfPlay": 13,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543679,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-09T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543680,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-09T19:00:00-04:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543681,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-09T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543682,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-09T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469241,
+            "description": "1-7 8-2 3-5 6-4",
+            "date": "2026-03-16T00:00:00Z",
+            "weekOfPlay": 14,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543683,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-16T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543684,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-16T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 87357,
+                  "name": "No Match This Week",
+                  "address": null,
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543685,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-16T19:00:00-04:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543686,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-16T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469242,
+            "description": "1-3 5-8 7-6 4-2",
+            "date": "2026-03-23T00:00:00Z",
+            "weekOfPlay": 15,
+            "skip": false,
+            "matches": [
+              {
+                "id": 48543687,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-23T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874756,
+                  "name": "GR\"8\"Balls Afire (T # 1)",
+                  "number": "03301",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874758,
+                  "name": "\"Wildcards\" (T # 2)",
+                  "number": "03303",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543688,
+                "isBye": true,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-23T19:00:00-04:00",
+                "isMine": true,
+                "isPaid": false,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874760,
+                  "name": "Pound For Pound (T # 3)",
+                  "number": "03305",
+                  "isMine": true,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874761,
+                  "name": "Bye",
+                  "number": "03308",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": [],
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543689,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-23T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12893372,
+                  "name": "The Nightmare Collective",
+                  "number": "03307",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12891064,
+                  "name": "We Dem Boyz (T # 3)",
+                  "number": "03306",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              },
+              {
+                "id": 48543690,
+                "isBye": false,
+                "status": "UNPLAYED",
+                "scoresheet": null,
+                "startTime": "2026-03-23T19:00:00-04:00",
+                "isMine": false,
+                "isPaid": null,
+                "isScored": false,
+                "isFinalized": false,
+                "isPlayoff": false,
+                "description": "",
+                "tableNumber": null,
+                "results": [],
+                "timeZone": {
+                  "id": "169",
+                  "name": "America/New_York",
+                  "__typename": "TimeZone"
+                },
+                "location": {
+                  "id": 31800,
+                  "name": "Nottingham's",
+                  "address": {
+                    "id": 48046,
+                    "name": "Nottingham's",
+                    "__typename": "Address"
+                  },
+                  "__typename": "HostLocation"
+                },
+                "home": {
+                  "id": 12874759,
+                  "name": "Screwballs (T # 2)",
+                  "number": "03304",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "away": {
+                  "id": 12874757,
+                  "name": "Johnnies Crushers (T # 1)",
+                  "number": "03302",
+                  "isMine": false,
+                  "__typename": "Team"
+                },
+                "league": {
+                  "id": 319,
+                  "isMine": true,
+                  "slug": "Maryland",
+                  "isElectronicPaymentsEnabled": true,
+                  "__typename": "League"
+                },
+                "orderItems": null,
+                "division": {
+                  "id": 418320,
+                  "scheduleInEdit": false,
+                  "isTournament": false,
+                  "__typename": "Division"
+                },
+                "__typename": "Match"
+              }
+            ],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469243,
+            "description": "No Tier 1 Semi Finals",
+            "date": "2026-03-30T00:00:00Z",
+            "weekOfPlay": 16,
+            "skip": false,
+            "matches": [],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469244,
+            "description": "Tier 2 Semi Finals",
+            "date": "2026-03-30T00:00:00Z",
+            "weekOfPlay": 17,
+            "skip": false,
+            "matches": [],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469245,
+            "description": "Tier 1 Finals",
+            "date": "2026-04-11T00:00:00Z",
+            "weekOfPlay": 18,
+            "skip": false,
+            "matches": [],
+            "__typename": "Schedule"
+          },
+          {
+            "id": 11469246,
+            "description": "Tier 2 Finals",
+            "date": "2026-04-18T00:00:00Z",
+            "weekOfPlay": 19,
+            "skip": false,
+            "matches": [],
+            "__typename": "Schedule"
+          }
+        ],
+        "scheduleInEdit": false,
+        "__typename": "Division"
+      }
+    }
+  }
+]

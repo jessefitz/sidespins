@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,8 +6,8 @@
     <title>SideSpins App</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -696,7 +696,7 @@
         const errorContainer = document.getElementById("error-container");
         const errorMessage = document.getElementById("error-message");
         const dashboardContainer = document.getElementById(
-          "dashboard-container"
+          "dashboard-container",
         );
         const roleActions = document.getElementById("role-actions");
         const logoutBtn = document.getElementById("logout-btn");
@@ -869,9 +869,21 @@
             admin: [
               ...commonActions,
               {
-                text: "Admin Panel",
-                href: "/admin/",
-                description: "Manage users, teams, and system settings",
+                text: "Match Management",
+                href: "/captain-matches.html",
+                description: "Create and manage team matches",
+                icon: "📅",
+              },
+              {
+                text: "Team Management",
+                href: "/team-admin.html",
+                description: "Manage team roster and settings",
+                icon: "👥",
+              },
+              {
+                text: "Admin Dashboard",
+                href: "/admin.html",
+                description: "Manage sessions and system settings",
                 icon: "⚙️",
               },
             ],
@@ -970,7 +982,7 @@
 
         function showComingSoon(feature) {
           alert(
-            `${feature} feature is coming soon! This will be available in a future update.`
+            `${feature} feature is coming soon! This will be available in a future update.`,
           );
         }
 

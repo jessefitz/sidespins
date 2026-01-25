@@ -67,6 +67,9 @@ public class Team
     [JsonProperty("captainPlayerId")]
     public string CaptainPlayerId { get; set; } = string.Empty;
 
+    [JsonProperty("activeSessionId")]
+    public string? ActiveSessionId { get; set; }
+
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
 }

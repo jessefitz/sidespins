@@ -123,7 +123,7 @@ public class SessionsFunctions
     }
 
     [Function("CreateSession")]
-    [RequireAuthentication("player")]
+    [RequireAuthentication("admin")]
     public async Task<IActionResult> CreateSession(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
@@ -137,12 +137,6 @@ public class SessionsFunctions
     {
         try
         {
-            // Check if user is captain in this division
-            if (!await IsCaptainInDivision(context, divisionId))
-            {
-                return new UnauthorizedObjectResult("Only captains can create sessions");
-            }
-
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var session = JsonConvert.DeserializeObject<Session>(requestBody);
 
@@ -194,7 +188,7 @@ public class SessionsFunctions
     }
 
     [Function("UpdateSession")]
-    [RequireAuthentication("player")]
+    [RequireAuthentication("admin")]
     public async Task<IActionResult> UpdateSession(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
@@ -209,12 +203,6 @@ public class SessionsFunctions
     {
         try
         {
-            // Check if user is captain in this division
-            if (!await IsCaptainInDivision(context, divisionId))
-            {
-                return new UnauthorizedObjectResult("Only captains can update sessions");
-            }
-
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var session = JsonConvert.DeserializeObject<Session>(requestBody);
 
@@ -264,7 +252,7 @@ public class SessionsFunctions
     }
 
     [Function("DeleteSession")]
-    [RequireAuthentication("player")]
+    [RequireAuthentication("admin")]
     public async Task<IActionResult> DeleteSession(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
@@ -279,12 +267,6 @@ public class SessionsFunctions
     {
         try
         {
-            // Check if user is captain in this division
-            if (!await IsCaptainInDivision(context, divisionId))
-            {
-                return new UnauthorizedObjectResult("Only captains can delete sessions");
-            }
-
             // Check if session has any matches
             var matchCount = await _cosmosService.GetMatchCountBySessionAsync(
                 sessionId,
@@ -294,6 +276,19 @@ public class SessionsFunctions
             {
                 return new BadRequestObjectResult(
                     $"Cannot delete session with {matchCount} existing matches"
+                );
+            }
+
+            // Check if any team uses this session as their active session
+            var teamsUsingSession = await _cosmosService.GetTeamsUsingActiveSessionAsync(
+                sessionId,
+                divisionId
+            );
+            if (teamsUsingSession.Count > 0)
+            {
+                var teamNames = string.Join(", ", teamsUsingSession.Select(t => t.Name));
+                return new BadRequestObjectResult(
+                    $"Cannot delete session - it is the active session for: {teamNames}"
                 );
             }
 

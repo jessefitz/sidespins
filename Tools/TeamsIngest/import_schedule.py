@@ -205,16 +205,76 @@ def slugify(text: str) -> str:
     return text
 
 
+def check_match_exists(
+    matches_container,
+    division_id: str,
+    session_id: str,
+    week: int,
+    home_apa_id: str,
+    away_apa_id: str,
+    team_map: Dict[str, Dict]
+) -> Optional[Dict]:
+    """
+    Check if a match already exists for the given teams, week, and session.
+    
+    Args:
+        matches_container: Cosmos DB matches container client
+        division_id: Division ID
+        session_id: Session ID
+        week: Week of play
+        home_apa_id: Home team's APA ID
+        away_apa_id: Away team's APA ID
+        team_map: Mapping of APA team IDs to team info
+        
+    Returns:
+        Existing match document or None
+    """
+    # Get team IDs from APA IDs
+    home_info = team_map.get(home_apa_id)
+    away_info = team_map.get(away_apa_id)
+    
+    if not home_info or not away_info:
+        return None
+    
+    home_team_id = home_info["id"]
+    away_team_id = away_info["id"]
+    
+    # Query for existing match
+    query = """SELECT * FROM c 
+               WHERE c.divisionId = @divisionId 
+               AND c.sessionId = @sessionId 
+               AND c.week = @week 
+               AND ((c.homeTeamId = @homeTeamId AND c.awayTeamId = @awayTeamId)
+                    OR (c.homeTeamId = @awayTeamId AND c.awayTeamId = @homeTeamId))"""
+    
+    parameters = [
+        {"name": "@divisionId", "value": division_id},
+        {"name": "@sessionId", "value": session_id},
+        {"name": "@week", "value": week},
+        {"name": "@homeTeamId", "value": home_team_id},
+        {"name": "@awayTeamId", "value": away_team_id}
+    ]
+    
+    items = list(matches_container.query_items(
+        query=query,
+        parameters=parameters,
+        enable_cross_partition_query=False,
+        partition_key=division_id
+    ))
+    
+    return items[0] if items else None
+
+
 def build_team_mapping_from_db(teams_container, division_id: str) -> Dict[str, Dict]:
     """
-    Build a mapping from API team numbers to database team IDs by querying Cosmos DB.
+    Build a mapping from APA team IDs to database team info by querying Cosmos DB.
     
     Args:
         teams_container: Cosmos DB teams container client
         division_id: Division ID to query
         
     Returns:
-        Dict mapping team numbers (e.g., "03301") to {id, name}
+        Dict mapping APA team IDs to {id, name, apaTeamId}
     """
     query = "SELECT * FROM c WHERE c.divisionId = @divisionId"
     parameters = [{"name": "@divisionId", "value": division_id}]
@@ -227,15 +287,21 @@ def build_team_mapping_from_db(teams_container, division_id: str) -> Dict[str, D
     
     team_map = {}
     for team in teams:
-        # Extract team number from team ID (last component after final underscore)
-        # E.g., "team_we_dem_boyz_03306" -> "03306"
-        team_id = team["id"]
-        parts = team_id.split("_")
-        if len(parts) > 0:
-            team_number = parts[-1]
-            team_map[team_number] = {
-                "id": team_id,
-                "name": team["name"]
+        # Use apaTeamId if available, otherwise fall back to extracting number from ID
+        apa_team_id = team.get("apaTeamId")
+        if not apa_team_id:
+            # Fallback: extract team number from team ID (last component)
+            # E.g., "team_we_dem_boyz_03306" -> "03306"
+            team_id = team["id"]
+            parts = team_id.split("_")
+            if len(parts) > 0:
+                apa_team_id = parts[-1]
+        
+        if apa_team_id:
+            team_map[apa_team_id] = {
+                "id": team["id"],
+                "name": team["name"],
+                "apaTeamId": apa_team_id
             }
     
     return team_map
@@ -257,7 +323,7 @@ def transform_match(
         week: Week of play number
         division_id: Division ID
         session_id: Session ID
-        team_map: Mapping of team numbers to team info
+        team_map: Mapping of APA team IDs to team info
         timestamp: ISO timestamp for createdAt
         
     Returns:
@@ -267,12 +333,12 @@ def transform_match(
     if match_data.get("isBye"):
         return None
     
-    # Get home and away team info
-    home_number = match_data["home"]["number"]
-    away_number = match_data["away"]["number"]
+    # Get home and away team info using APA team IDs
+    home_apa_id = str(match_data["home"]["id"])
+    away_apa_id = str(match_data["away"]["id"])
     
-    home_info = team_map.get(home_number)
-    away_info = team_map.get(away_number)
+    home_info = team_map.get(home_apa_id)
+    away_info = team_map.get(away_apa_id)
     
     # Skip if teams not found (with warning logged by caller)
     if not home_info or not away_info:
@@ -367,7 +433,9 @@ def import_schedule(
     cosmos_uri: str,
     cosmos_key: str,
     cosmos_db: str,
-    what_if: bool = False
+    what_if: bool = False,
+    one_team_apa_id: str = None,
+    sidespins_division_id: str = None
 ):
     """
     Main import function to fetch and import schedule data.
@@ -380,6 +448,8 @@ def import_schedule(
         cosmos_key: Cosmos DB access key
         cosmos_db: Cosmos DB database name
         what_if: If True, preview changes without committing
+        one_team_apa_id: If provided, only import/update matches for this team (APA ID)
+        sidespins_division_id: Existing SideSpins division ID to use (optional)
     """
     timestamp = datetime.utcnow().isoformat() + 'Z'
     
@@ -387,9 +457,11 @@ def import_schedule(
     stats = {
         "weeks_processed": 0,
         "matches_created": 0,
+        "matches_updated": 0,
         "matches_skipped_exists": 0,
         "matches_skipped_bye": 0,
         "matches_skipped_no_team": 0,
+        "matches_skipped_not_target_team": 0,
         "warnings": []
     }
     
@@ -398,7 +470,12 @@ def import_schedule(
     division_data = fetch_division_schedule(access_token, division_id)
     
     # Build our division ID
-    our_division_id = f"div_{division_id}"
+    if sidespins_division_id:
+        our_division_id = sidespins_division_id
+        print(f"Using provided SideSpins division ID: {our_division_id}")
+    else:
+        our_division_id = f"div_{division_id}"
+        print(f"Using generated division ID: {our_division_id}")
     
     # Connect to Cosmos DB
     if not what_if:
@@ -418,19 +495,36 @@ def import_schedule(
     if not what_if:
         team_map = build_team_mapping_from_db(teams_container, our_division_id)
         print(f"✓ Found {len(team_map)} teams in database")
+        
+        # Filter to one team if specified
+        if one_team_apa_id:
+            if one_team_apa_id not in team_map:
+                print(f"\n⚠ WARNING: Team with APA ID '{one_team_apa_id}' not found in database")
+                print(f"Available APA team IDs in division {our_division_id}:")
+                for apa_id, info in sorted(team_map.items()):
+                    print(f"  - {apa_id}: {info['name']}")
+                raise Exception(f"Team with APA ID '{one_team_apa_id}' not found. See available IDs above.")
+            print(f"✓ Filtering to one team: {team_map[one_team_apa_id]['name']} (APA ID: {one_team_apa_id})")
     else:
         # In what-if mode, build mapping from API data
         team_map = {}
         for team in division_data["teams"]:
             if not team.get("isBye"):
-                team_number = team["number"]
+                apa_team_id = str(team["id"])
                 clean_name = clean_team_name(team["name"])
-                team_id = f"team_{slugify(clean_name)}_{team_number}"
-                team_map[team_number] = {
+                team_id = f"team_{slugify(clean_name)}_{team['number']}"
+                team_map[apa_team_id] = {
                     "id": team_id,
-                    "name": clean_name
+                    "name": clean_name,
+                    "apaTeamId": apa_team_id
                 }
         print(f"✓ [WHAT-IF] Simulated {len(team_map)} team mappings")
+        
+        # Filter to one team if specified
+        if one_team_apa_id:
+            if one_team_apa_id not in team_map:
+                raise Exception(f"Team with APA ID '{one_team_apa_id}' not found in API data")
+            print(f"✓ [WHAT-IF] Filtering to one team: {team_map[one_team_apa_id]['name']} (APA ID: {one_team_apa_id})")
     
     # Process schedule
     print(f"\n{'='*60}")
@@ -463,14 +557,21 @@ def import_schedule(
                 stats["matches_skipped_bye"] += 1
                 continue
             
-            # Check if teams exist
-            home_number = match_data["home"]["number"]
-            away_number = match_data["away"]["number"]
+            # Get APA team IDs
+            home_apa_id = str(match_data["home"]["id"])
+            away_apa_id = str(match_data["away"]["id"])
             
-            if home_number not in team_map or away_number not in team_map:
+            # Filter to one team if specified
+            if one_team_apa_id:
+                if home_apa_id != one_team_apa_id and away_apa_id != one_team_apa_id:
+                    stats["matches_skipped_not_target_team"] += 1
+                    continue
+            
+            # Check if teams exist
+            if home_apa_id not in team_map or away_apa_id not in team_map:
                 home_name = match_data["home"]["name"]
                 away_name = match_data["away"]["name"]
-                warning = f"Week {week}: Teams not found in DB - {home_name} (#{home_number}) vs {away_name} (#{away_number})"
+                warning = f"Week {week}: Teams not found in DB - {home_name} (APA ID {home_apa_id}) vs {away_name} (APA ID {away_apa_id})"
                 print(f"  ⚠ {warning}")
                 stats["warnings"].append(warning)
                 stats["matches_skipped_no_team"] += 1
@@ -496,22 +597,38 @@ def import_schedule(
             status_emoji = "✓" if status == "completed" else "○"
             
             if what_if:
-                # Check if match would exist (simulate by ID)
-                print(f"  [WHAT-IF] {status_emoji} {home_name} vs {away_name} - Would create")
+                # Check if match exists
+                print(f"  [WHAT-IF] {status_emoji} {home_name} vs {away_name} - Would check/create/update")
                 if status == "completed":
                     print(f"    Score: {match_doc['totals']['homePoints']} - {match_doc['totals']['awayPoints']}")
                 stats["matches_created"] += 1
             else:
                 # Check if match already exists
-                try:
-                    existing = matches_container.read_item(
-                        item=match_doc["id"],
-                        partition_key=our_division_id
-                    )
-                    # Match exists - skip to preserve user data
-                    print(f"  ○ {home_name} vs {away_name} - Already exists (skipped)")
-                    stats["matches_skipped_exists"] += 1
-                except exceptions.CosmosResourceNotFoundError:
+                existing = check_match_exists(
+                    matches_container,
+                    our_division_id,
+                    session_id,
+                    week,
+                    home_apa_id,
+                    away_apa_id,
+                    team_map
+                )
+                
+                if existing:
+                    # Match exists - update schedule info only, preserve user data
+                    existing["scheduledAt"] = match_doc["scheduledAt"]
+                    existing["status"] = match_doc["status"]
+                    
+                    # Update totals if from API and existing doesn't have user-entered data
+                    if status == "completed" and not existing.get("playerMatches"):
+                        existing["totals"] = match_doc["totals"]
+                    
+                    matches_container.upsert_item(existing)
+                    print(f"  {status_emoji} {home_name} vs {away_name} - Updated")
+                    if status == "completed":
+                        print(f"    Score: {existing['totals']['homePoints']} - {existing['totals']['awayPoints']}")
+                    stats["matches_updated"] += 1
+                else:
                     # Create new match
                     matches_container.upsert_item(match_doc)
                     print(f"  {status_emoji} {home_name} vs {away_name} - Created")
@@ -527,9 +644,12 @@ def import_schedule(
     print(f"{'='*60}")
     print(f"Weeks:   {stats['weeks_processed']} processed")
     print(f"Matches: {stats['matches_created']} created")
+    print(f"         {stats['matches_updated']} updated")
     print(f"         {stats['matches_skipped_exists']} skipped (already exist)")
     print(f"         {stats['matches_skipped_bye']} skipped (bye)")
     print(f"         {stats['matches_skipped_no_team']} skipped (team not found)")
+    if one_team_apa_id:
+        print(f"         {stats['matches_skipped_not_target_team']} skipped (not target team)")
     
     if stats["warnings"]:
         print(f"\n⚠ WARNINGS ({len(stats['warnings'])}):")
@@ -583,6 +703,14 @@ def main():
         action="store_true",
         help="Preview changes without committing to database"
     )
+    parser.add_argument(
+        "--one-team-only",
+        help="APA team ID to import/update matches for (ignores other teams)"
+    )
+    parser.add_argument(
+        "--sidespins-division-id",
+        help="Existing SideSpins division ID to use (e.g., 'div_nottingham_wed_9b_311')"
+    )
     
     args = parser.parse_args()
     
@@ -594,7 +722,9 @@ def main():
             cosmos_uri=args.cosmos_uri,
             cosmos_key=args.cosmos_key,
             cosmos_db=args.cosmos_db,
-            what_if=args.what_if
+            what_if=args.what_if,
+            one_team_apa_id=args.one_team_only,
+            sidespins_division_id=args.sidespins_division_id
         )
     except Exception as e:
         print(f"\n❌ Error: {e}", file=sys.stderr)

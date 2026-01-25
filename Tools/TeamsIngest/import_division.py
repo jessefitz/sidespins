@@ -259,6 +259,33 @@ def check_player_exists(players_container, apa_number: str) -> Optional[Dict]:
         return None
 
 
+def check_team_exists(teams_container, apa_team_id: str, division_id: str) -> Optional[Dict]:
+    """
+    Check if a team already exists in the database by APA team ID.
+    
+    Args:
+        teams_container: Cosmos DB teams container client
+        apa_team_id: APA team ID to check
+        division_id: Division partition key
+        
+    Returns:
+        Existing team document or None
+    """
+    query = "SELECT * FROM c WHERE c.apaTeamId = @apaTeamId AND c.divisionId = @divisionId"
+    parameters = [
+        {"name": "@apaTeamId", "value": apa_team_id},
+        {"name": "@divisionId", "value": division_id}
+    ]
+    
+    items = list(teams_container.query_items(
+        query=query,
+        parameters=parameters,
+        enable_cross_partition_query=True
+    ))
+    
+    return items[0] if items else None
+
+
 def compare_names(display_name: str, first_name: str, last_name: str) -> bool:
     """
     Compare display name with stored first/last name to detect mismatches.
@@ -335,6 +362,7 @@ def transform_team(team_data: Dict, division_id: str, captain_player_id: str, ti
         "type": "team",
         "divisionId": division_id,
         "name": clean_name,
+        "apaTeamId": str(team_data["id"]),
         "captainPlayerId": captain_player_id,
         "createdAt": timestamp
     }
@@ -417,7 +445,8 @@ def import_division(
     cosmos_uri: str,
     cosmos_key: str,
     cosmos_db: str,
-    what_if: bool = False
+    what_if: bool = False,
+    sidespins_division_id: str = None
 ):
     """
     Main import function to fetch and import division data.
@@ -430,6 +459,7 @@ def import_division(
         cosmos_key: Cosmos DB access key
         cosmos_db: Cosmos DB database name
         what_if: If True, preview changes without committing
+        sidespins_division_id: Existing SideSpins division ID to import into (optional)
     """
     timestamp = datetime.utcnow().isoformat() + 'Z'
     
@@ -468,16 +498,24 @@ def import_division(
     print(f"\n{'='*60}")
     print("DIVISION")
     print(f"{'='*60}")
-    division_doc = transform_division(division_data, division_name, timestamp)
     
-    if what_if:
-        print(f"[WHAT-IF] Would create/update division:")
-        print(json.dumps(division_doc, indent=2))
-        stats["divisions_created"] = 1
+    if sidespins_division_id:
+        # Use existing division
+        print(f"Using existing SideSpins division: {sidespins_division_id}")
+        division_doc = {"id": sidespins_division_id}
+        stats["divisions_created"] = 0
     else:
-        divisions_container.upsert_item(division_doc)
-        print(f"✓ Division upserted: {division_doc['id']}")
-        stats["divisions_created"] = 1
+        # Create new division from APA data
+        division_doc = transform_division(division_data, division_name, timestamp)
+        
+        if what_if:
+            print(f"[WHAT-IF] Would create/update division:")
+            print(json.dumps(division_doc, indent=2))
+            stats["divisions_created"] = 1
+        else:
+            divisions_container.upsert_item(division_doc)
+            print(f"✓ Division upserted: {division_doc['id']}")
+            stats["divisions_created"] = 1
     
     # Process teams
     print(f"\n{'='*60}")
@@ -488,6 +526,18 @@ def import_division(
         # Skip bye teams
         if team_data.get("isBye"):
             print(f"\nSkipping bye team: {team_data.get('name', 'Unknown')}")
+            continue
+        
+        # Skip teams that already exist in the database
+        apa_team_id = str(team_data["id"])
+        existing_team = None
+        if not what_if:
+            existing_team = check_team_exists(teams_container, apa_team_id, division_doc["id"])
+        
+        if existing_team:
+            print(f"\nSkipping existing team (APA ID {apa_team_id}): {team_data.get('name', 'Unknown')}")
+            stats["teams_skipped"] = stats.get("teams_skipped", 0) + 1
+            continue
             continue
         
         roster = team_data.get("roster", [])
@@ -645,6 +695,10 @@ def main():
         action="store_true",
         help="Preview changes without committing to database"
     )
+    parser.add_argument(
+        "--sidespins-division-id",
+        help="Existing SideSpins division ID to import teams into (skips division creation)"
+    )
     
     args = parser.parse_args()
     
@@ -656,7 +710,8 @@ def main():
             cosmos_uri=args.cosmos_uri,
             cosmos_key=args.cosmos_key,
             cosmos_db=args.cosmos_db,
-            what_if=args.what_if
+            what_if=args.what_if,
+            sidespins_division_id=args.sidespins_division_id
         )
     except Exception as e:
         print(f"\n❌ Error: {e}", file=sys.stderr)

@@ -7,7 +7,16 @@
     the moov atom for streaming optimization, and organizes outputs into dated folders.
 
 .PARAMETER DriveLetter
-    Drive letter to scan (e.g., 'D' or 'E'). Not required when using -UploadOnly.
+    Drive letter to scan (e.g., 'D' or 'E'). Not required when using -UploadOnly or -SourceDirectory.
+
+.PARAMETER SourceDirectory
+    Name of a subdirectory under OutputRoot to use as the source. When specified, skips
+    drive scanning and uses this directory directly. FFmpeg conversion is skipped unless
+    -MovFlags is also specified.
+
+.PARAMETER MovFlags
+    When used with -SourceDirectory, enables ffmpeg conversion with movflags faststart.
+    Without this flag, files from SourceDirectory are uploaded directly without conversion.
 
 .PARAMETER UploadOnly
     Skip drive scanning and only upload existing files from the output directory.
@@ -19,20 +28,28 @@
     Dry-run mode. Shows what would be processed without making changes.
 
 .EXAMPLE
-    .\usb_ingest.ps1 -DriveLetter D
+    .\video-processing.ps1 -DriveLetter D
     Scans D:\ for MP4 files, processes them, and uploads to Azure.
 
 .EXAMPLE
-    .\usb_ingest.ps1 -DriveLetter E -WhatIf
+    .\video-processing.ps1 -DriveLetter E -WhatIf
     Shows what would be processed on E:\ without making changes.
 
 .EXAMPLE
-    .\usb_ingest.ps1 -UploadOnly
+    .\video-processing.ps1 -UploadOnly
     Upload today's processed videos to Azure without scanning drives.
 
 .EXAMPLE
-    .\usb_ingest.ps1 -DriveLetter D -SkipUpload
+    .\video-processing.ps1 -DriveLetter D -SkipUpload
     Process files from D:\ but don't upload to Azure.
+
+.EXAMPLE
+    .\video-processing.ps1 -SourceDirectory "2026-01-28"
+    Upload files from the 2026-01-28 folder without ffmpeg conversion.
+
+.EXAMPLE
+    .\video-processing.ps1 -SourceDirectory "2026-01-28" -MovFlags
+    Process files from the 2026-01-28 folder with ffmpeg faststart conversion, then upload.
 #>
 
 [CmdletBinding(SupportsShouldProcess)]
@@ -42,6 +59,12 @@ param(
     [string]$DriveLetter,
 
     [Parameter(Mandatory=$false)]
+    [string]$SourceDirectory,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$MovFlags,
+
+    [Parameter(Mandatory=$false)]
     [switch]$UploadOnly,
 
     [Parameter(Mandatory=$false)]
@@ -49,16 +72,26 @@ param(
 )
 
 # Script version
-$ScriptVersion = "1.1.0-phase3"
+$ScriptVersion = "1.2.0-phase3"
 
 # Validate parameter combinations
-if ($UploadOnly -and $DriveLetter) {
-    Write-Error "Cannot specify both -UploadOnly and -DriveLetter"
+$paramCount = 0
+if ($DriveLetter) { $paramCount++ }
+if ($SourceDirectory) { $paramCount++ }
+if ($UploadOnly) { $paramCount++ }
+
+if ($paramCount -gt 1) {
+    Write-Error "Cannot specify more than one of: -DriveLetter, -SourceDirectory, or -UploadOnly"
     exit 1
 }
 
-if (-not $UploadOnly -and -not $DriveLetter) {
-    Write-Error "Must specify either -DriveLetter or -UploadOnly"
+if ($paramCount -eq 0) {
+    Write-Error "Must specify one of: -DriveLetter, -SourceDirectory, or -UploadOnly"
+    exit 1
+}
+
+if ($MovFlags -and -not $SourceDirectory) {
+    Write-Error "-MovFlags can only be used with -SourceDirectory"
     exit 1
 }
 
@@ -198,6 +231,12 @@ function Find-VideoFiles {
             # Check if path should be excluded
             if ($excludePattern -and $_.FullName -match $excludePattern) {
                 Write-Log "Excluded: $($_.FullName)" -Level WARN
+                return
+            }
+            
+            # Skip zero-length files
+            if ($_.Length -eq 0) {
+                Write-Log "Skipped (zero length): $($_.FullName)" -Level WARN
                 return
             }
             
@@ -594,6 +633,8 @@ function Start-AzureUpload {
 function Start-Ingest {
     param(
         [string]$DriveLetter,
+        [string]$SourceDirectory,
+        [bool]$MovFlags,
         [PSCustomObject]$Config,
         [bool]$UploadOnly,
         [bool]$SkipUpload
@@ -603,8 +644,63 @@ function Start-Ingest {
     
     $outputDir = $null
     
+    # Handle SourceDirectory mode
+    if ($SourceDirectory) {
+        $sourcePath = Join-Path $Config.OutputRoot $SourceDirectory
+        
+        if (-not (Test-Path $sourcePath)) {
+            throw "Source directory does not exist: $sourcePath"
+        }
+        
+        Write-Log "=== Source Directory Mode ===" -Level INFO
+        Write-Log "Source path: $sourcePath" -Level INFO
+        
+        if ($MovFlags) {
+            # Process files with ffmpeg conversion
+            Write-Log "MovFlags enabled - will process files with ffmpeg faststart" -Level INFO
+            
+            # Check ffmpeg
+            if (-not (Test-FfmpegAvailable -FfmpegPath $Config.FfmpegPath)) {
+                throw "FFmpeg is not available. Please install ffmpeg and ensure it's in PATH or configure FfmpegPath in config.json"
+            }
+            
+            # Find video files in source directory
+            $videoFiles = Find-VideoFiles -RootPath $sourcePath `
+                                           -Extensions $Config.FileExtensions `
+                                           -ExcludePaths $Config.ExcludePaths
+            
+            if ($videoFiles.Count -eq 0) {
+                Write-Log "No video files found in $sourcePath" -Level WARN
+                return
+            }
+            
+            # Process each file (output to same directory)
+            Write-Log "Beginning conversion of $($videoFiles.Count) file(s)..." -Level INFO
+            
+            foreach ($file in $videoFiles) {
+                $result = Convert-VideoFile -SourceFile $file `
+                                            -DestinationPath $sourcePath `
+                                            -Suffix $Config.AppendSuffix `
+                                            -FfmpegPath $Config.FfmpegPath `
+                                            -SkipIfExists $Config.SkipIfExists
+            }
+            
+            Write-Log "" -Level INFO
+            Write-Log "=== Local Conversion Complete ===" -Level SUCCESS
+        }
+        else {
+            Write-Log "MovFlags not specified - skipping ffmpeg conversion" -Level INFO
+            
+            # Count files for logging
+            $existingFiles = Get-ChildItem -Path $sourcePath -File | 
+                Where-Object { $_.Extension -match '\.mp4$' }
+            Write-Log "Found $($existingFiles.Count) file(s) ready for upload" -Level INFO
+        }
+        
+        $outputDir = $sourcePath
+    }
     # Phase 1: Process files from drive (unless UploadOnly)
-    if (-not $UploadOnly) {
+    elseif (-not $UploadOnly) {
         Write-Log "=== Phase 1: Local Conversion ===" -Level INFO
         
         # Validate drive
@@ -736,6 +832,8 @@ try {
     
     # Start ingest
     Start-Ingest -DriveLetter $DriveLetter `
+                 -SourceDirectory $SourceDirectory `
+                 -MovFlags $MovFlags.IsPresent `
                  -Config $config `
                  -UploadOnly $UploadOnly.IsPresent `
                  -SkipUpload $SkipUpload.IsPresent

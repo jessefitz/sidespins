@@ -1,0 +1,2533 @@
+---
+layout: default
+title: Observations - SideSpins
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Observations - SideSpins</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .btn-back {
+        background: transparent;
+        color: #666;
+        border: 1px solid #e1e5e9;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-back:hover {
+        background: #f8f9fa;
+        border-color: #007cba;
+        color: #007cba;
+      }
+
+      h1 {
+        margin: 0;
+        color: #333;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: #007cba;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #005a87;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #5a6268;
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #c82333;
+      }
+
+      .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
+      /* Observations List */
+      .observations-list {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .observation-card {
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .observation-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .observation-card.active {
+        border-color: #007cba;
+        background: #f8f9fa;
+      }
+
+      .observation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+      }
+
+      .observation-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .observation-meta {
+        color: #666;
+        font-size: 0.875rem;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .badge-practice {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+
+      .badge-match {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+
+      .badge-active {
+        background: #e8f5e9;
+        color: #388e3c;
+      }
+
+      .badge-completed {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+
+      /* Observation Detail View */
+      .observation-detail {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .observation-detail.active {
+        display: block;
+      }
+
+      .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e1e5e9;
+      }
+
+      .detail-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      /* Video Player */
+      .video-section {
+        margin-bottom: 2rem;
+      }
+
+      video {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 8px;
+        background: #000;
+      }
+
+      .no-video-message {
+        text-align: center;
+        padding: 3rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        color: #666;
+      }
+
+      /* Recording Form */
+      .recording-form {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 6px;
+        margin-top: 1rem;
+        display: none;
+      }
+
+      .recording-form.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #007cba;
+      }
+
+      /* Notes Section */
+      .notes-section {
+        margin-top: 2rem;
+      }
+
+      .notes-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .notes-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .note-card {
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s;
+      }
+
+      .note-card:hover {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .note-card.clickable {
+        cursor: pointer;
+      }
+
+      .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .note-timestamp {
+        font-weight: 600;
+        color: #007cba;
+        cursor: pointer;
+      }
+
+      .note-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .note-text {
+        color: #333;
+        margin: 0;
+      }
+
+      .note-form {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .form-row .form-group {
+        flex: 1;
+      }
+
+      /* New Observation Form */
+      .new-observation-form {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none;
+        margin-bottom: 2rem;
+      }
+
+      .new-observation-form.active {
+        display: block;
+      }
+
+      .timer {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #007cba;
+        margin: 1rem 0;
+        text-align: center;
+      }
+
+      /* Loading & Error States */
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      /* Blob Picker Styles */
+      .blob-picker {
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+      }
+
+      .blob-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e1e5e9;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .blob-item:last-child {
+        border-bottom: none;
+      }
+
+      .blob-item:hover {
+        background: #f8f9fa;
+      }
+
+      .blob-item.selected {
+        background: #e3f2fd;
+        border-color: #007cba;
+      }
+
+      .blob-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .blob-info {
+        flex: 1;
+      }
+
+      .blob-name {
+        font-weight: 500;
+        color: #333;
+        word-break: break-all;
+      }
+
+      .blob-meta {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+      }
+
+      .blob-picker-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .selected-count {
+        color: #007cba;
+        font-weight: 600;
+        padding: 0.5rem;
+      }
+
+      .search-box {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+      }
+
+      .search-box:focus {
+        outline: none;
+        border-color: #007cba;
+      }
+
+      .error-message {
+        background: #fee;
+        border: 1px solid #fcc;
+        color: #c33;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .success-message {
+        background: #efe;
+        border: 1px solid #cfc;
+        color: #3c3;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 700px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        margin: 2rem auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e1e5e9;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .video-part-dropdown {
+        margin-bottom: 1rem;
+      }
+
+      .video-part-dropdown label {
+        font-weight: 600;
+        margin-right: 0.5rem;
+      }
+
+      .video-part-dropdown select {
+        padding: 0.5rem;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+
+      /* Toast Notification */
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #007cba;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 2000;
+        display: none;
+        animation: slideIn 0.3s ease;
+      }
+
+      .toast.active {
+        display: block;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .header-actions {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
+        }
+
+        .form-row {
+          flex-direction: column;
+        }
+
+        .toast {
+          bottom: 1rem;
+          right: 1rem;
+          left: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header-actions">
+        <div class="header-left">
+          <a href="/app.html" class="btn btn-back btn-sm">← Dashboard</a>
+          <h1>📹 Observations</h1>
+        </div>
+        <button class="btn btn-primary" id="newObservationBtn">
+          + New Observation
+        </button>
+      </div>
+
+      <!-- New Observation Form -->
+      <div class="new-observation-form" id="newObservationForm">
+        <h2>Create New Observation</h2>
+        <form id="createObservationForm">
+          <div class="form-group">
+            <label for="observationLabel">Type</label>
+            <select id="observationLabel" class="form-control" required>
+              <option value="practice">Practice</option>
+              <option value="match">Match</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="observationDescription">Description</label>
+            <textarea
+              id="observationDescription"
+              class="form-control"
+              rows="3"
+              placeholder="Optional description..."
+            ></textarea>
+          </div>
+          <div class="form-row">
+            <button type="submit" class="btn btn-primary">
+              Start Observation
+            </button>
+            <button type="button" class="btn btn-secondary" id="cancelNewBtn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Observations List -->
+      <div class="observations-list">
+        <h2>Recent Observations</h2>
+        <div id="observationsList" class="loading">Loading observations...</div>
+      </div>
+
+      <!-- Observation Detail -->
+      <div class="observation-detail" id="observationDetail">
+        <div class="detail-header">
+          <div>
+            <h2 id="detailTitle">Observation Details</h2>
+            <div id="detailMeta" class="observation-meta"></div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn btn-secondary btn-sm" id="attachRecordingBtn">
+              Attach Recording
+            </button>
+            <button class="btn btn-sm" id="toggleStatusBtn">
+              Mark Complete
+            </button>
+            <button class="btn btn-danger btn-sm" id="deleteObservationBtn">
+              Delete
+            </button>
+            <button class="btn btn-secondary btn-sm" id="closeDetailBtn">
+              Close
+            </button>
+          </div>
+        </div>
+
+        <!-- Video Player -->
+        <div class="video-section">
+          <div id="videoPlayer"></div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="notes-section">
+          <div class="notes-header">
+            <h3>Notes</h3>
+            <button class="btn btn-primary btn-sm" id="addNoteBtn">
+              + Add Note
+            </button>
+          </div>
+
+          <!-- Notes List -->
+          <div class="notes-list" id="notesList">
+            <p class="loading">No notes yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Add Note</h3>
+          <button class="modal-close" onclick="hideNoteModal()">&times;</button>
+        </div>
+        <form id="noteModalForm">
+          <div class="form-group">
+            <label for="noteTypeSelect">Note Type</label>
+            <select id="noteTypeSelect" class="form-control" required>
+              <option value="moment">Moment in Time</option>
+              <option value="general">General Observation</option>
+            </select>
+          </div>
+          <div class="form-group" id="timestampGroup">
+            <label for="timestampSelect">Timestamp</label>
+            <select id="timestampSelect" class="form-control">
+              <option value="now">Now</option>
+              <option value="30">Now Minus 30 Seconds</option>
+              <option value="60">Now Minus 1 Minute</option>
+              <option value="120">Now Minus 2 Minutes</option>
+              <option value="180">Now Minus 3 Minutes</option>
+              <option value="240">Now Minus 4 Minutes</option>
+              <option value="300">Now Minus 5 Minutes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="noteModalText">Note Text</label>
+            <textarea
+              id="noteModalText"
+              class="form-control"
+              rows="3"
+              placeholder="Enter your note..."
+              required
+            ></textarea>
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+            <button type="submit" class="btn btn-primary">Add Note</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="hideNoteModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recording Modal -->
+    <div id="recordingModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Manage Video Recordings</h3>
+          <button class="modal-close" onclick="hideRecordingModal()">
+            &times;
+          </button>
+        </div>
+
+        <!-- List of existing parts -->
+        <div id="modalRecordingPartsList" class="mb-3"></div>
+
+        <!-- Add new part form -->
+        <form id="modalAttachRecordingForm">
+          <h4>Add Recording Parts</h4>
+
+          <div class="form-group">
+            <label for="modalContainerName">Container Name</label>
+            <input
+              type="text"
+              id="modalContainerName"
+              class="form-control"
+              value="videos"
+              required
+            />
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              id="modalLoadBlobsBtn"
+              style="margin-top: 0.5rem"
+            >
+              Load Videos
+            </button>
+          </div>
+
+          <!-- Blob Picker -->
+          <div id="modalBlobPickerContainer" style="display: none">
+            <div class="form-group">
+              <label>Select Video Files (multiple selection supported)</label>
+              <input
+                type="text"
+                id="modalBlobSearch"
+                class="search-box"
+                placeholder="Search videos..."
+              />
+              <div id="modalBlobPicker" class="blob-picker">
+                <div class="loading">
+                  Click "Load Videos" to see available files
+                </div>
+              </div>
+              <div class="blob-picker-actions">
+                <span id="modalSelectedCount" class="selected-count"
+                  >0 videos selected</span
+                >
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  id="modalSelectAllBtn"
+                >
+                  Select All
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  id="modalClearSelectionBtn"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="modalAddPartsBtn"
+              disabled
+            >
+              Add Selected Videos
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="hideRecordingModal()"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+      const authManager = new AuthManager();
+      let observations = [];
+      let currentObservation = null;
+      let notes = [];
+      let videoElement = null;
+      let activeTimer = null;
+      let availableBlobs = [];
+      let selectedBlobs = new Set();
+
+      // Role state
+      let isCaptainOrManager = false;
+      let isAdmin = false;
+
+      // Polling state
+      let pollInterval = null;
+      let lastObservationCount = 0;
+      let lastNotesCount = 0;
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Check authentication
+        const isAuthenticated = await authManager.requireAuth(
+          "/login-new.html?redirect=" +
+            encodeURIComponent(window.location.pathname),
+        );
+        if (!isAuthenticated) return;
+
+        // Load observations
+        await loadObservations();
+        lastObservationCount = observations.length;
+
+        // Load user memberships for role checks
+        await authManager.loadUserMemberships();
+
+        // Check user roles
+        isCaptainOrManager =
+          authManager.hasTeamRole("captain") ||
+          authManager.hasTeamRole("manager");
+        isAdmin = authManager.isGlobalAdmin();
+
+        // Hide create observation button for non-captains/managers (admins can create too)
+        if (!isCaptainOrManager && !isAdmin) {
+          const newObsBtn = document.getElementById("newObservationBtn");
+          if (newObsBtn) newObsBtn.style.display = "none";
+        }
+
+        // Note: Delete and toggle buttons visibility will be controlled in showDetail()
+        // based on observation status and user role
+
+        // Start polling for updates
+        startPolling();
+
+        // Pause polling when tab not visible
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("beforeunload", stopPolling);
+
+        // Event listeners
+        document
+          .getElementById("newObservationBtn")
+          .addEventListener("click", () => {
+            document
+              .getElementById("newObservationForm")
+              .classList.add("active");
+          });
+
+        document
+          .getElementById("cancelNewBtn")
+          .addEventListener("click", () => {
+            document
+              .getElementById("newObservationForm")
+              .classList.remove("active");
+            document.getElementById("createObservationForm").reset();
+          });
+
+        document
+          .getElementById("createObservationForm")
+          .addEventListener("submit", handleCreateObservation);
+        document
+          .getElementById("attachRecordingBtn")
+          .addEventListener("click", showRecordingModal);
+        document
+          .getElementById("modalAttachRecordingForm")
+          .addEventListener("submit", handleAttachRecordingModal);
+        document
+          .getElementById("modalLoadBlobsBtn")
+          .addEventListener("click", loadBlobsModal);
+        document
+          .getElementById("modalSelectAllBtn")
+          .addEventListener("click", selectAllBlobsModal);
+        document
+          .getElementById("modalClearSelectionBtn")
+          .addEventListener("click", clearSelectionModal);
+        document
+          .getElementById("modalBlobSearch")
+          .addEventListener("input", filterBlobsModal);
+        document
+          .getElementById("closeDetailBtn")
+          .addEventListener("click", closeDetail);
+        document
+          .getElementById("deleteObservationBtn")
+          .addEventListener("click", handleDeleteObservation);
+        document
+          .getElementById("toggleStatusBtn")
+          .addEventListener("click", handleToggleStatus);
+        document
+          .getElementById("addNoteBtn")
+          .addEventListener("click", showNoteModal);
+        document
+          .getElementById("noteModalForm")
+          .addEventListener("submit", handleAddNoteModal);
+        document
+          .getElementById("noteTypeSelect")
+          .addEventListener("change", handleNoteTypeChange);
+
+        // Modal background click handlers
+        document.getElementById("noteModal").addEventListener("click", (e) => {
+          if (e.target.id === "noteModal") {
+            hideNoteModal();
+          }
+        });
+
+        document
+          .getElementById("recordingModal")
+          .addEventListener("click", (e) => {
+            if (e.target.id === "recordingModal") {
+              hideRecordingModal();
+            }
+          });
+      });
+
+      // Load all observations
+      async function loadObservations() {
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/GetObservations`,
+            { method: "GET" },
+          );
+
+          if (!response.ok) throw new Error("Failed to load observations");
+
+          observations = await response.json();
+          renderObservationsList();
+        } catch (error) {
+          console.error("Error loading observations:", error);
+          document.getElementById("observationsList").innerHTML =
+            '<div class="error-message">Failed to load observations.</div>';
+        }
+      }
+
+      // Render observations list
+      function renderObservationsList() {
+        const listEl = document.getElementById("observationsList");
+
+        if (observations.length === 0) {
+          listEl.innerHTML =
+            "<p>No observations yet. Create your first one!</p>";
+          return;
+        }
+
+        listEl.innerHTML = observations
+          .map(
+            (obs) => `
+          <div class="observation-card" onclick="viewObservation('${obs.id}')">
+            <div class="observation-header">
+              <div>
+                <h3 class="observation-title">
+                  ${obs.description || `${obs.label} observation`}
+                </h3>
+                <div class="observation-meta">
+                  ${new Date(obs.startTime).toLocaleString()}
+                  ${
+                    obs.endTime
+                      ? " - " + new Date(obs.endTime).toLocaleString()
+                      : " (ongoing)"
+                  }
+                </div>
+              </div>
+              <div>
+                <span class="badge badge-${obs.label}">${obs.label}</span>
+                <span class="badge badge-${obs.status}">${obs.status}</span>
+              </div>
+            </div>
+          </div>
+        `,
+          )
+          .join("");
+      }
+
+      // View observation detail
+      async function viewObservation(id) {
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${id}`,
+            { method: "GET" },
+          );
+
+          if (!response.ok) throw new Error("Failed to load observation");
+
+          currentObservation = await response.json();
+
+          // Load notes
+          await loadNotes(id);
+          lastNotesCount = notes.length;
+
+          // Render detail view (but NOT the video yet)
+          renderObservationDetail();
+
+          // Show detail section
+          document.getElementById("observationDetail").classList.add("active");
+          document
+            .getElementById("observationDetail")
+            .scrollIntoView({ behavior: "smooth" });
+
+          // NOW initialize the video player after the container is visible
+          // Use requestAnimationFrame to ensure layout has completed
+          requestAnimationFrame(() => {
+            renderVideoPlayer();
+          });
+        } catch (error) {
+          console.error("Error viewing observation:", error);
+          alert("Failed to load observation details");
+        }
+      }
+
+      // Render observation detail
+      function renderObservationDetail() {
+        const obs = currentObservation;
+
+        document.getElementById("detailTitle").textContent =
+          obs.description || `${obs.label} observation`;
+        document.getElementById("detailMeta").innerHTML = `
+          <span class="badge badge-${obs.label}">${obs.label}</span>
+          <span class="badge badge-${obs.status}">${obs.status}</span>
+          <span>${new Date(obs.startTime).toLocaleString()}</span>
+          ${
+            obs.endTime
+              ? "<span> - " + new Date(obs.endTime).toLocaleString() + "</span>"
+              : ""
+          }
+        `;
+
+        // Show/hide Attach Recording button based on observation status
+        const attachBtn = document.getElementById("attachRecordingBtn");
+        if (obs.status === "completed") {
+          attachBtn.style.display = "inline-block";
+        } else {
+          attachBtn.style.display = "none";
+        }
+
+        // Update toggle status button
+        const toggleBtn = document.getElementById("toggleStatusBtn");
+        const deleteBtn = document.getElementById("deleteObservationBtn");
+
+        // Determine if user can modify this observation
+        // Completed observations can only be modified by admins
+        const canModify =
+          obs.status === "active" ? isCaptainOrManager || isAdmin : isAdmin;
+
+        // Show/hide action buttons based on permissions
+        if (canModify) {
+          toggleBtn.style.display = "inline-block";
+          deleteBtn.style.display = "inline-block";
+        } else {
+          toggleBtn.style.display = "none";
+          deleteBtn.style.display = "none";
+        }
+
+        toggleBtn.textContent =
+          obs.status === "active" ? "Mark Complete" : "Reopen";
+        toggleBtn.className =
+          obs.status === "active"
+            ? "btn btn-primary btn-sm"
+            : "btn btn-secondary btn-sm";
+
+        // Render notes (video will be rendered separately after container is visible)
+        renderNotes();
+      }
+
+      // Global state for multi-part video
+      let currentVideoPart = null;
+      let sortedParts = [];
+
+      function renderVideoPlayer() {
+        const playerEl = document.getElementById("videoPlayer");
+
+        if (
+          !currentObservation.recordingParts ||
+          currentObservation.recordingParts.length === 0
+        ) {
+          playerEl.innerHTML =
+            '<div class="no-video-message">No video recording attached yet.</div>';
+          videoElement = null;
+          currentVideoPart = null;
+          sortedParts = [];
+          return;
+        }
+
+        // Sort parts by startTime (if available) or fallback to startOffsetSeconds for legacy data
+        sortedParts = [...currentObservation.recordingParts].sort((a, b) => {
+          // Prefer startTime (new format) over startOffsetSeconds (legacy)
+          const aTime = a.startTime ? new Date(a.startTime).getTime() : null;
+          const bTime = b.startTime ? new Date(b.startTime).getTime() : null;
+
+          if (aTime && bTime) {
+            return aTime - bTime;
+          }
+          // Fallback to legacy offset-based sorting
+          return (a.startOffsetSeconds || 0) - (b.startOffsetSeconds || 0);
+        });
+
+        // Build HTML with dropdown if multiple parts
+        let html = "";
+
+        // Debug logging
+        console.log(
+          "Recording parts:",
+          sortedParts.map((p) => ({
+            blobName: p.blobName,
+            startTime: p.startTime,
+            durationSeconds: p.durationSeconds,
+            startOffsetSeconds: p.startOffsetSeconds,
+          })),
+        );
+
+        if (sortedParts.length > 1) {
+          html += '<div class="video-part-dropdown">';
+          html += "<label>Select Part:</label>";
+          html += '<select id="partSelector" onchange="handlePartSelection()">';
+          sortedParts.forEach((part, index) => {
+            // Format part label based on available data
+            let partLabel;
+
+            if (part.startTime) {
+              // New format: show actual recording time
+              const startDate = new Date(part.startTime);
+              const timeStr = startDate.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+              const durationStr = part.durationSeconds
+                ? ` (${formatTime(part.durationSeconds)})`
+                : "";
+              partLabel = `Part ${index + 1} - ${timeStr}${durationStr}`;
+            } else {
+              // Legacy format: show observation timeline offsets
+              const startOffset = formatTime(part.startOffsetSeconds || 0);
+              let endOffset;
+
+              if (index < sortedParts.length - 1) {
+                endOffset = formatTime(
+                  sortedParts[index + 1].startOffsetSeconds || 0,
+                );
+              } else {
+                endOffset = "End";
+              }
+              partLabel = `Part ${index + 1} (${startOffset} - ${endOffset})`;
+            }
+
+            console.log(`Part ${index + 1}: ${partLabel}`);
+
+            html += `<option value="${index}">${partLabel}</option>`;
+          });
+          html += "</select>";
+          html += "</div>";
+        }
+
+        html += '<div id="videoContainer"></div>';
+        playerEl.innerHTML = html;
+
+        // Load first part
+        loadVideoPart(sortedParts[0], 0);
+      }
+
+      function handlePartSelection() {
+        const selector = document.getElementById("partSelector");
+        const selectedIndex = parseInt(selector.value);
+        const selectedPart = sortedParts[selectedIndex];
+
+        if (selectedPart) {
+          loadVideoPart(selectedPart, selectedIndex, { autoplay: false });
+        }
+      }
+
+      function loadVideoPart(
+        part,
+        partIndex,
+        { autoplay = false, seekTo = null } = {},
+      ) {
+        const containerEl = document.getElementById("videoContainer");
+
+        // Use Azure Front Door CDN for video playback
+        const videoUrl = `https://storage-cdn-d0egdudcfacwdeh7.z03.azurefd.net/${part.container}/${part.blobName}`;
+
+        if (!videoElement) {
+          // Create video element on first load
+          videoElement = document.createElement("video");
+          videoElement.id = "videoEl";
+          videoElement.controls = true;
+          videoElement.preload = "metadata";
+          videoElement.playsInline = true;
+          videoElement.crossOrigin = "anonymous";
+
+          containerEl.innerHTML = "";
+          containerEl.appendChild(videoElement);
+
+          // Auto-transition to next part when current part ends
+          videoElement.addEventListener("ended", handleVideoEnded);
+        }
+
+        // Update source
+        videoElement.src = videoUrl;
+        currentVideoPart = part;
+        updatePartIndicator(partIndex);
+
+        // Update dropdown selection if it exists
+        const selector = document.getElementById("partSelector");
+        if (selector) {
+          selector.value = partIndex;
+        }
+
+        // Wait for metadata before seeking or playing
+        const onReady = () => {
+          if (typeof seekTo === "number") {
+            videoElement.currentTime = seekTo;
+          }
+
+          if (autoplay) {
+            videoElement.play().catch(() => {});
+          }
+
+          videoElement.removeEventListener("loadedmetadata", onReady);
+        };
+
+        videoElement.addEventListener("loadedmetadata", onReady);
+        videoElement.load();
+      }
+
+      function handleVideoEnded() {
+        if (!currentVideoPart || !sortedParts.length) return;
+
+        const currentIndex = sortedParts.findIndex(
+          (p) => p.partNumber === currentVideoPart.partNumber,
+        );
+
+        if (currentIndex >= 0 && currentIndex < sortedParts.length - 1) {
+          // Auto-transition to next part
+          const nextPart = sortedParts[currentIndex + 1];
+          loadVideoPart(nextPart, currentIndex + 1, { autoplay: true });
+        }
+      }
+
+      function updatePartIndicator(partIndex) {
+        // Add visual indicator of current part (if multiple parts exist)
+        if (!sortedParts || sortedParts.length <= 1) return;
+
+        const containerEl = document.getElementById("videoContainer");
+        let indicator = document.getElementById("partIndicator");
+
+        if (!indicator) {
+          indicator = document.createElement("div");
+          indicator.id = "partIndicator";
+          indicator.style.cssText =
+            "position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; z-index: 10;";
+          containerEl.style.position = "relative";
+          containerEl.appendChild(indicator);
+        }
+
+        indicator.textContent = `Part ${partIndex + 1} of ${
+          sortedParts.length
+        }`;
+      }
+
+      // Load notes for observation
+      async function loadNotes(observationId) {
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${observationId}/notes`,
+            { method: "GET" },
+          );
+
+          if (!response.ok) throw new Error("Failed to load notes");
+
+          notes = await response.json();
+        } catch (error) {
+          console.error("Error loading notes:", error);
+          notes = [];
+        }
+      }
+
+      // Render notes list
+      function renderNotes() {
+        const listEl = document.getElementById("notesList");
+
+        if (notes.length === 0) {
+          listEl.innerHTML = "<p>No notes yet.</p>";
+          return;
+        }
+
+        listEl.innerHTML = notes
+          .map((note) => {
+            // Support both new timestamp format and legacy offsetSeconds
+            const hasTimestamp =
+              note.timestamp ||
+              (note.offsetSeconds !== null && note.offsetSeconds !== undefined);
+
+            // Format the timestamp display
+            let timestampDisplay = "";
+            if (note.timestamp) {
+              // New format: show actual time
+              const noteTime = new Date(note.timestamp);
+              timestampDisplay = noteTime.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+            } else if (
+              note.offsetSeconds !== null &&
+              note.offsetSeconds !== undefined
+            ) {
+              // Legacy format: show offset
+              timestampDisplay = formatTime(note.offsetSeconds);
+            }
+
+            // Build author display
+            const authorInfo = note.createdByName
+              ? `<span style="color: #666; font-size: 0.875rem;">By ${escapeHtml(
+                  note.createdByName,
+                )}</span>`
+              : "";
+
+            return `
+            <div class="note-card ${hasTimestamp ? "clickable" : ""}" ${
+              hasTimestamp ? `onclick="seekToNote('${note.id}')"` : ""
+            }>
+              <div class="note-header">
+                <div>
+                  ${
+                    hasTimestamp
+                      ? `<span class="note-timestamp">${timestampDisplay}</span>`
+                      : "<span>General Note</span>"
+                  }
+                  ${authorInfo ? ` • ${authorInfo}` : ""}
+                </div>
+                <div class="note-actions">
+                  <button class="btn btn-danger btn-sm" onclick="handleDeleteNote(event, '${
+                    note.id
+                  }')">Delete</button>
+                </div>
+              </div>
+              <p class="note-text">${escapeHtml(note.text)}</p>
+            </div>
+          `;
+          })
+          .join("");
+      }
+
+      // Seek video to note timestamp
+      function seekToNote(noteId) {
+        const note = notes.find((n) => n.id === noteId);
+        if (!note) return;
+
+        // Support both new timestamp format and legacy offsetSeconds
+        const hasTimestamp =
+          note.timestamp ||
+          (note.offsetSeconds !== null && note.offsetSeconds !== undefined);
+        if (!hasTimestamp) return;
+
+        // Find which part contains this timestamp
+        const result = findPartForTimestamp(note);
+        if (!result) {
+          console.warn(`No video part found for note`, note);
+          return;
+        }
+
+        // Calculate seek time within the video part
+        let seekTime;
+        if (note.timestamp && result.part.startTime) {
+          // New format: calculate from DateTime difference
+          const noteTime = new Date(note.timestamp).getTime();
+          const partStartTime = new Date(result.part.startTime).getTime();
+          seekTime = (noteTime - partStartTime) / 1000; // Convert ms to seconds
+        } else {
+          // Legacy format: use offsetSeconds
+          seekTime =
+            (note.offsetSeconds || 0) - (result.part.startOffsetSeconds || 0);
+        }
+
+        console.log(
+          `Seeking to note: timestamp=${note.timestamp || note.offsetSeconds}, part=${
+            result.index + 1
+          }, seekTime=${seekTime}`,
+        );
+
+        // Check if we need to switch to a different part
+        if (
+          !currentVideoPart ||
+          currentVideoPart.partNumber !== result.part.partNumber
+        ) {
+          // Switch to the correct part and seek
+          loadVideoPart(result.part, result.index, {
+            autoplay: true,
+            seekTo: Math.max(0, seekTime),
+          });
+        } else {
+          // Same part, just seek
+          videoElement.currentTime = Math.max(0, seekTime);
+          videoElement.play();
+        }
+      }
+
+      function findPartForTimestamp(note) {
+        if (!sortedParts || sortedParts.length === 0) return null;
+
+        // Handle new timestamp format
+        if (note.timestamp && sortedParts[0].startTime) {
+          const noteTime = new Date(note.timestamp).getTime();
+
+          for (let i = 0; i < sortedParts.length; i++) {
+            const part = sortedParts[i];
+            const partStart = new Date(part.startTime).getTime();
+            const partEnd = part.durationSeconds
+              ? partStart + part.durationSeconds * 1000
+              : sortedParts[i + 1]
+                ? new Date(sortedParts[i + 1].startTime).getTime()
+                : Infinity;
+
+            if (noteTime >= partStart && noteTime < partEnd) {
+              return { part, index: i };
+            }
+          }
+
+          // If note is after all parts, return last part
+          if (
+            noteTime >=
+            new Date(sortedParts[sortedParts.length - 1].startTime).getTime()
+          ) {
+            return {
+              part: sortedParts[sortedParts.length - 1],
+              index: sortedParts.length - 1,
+            };
+          }
+
+          return null;
+        }
+
+        // Legacy offsetSeconds format
+        const offsetSeconds = note.offsetSeconds;
+        if (offsetSeconds === null || offsetSeconds === undefined) return null;
+
+        for (let i = 0; i < sortedParts.length; i++) {
+          const part = sortedParts[i];
+          const nextPart = sortedParts[i + 1];
+
+          if (!nextPart) {
+            // Last part handles everything from its start onward
+            if (offsetSeconds >= (part.startOffsetSeconds || 0)) {
+              return { part, index: i };
+            }
+          } else {
+            // This part handles from its start to next part's start
+            if (
+              offsetSeconds >= (part.startOffsetSeconds || 0) &&
+              offsetSeconds < (nextPart.startOffsetSeconds || 0)
+            ) {
+              return { part, index: i };
+            }
+          }
+        }
+
+        return null;
+      }
+
+      // Get current video time as a timestamp (utility function)
+      // Returns ISO timestamp string if using new format, or offsetSeconds for legacy
+      function getCurrentVideoTimestamp() {
+        if (!videoElement || !currentVideoPart) return null;
+
+        if (currentVideoPart.startTime) {
+          // New format: calculate actual DateTime
+          const partStart = new Date(currentVideoPart.startTime).getTime();
+          const currentMs = partStart + videoElement.currentTime * 1000;
+          return new Date(currentMs).toISOString();
+        } else {
+          // Legacy format: return offsetSeconds
+          return Math.floor(
+            videoElement.currentTime +
+              (currentVideoPart.startOffsetSeconds || 0),
+          );
+        }
+      }
+
+      // Handle create observation
+      async function handleCreateObservation(e) {
+        e.preventDefault();
+
+        const label = document.getElementById("observationLabel").value;
+        const description = document.getElementById(
+          "observationDescription",
+        ).value;
+
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/CreateObservation`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                label,
+                description,
+                startTime: new Date().toISOString(),
+                status: "active",
+              }),
+            },
+          );
+
+          if (!response.ok) throw new Error("Failed to create observation");
+
+          const newObs = await response.json();
+          observations.unshift(newObs);
+
+          // Reset form and hide
+          document.getElementById("createObservationForm").reset();
+          document
+            .getElementById("newObservationForm")
+            .classList.remove("active");
+
+          // Reload list and view new observation
+          renderObservationsList();
+          viewObservation(newObs.id);
+        } catch (error) {
+          console.error("Error creating observation:", error);
+          alert("Failed to create observation");
+        }
+      }
+
+      // Parse filename format: YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.mp4
+      // Example: 20260129_004011_D211_001_MVI_0066.MP4
+      // Returns: { startTime: Date (UTC), durationSeconds: number, sequenceNumber: number }
+      function parseRecordingFilename(filename) {
+        // Support virtual folders in blob names by stripping any prefix before the leaf name
+        const leafName = filename.split("/").pop();
+
+        // New format: YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.ext
+        const newPattern =
+          /^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_D(\d+)_(\d{3})_/;
+        const newMatch = leafName.match(newPattern);
+
+        if (newMatch) {
+          const [, year, month, day, hour, minute, second, duration, seq] =
+            newMatch;
+
+          // Parse as UTC timestamp
+          const startTime = new Date(
+            Date.UTC(
+              parseInt(year),
+              parseInt(month) - 1, // JS months are 0-indexed
+              parseInt(day),
+              parseInt(hour),
+              parseInt(minute),
+              parseInt(second),
+            ),
+          );
+
+          return {
+            startTime,
+            durationSeconds: parseInt(duration),
+            sequenceNumber: parseInt(seq),
+            year: parseInt(year),
+            month: parseInt(month),
+            day: parseInt(day),
+            hour: parseInt(hour),
+            minute: parseInt(minute),
+            second: parseInt(second),
+            isNewFormat: true,
+          };
+        }
+
+        // Legacy format: YYYY_MMDD_HHMMSS_SEQ[_custom].ext
+        const legacyPattern =
+          /^(\d{4})_(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_(\d{3})/;
+        const legacyMatch = leafName.match(legacyPattern);
+
+        if (legacyMatch) {
+          const [, year, month, day, hour, minute, second, seq] = legacyMatch;
+
+          return {
+            startTime: new Date(
+              parseInt(year),
+              parseInt(month) - 1,
+              parseInt(day),
+              parseInt(hour),
+              parseInt(minute),
+              parseInt(second),
+            ),
+            durationSeconds: null, // Legacy format doesn't include duration
+            sequenceNumber: parseInt(seq),
+            year: parseInt(year),
+            month: parseInt(month),
+            day: parseInt(day),
+            hour: parseInt(hour),
+            minute: parseInt(minute),
+            second: parseInt(second),
+            isNewFormat: false,
+          };
+        }
+
+        return null;
+      }
+
+      // Show recording modal
+      function showRecordingModal() {
+        document.getElementById("recordingModal").classList.add("active");
+        document.getElementById("modalContainerName").value = "videos";
+        selectedBlobs.clear();
+        availableBlobs = [];
+        renderModalRecordingPartsList();
+      }
+
+      // Hide recording modal
+      function hideRecordingModal() {
+        document.getElementById("recordingModal").classList.remove("active");
+        document.getElementById("modalAttachRecordingForm").reset();
+        document.getElementById("modalBlobPickerContainer").style.display =
+          "none";
+        selectedBlobs.clear();
+        availableBlobs = [];
+      }
+
+      // Render recording parts list in modal
+      function renderModalRecordingPartsList() {
+        const listEl = document.getElementById("modalRecordingPartsList");
+
+        if (
+          !currentObservation.recordingParts ||
+          currentObservation.recordingParts.length === 0
+        ) {
+          listEl.innerHTML =
+            "<p><em>No recording parts yet. Add one below.</em></p>";
+          return;
+        }
+
+        // Sort by startTime (if available) or startOffsetSeconds
+        const sortedParts = [...currentObservation.recordingParts].sort(
+          (a, b) => {
+            if (a.startTime && b.startTime) {
+              return new Date(a.startTime) - new Date(b.startTime);
+            }
+            return (a.startOffsetSeconds || 0) - (b.startOffsetSeconds || 0);
+          },
+        );
+
+        listEl.innerHTML = `
+          <h4>Current Parts</h4>
+          <div class="parts-list">
+            ${sortedParts
+              .map((part, index) => {
+                // Build timestamp display
+                let timestampInfo = "";
+                if (part.startTime) {
+                  // New format: show actual recording time
+                  const startDate = new Date(part.startTime);
+                  timestampInfo = `<span style="color: #28a745;">📹 ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}</span>`;
+                } else {
+                  // Try to parse from filename for legacy display
+                  const parsed = parseRecordingFilename(part.blobName);
+                  if (parsed) {
+                    timestampInfo = `<span style="color: #28a745;">📹 ${parsed.year}-${String(
+                      parsed.month,
+                    ).padStart(2, "0")}-${String(parsed.day).padStart(
+                      2,
+                      "0",
+                    )} ${String(parsed.hour).padStart(2, "0")}:${String(
+                      parsed.minute,
+                    ).padStart(2, "0")}:${String(parsed.second).padStart(
+                      2,
+                      "0",
+                    )}</span>`;
+                  }
+                }
+
+                // Build duration/offset info
+                let timingInfo = "";
+                if (part.durationSeconds) {
+                  timingInfo = `Duration: ${formatTime(part.durationSeconds)}`;
+                } else if (part.startOffsetSeconds !== undefined) {
+                  timingInfo = `Start: ${formatTime(part.startOffsetSeconds)}`;
+                }
+
+                return `
+              <div class="part-card" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>Part ${index + 1}</strong> ${timestampInfo}
+                    <div style="font-size: 12px; color: #666;">
+                      ${part.blobName}<br>
+                      ${timingInfo}
+                    </div>
+                  </div>
+                  <button class="btn btn-danger btn-sm" onclick="handleDeleteRecordingPartModal(${index})">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            `;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      // Load available blobs in modal
+      async function loadBlobsModal() {
+        const container = document.getElementById("modalContainerName").value;
+        const pickerEl = document.getElementById("modalBlobPicker");
+        const pickerContainer = document.getElementById(
+          "modalBlobPickerContainer",
+        );
+
+        pickerEl.innerHTML = '<div class="loading">Loading videos...</div>';
+        pickerContainer.style.display = "block";
+
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/blobs/list?container=${encodeURIComponent(
+              container,
+            )}`,
+            { method: "GET" },
+          );
+
+          if (!response.ok) throw new Error("Failed to load blobs");
+
+          const data = await response.json();
+          availableBlobs = data.blobs || [];
+
+          renderBlobPickerModal();
+        } catch (error) {
+          console.error("Error loading blobs:", error);
+          pickerEl.innerHTML =
+            '<div class="error-message">Failed to load videos. Check container name.</div>';
+        }
+      }
+
+      // Render blob picker in modal
+      function renderBlobPickerModal(filteredBlobs = null) {
+        const pickerEl = document.getElementById("modalBlobPicker");
+        const blobs = filteredBlobs || availableBlobs;
+
+        if (blobs.length === 0) {
+          pickerEl.innerHTML =
+            '<div class="loading">No video files found in this container.</div>';
+          return;
+        }
+
+        pickerEl.innerHTML = blobs
+          .map((blob) => {
+            const isSelected = selectedBlobs.has(blob.name);
+            const sizeMB = (blob.sizeBytes / 1024 / 1024).toFixed(2);
+            const date = new Date(blob.lastModified).toLocaleString();
+
+            return `
+              <div class="blob-item ${
+                isSelected ? "selected" : ""
+              }" data-blob-name="${blob.name}">
+                <input 
+                  type="checkbox" 
+                  class="blob-checkbox" 
+                  ${isSelected ? "checked" : ""} 
+                  onchange="toggleBlobSelectionModal('${blob.name}')"
+                />
+                <div class="blob-info">
+                  <div class="blob-name">${blob.name}</div>
+                  <div class="blob-meta">${sizeMB} MB • ${date}</div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+
+        updateSelectedCountModal();
+      }
+
+      // Toggle blob selection in modal
+      function toggleBlobSelectionModal(blobName) {
+        if (selectedBlobs.has(blobName)) {
+          selectedBlobs.delete(blobName);
+        } else {
+          selectedBlobs.add(blobName);
+        }
+
+        updateSelectedCountModal();
+        updateAddButtonModal();
+
+        // Update UI
+        const blobItem = document.querySelector(
+          `[data-blob-name="${blobName}"]`,
+        );
+        if (blobItem) {
+          blobItem.classList.toggle("selected");
+        }
+      }
+
+      // Select all visible blobs in modal
+      function selectAllBlobsModal() {
+        const searchTerm = document
+          .getElementById("modalBlobSearch")
+          .value.toLowerCase();
+        const visibleBlobs = searchTerm
+          ? availableBlobs.filter((b) =>
+              b.name.toLowerCase().includes(searchTerm),
+            )
+          : availableBlobs;
+
+        visibleBlobs.forEach((blob) => selectedBlobs.add(blob.name));
+        renderBlobPickerModal(searchTerm ? visibleBlobs : null);
+      }
+
+      // Clear all selections in modal
+      function clearSelectionModal() {
+        selectedBlobs.clear();
+        renderBlobPickerModal();
+      }
+
+      // Filter blobs by search term in modal
+      function filterBlobsModal() {
+        const searchTerm = document
+          .getElementById("modalBlobSearch")
+          .value.toLowerCase();
+        if (!searchTerm) {
+          renderBlobPickerModal();
+          return;
+        }
+
+        const filtered = availableBlobs.filter((blob) =>
+          blob.name.toLowerCase().includes(searchTerm),
+        );
+        renderBlobPickerModal(filtered);
+      }
+
+      // Update selected count display in modal
+      function updateSelectedCountModal() {
+        document.getElementById("modalSelectedCount").textContent = `${
+          selectedBlobs.size
+        } video${selectedBlobs.size !== 1 ? "s" : ""} selected`;
+      }
+
+      // Update add button state in modal
+      function updateAddButtonModal() {
+        const addBtn = document.getElementById("modalAddPartsBtn");
+        addBtn.disabled = selectedBlobs.size === 0;
+      }
+
+      // Handle attach recording from modal
+      async function handleAttachRecordingModal(e) {
+        e.preventDefault();
+
+        const container = document.getElementById("modalContainerName").value;
+
+        // Multi-select mode - process selected blobs
+        if (selectedBlobs.size === 0) {
+          alert("Please select at least one video file");
+          return;
+        }
+
+        try {
+          let newParts = [];
+
+          // Convert selected blob names to array and sort
+          const selectedBlobNames = Array.from(selectedBlobs).sort();
+
+          // Parse each filename and create parts
+          const parsedBlobs = selectedBlobNames.map((name) => ({
+            name,
+            parsed: parseRecordingFilename(name),
+          }));
+
+          // Sort by startTime (earliest first)
+          parsedBlobs.sort((a, b) => {
+            if (!a.parsed || !b.parsed) return 0;
+            return a.parsed.startTime - b.parsed.startTime;
+          });
+
+          // Calculate part numbers
+          const existingParts = currentObservation.recordingParts || [];
+          let nextPartNumber = 1;
+          if (existingParts.length > 0) {
+            nextPartNumber =
+              Math.max(...existingParts.map((p) => p.partNumber)) + 1;
+          }
+
+          for (let i = 0; i < parsedBlobs.length; i++) {
+            const { name, parsed } = parsedBlobs[i];
+
+            // Build recording part - always use sequential part numbers based on position
+            const part = {
+              partNumber: nextPartNumber + i,
+              provider: "azure_blob",
+              container,
+              blobName: name,
+              contentType: "video/mp4",
+            };
+
+            if (parsed && parsed.isNewFormat) {
+              // New format: use startTime and durationSeconds directly from filename
+              part.startTime = parsed.startTime.toISOString();
+              part.durationSeconds = parsed.durationSeconds;
+            } else if (parsed) {
+              // Legacy format: still use startTime from filename but no duration
+              part.startTime = parsed.startTime.toISOString();
+              // Legacy: Calculate startOffsetSeconds for backward compatibility
+              const firstParsed = parsedBlobs[0].parsed;
+              if (firstParsed) {
+                part.startOffsetSeconds = Math.floor(
+                  (parsed.startTime - firstParsed.startTime) / 1000,
+                );
+              } else {
+                part.startOffsetSeconds = 0;
+              }
+            } else {
+              // No parsed data - use defaults
+              part.startOffsetSeconds = 0;
+            }
+
+            newParts.push(part);
+          }
+
+          console.log("New parts to add:", JSON.stringify(newParts, null, 2));
+
+          // Merge with existing parts
+          const existingPartsCopy = currentObservation.recordingParts || [];
+          const updatedParts = [...existingPartsCopy];
+
+          // Add or replace parts
+          for (const newPart of newParts) {
+            const existingIndex = updatedParts.findIndex(
+              (p) => p.partNumber === newPart.partNumber,
+            );
+            if (existingIndex >= 0) {
+              // Replace existing
+              updatedParts[existingIndex] = newPart;
+            } else {
+              // Add new
+              updatedParts.push(newPart);
+            }
+          }
+
+          const updatedObs = {
+            ...currentObservation,
+            recordingParts: updatedParts,
+          };
+
+          console.log(
+            "Sending observation update:",
+            JSON.stringify(updatedObs, null, 2),
+          );
+
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedObs),
+            },
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("API Error:", response.status, errorText);
+            throw new Error(
+              `Failed to add recording parts: ${response.status} ${errorText}`,
+            );
+          }
+
+          currentObservation = await response.json();
+
+          // Reset and refresh
+          selectedBlobs.clear();
+          renderModalRecordingPartsList();
+
+          // Refresh video player
+          requestAnimationFrame(() => {
+            renderVideoPlayer();
+          });
+
+          alert(
+            `Successfully added ${newParts.length} recording part${
+              newParts.length !== 1 ? "s" : ""
+            }`,
+          );
+        } catch (error) {
+          console.error("Error adding recording parts:", error);
+          alert("Failed to add recording parts: " + error.message);
+        }
+      }
+
+      // Handle delete recording part from modal
+      async function handleDeleteRecordingPartModal(partIndex) {
+        // Sort by startTime (if available) or startOffsetSeconds
+        const sortedParts = [...currentObservation.recordingParts].sort(
+          (a, b) => {
+            if (a.startTime && b.startTime) {
+              return new Date(a.startTime) - new Date(b.startTime);
+            }
+            return (a.startOffsetSeconds || 0) - (b.startOffsetSeconds || 0);
+          },
+        );
+        const partToDelete = sortedParts[partIndex];
+
+        if (!confirm(`Delete Part ${partIndex + 1}?`)) return;
+
+        try {
+          const updatedParts = currentObservation.recordingParts.filter(
+            (p) => p.partNumber !== partToDelete.partNumber,
+          );
+
+          const updatedObs = {
+            ...currentObservation,
+            recordingParts: updatedParts,
+          };
+
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedObs),
+            },
+          );
+
+          if (!response.ok) throw new Error("Failed to delete recording part");
+
+          currentObservation = await response.json();
+
+          // Refresh list and video player
+          renderModalRecordingPartsList();
+          requestAnimationFrame(() => {
+            renderVideoPlayer();
+          });
+        } catch (error) {
+          console.error("Error deleting recording part:", error);
+          alert("Failed to delete recording part");
+        }
+      }
+
+      // Handle delete observation
+      async function handleDeleteObservation() {
+        if (
+          !confirm(
+            "Are you sure you want to delete this observation? This will also delete all associated notes.",
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            { method: "DELETE" },
+          );
+
+          if (response.status === 403) {
+            const errorData = await response.json();
+            alert(
+              errorData.error ||
+                "You don't have permission to delete this observation",
+            );
+            return;
+          }
+
+          if (!response.ok) throw new Error("Failed to delete observation");
+
+          // Remove from list and close detail
+          observations = observations.filter(
+            (o) => o.id !== currentObservation.id,
+          );
+          renderObservationsList();
+          closeDetail();
+        } catch (error) {
+          console.error("Error deleting observation:", error);
+          alert("Failed to delete observation");
+        }
+      }
+
+      // Handle toggle status
+      async function handleToggleStatus() {
+        try {
+          const newStatus =
+            currentObservation.status === "active" ? "completed" : "active";
+          const updatedObs = {
+            ...currentObservation,
+            status: newStatus,
+            endTime:
+              newStatus === "completed" ? new Date().toISOString() : null,
+          };
+
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedObs),
+            },
+          );
+
+          if (response.status === 403) {
+            const errorData = await response.json();
+            alert(
+              errorData.error ||
+                "You don't have permission to update this observation",
+            );
+            return;
+          }
+
+          if (!response.ok) throw new Error("Failed to update status");
+
+          currentObservation = await response.json();
+
+          // Update in list
+          const index = observations.findIndex(
+            (o) => o.id === currentObservation.id,
+          );
+          if (index !== -1) observations[index] = currentObservation;
+
+          // Refresh views
+          renderObservationsList();
+          renderObservationDetail();
+        } catch (error) {
+          console.error("Error updating status:", error);
+          alert("Failed to update observation status");
+        }
+      }
+
+      // Handle delete note
+      async function handleDeleteNote(event, noteId) {
+        event.stopPropagation();
+
+        if (!confirm("Delete this note?")) return;
+
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}/notes/${noteId}`,
+            { method: "DELETE" },
+          );
+
+          if (!response.ok) throw new Error("Failed to delete note");
+
+          notes = notes.filter((n) => n.id !== noteId);
+          renderNotes();
+        } catch (error) {
+          console.error("Error deleting note:", error);
+          alert("Failed to delete note");
+        }
+      }
+
+      // Close detail view
+      function closeDetail() {
+        document.getElementById("observationDetail").classList.remove("active");
+        currentObservation = null;
+        notes = [];
+        videoElement = null;
+        lastNotesCount = 0;
+      }
+
+      // Show note modal
+      function showNoteModal() {
+        document.getElementById("noteModal").classList.add("active");
+        document.getElementById("noteModalForm").reset();
+        document.getElementById("timestampGroup").style.display = "block";
+      }
+
+      // Hide note modal
+      function hideNoteModal() {
+        document.getElementById("noteModal").classList.remove("active");
+        document.getElementById("noteModalForm").reset();
+      }
+
+      // Handle note type change
+      function handleNoteTypeChange() {
+        const noteType = document.getElementById("noteTypeSelect").value;
+        const timestampGroup = document.getElementById("timestampGroup");
+
+        if (noteType === "general") {
+          timestampGroup.style.display = "none";
+        } else {
+          timestampGroup.style.display = "block";
+        }
+      }
+
+      // Handle add note from modal
+      async function handleAddNoteModal(e) {
+        e.preventDefault();
+
+        const text = document.getElementById("noteModalText").value;
+        const noteType = document.getElementById("noteTypeSelect").value;
+        let timestamp = null;
+        let offsetSeconds = null; // Legacy fallback
+
+        if (noteType === "moment") {
+          const timestampValue =
+            document.getElementById("timestampSelect").value;
+
+          // Calculate the timestamp based on video position
+          if (timestampValue === "now") {
+            // Use current video time if available
+            if (
+              videoElement &&
+              currentVideoPart &&
+              currentVideoPart.startTime
+            ) {
+              // New format: calculate actual DateTime
+              const partStart = new Date(currentVideoPart.startTime).getTime();
+              const currentMs = partStart + videoElement.currentTime * 1000;
+              timestamp = new Date(currentMs).toISOString();
+            } else if (videoElement && currentVideoPart) {
+              // Legacy format: use offsetSeconds
+              offsetSeconds = Math.floor(
+                videoElement.currentTime +
+                  (currentVideoPart.startOffsetSeconds || 0),
+              );
+            } else {
+              // No video, use current time as timestamp
+              timestamp = new Date().toISOString();
+            }
+          } else {
+            // Calculate "now minus X seconds"
+            const subtractSeconds = parseInt(timestampValue);
+            if (
+              videoElement &&
+              currentVideoPart &&
+              currentVideoPart.startTime
+            ) {
+              // New format: calculate actual DateTime minus offset
+              const partStart = new Date(currentVideoPart.startTime).getTime();
+              const currentMs =
+                partStart +
+                videoElement.currentTime * 1000 -
+                subtractSeconds * 1000;
+              timestamp = new Date(currentMs).toISOString();
+            } else if (videoElement && currentVideoPart) {
+              // Legacy format: use offsetSeconds
+              offsetSeconds = Math.floor(
+                videoElement.currentTime +
+                  (currentVideoPart.startOffsetSeconds || 0) -
+                  subtractSeconds,
+              );
+              offsetSeconds = Math.max(0, offsetSeconds);
+            } else {
+              // No video, use current time minus offset
+              timestamp = new Date(
+                Date.now() - subtractSeconds * 1000,
+              ).toISOString();
+            }
+          }
+        }
+
+        try {
+          // Build request body - prefer timestamp over offsetSeconds
+          const requestBody = { text };
+          if (timestamp) {
+            requestBody.timestamp = timestamp;
+          } else if (offsetSeconds !== null) {
+            requestBody.offsetSeconds = offsetSeconds;
+          }
+
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(requestBody),
+            },
+          );
+
+          if (!response.ok) throw new Error("Failed to add note");
+
+          const newNote = await response.json();
+          notes.push(newNote);
+
+          // Sort notes: prefer timestamp, fallback to offsetSeconds
+          notes.sort((a, b) => {
+            const aTime = a.timestamp
+              ? new Date(a.timestamp).getTime()
+              : a.offsetSeconds !== null
+                ? a.offsetSeconds * 1000
+                : 999999999;
+            const bTime = b.timestamp
+              ? new Date(b.timestamp).getTime()
+              : b.offsetSeconds !== null
+                ? b.offsetSeconds * 1000
+                : 999999999;
+            return aTime - bTime;
+          });
+
+          // Close modal and refresh
+          hideNoteModal();
+          renderNotes();
+        } catch (error) {
+          console.error("Error adding note:", error);
+          alert("Failed to add note");
+        }
+      }
+
+      // Utility: Format time in seconds to MM:SS
+      function formatTime(seconds) {
+        if (seconds === null || seconds === undefined) return "";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      // Utility: Escape HTML
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // ============================================================
+      // POLLING & AUTO-UPDATE
+      // ============================================================
+
+      // Start polling for updates
+      function startPolling() {
+        if (pollInterval) return; // Already polling
+        pollInterval = setInterval(pollForUpdates, 8000); // Poll every 8 seconds
+        console.log("Started polling for updates");
+      }
+
+      // Stop polling
+      function stopPolling() {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+          console.log("Stopped polling for updates");
+        }
+      }
+
+      // Handle visibility change (pause when tab not visible)
+      function handleVisibilityChange() {
+        if (document.hidden) {
+          stopPolling();
+        } else {
+          startPolling();
+        }
+      }
+
+      // Main polling function
+      async function pollForUpdates() {
+        try {
+          // Always update main observations list (unless creating new observation)
+          if (
+            !document
+              .getElementById("newObservationForm")
+              .classList.contains("active")
+          ) {
+            await updateObservationsList();
+          }
+
+          // Only update detail view if appropriate
+          if (shouldUpdateDetailView()) {
+            await updateDetailView();
+          }
+        } catch (error) {
+          console.error("Error polling for updates:", error);
+          // Continue polling even on errors
+        }
+      }
+
+      // Check if detail view should be updated
+      function shouldUpdateDetailView() {
+        // Detail must be active
+        if (
+          !document
+            .getElementById("observationDetail")
+            .classList.contains("active")
+        ) {
+          return false;
+        }
+
+        // No modals open
+        if (
+          document.getElementById("noteModal").classList.contains("active") ||
+          document.getElementById("recordingModal").classList.contains("active")
+        ) {
+          return false;
+        }
+
+        // Video not playing (only update when paused/stopped or no video)
+        if (videoElement && !videoElement.paused && !videoElement.ended) {
+          return false;
+        }
+
+        return true;
+      }
+
+      // Update observations list
+      async function updateObservationsList() {
+        try {
+          const response = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/GetObservations`,
+            { method: "GET" },
+          );
+
+          if (!response.ok) return;
+
+          const newObservations = await response.json();
+
+          // Check for new observations
+          if (newObservations.length > lastObservationCount) {
+            const newCount = newObservations.length - lastObservationCount;
+            showToast(
+              `${newCount} new observation${newCount !== 1 ? "s" : ""} added`,
+            );
+          }
+
+          lastObservationCount = newObservations.length;
+          observations = newObservations;
+          renderObservationsList();
+        } catch (error) {
+          console.error("Error updating observations list:", error);
+        }
+      }
+
+      // Update detail view (current observation + notes)
+      async function updateDetailView() {
+        if (!currentObservation?.id) return;
+
+        try {
+          // Fetch latest observation data
+          const obsResponse = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}`,
+            { method: "GET" },
+          );
+
+          if (!obsResponse.ok) return;
+
+          const updatedObs = await obsResponse.json();
+
+          // Check if recording parts changed
+          const partsChanged =
+            JSON.stringify(updatedObs.recordingParts) !==
+            JSON.stringify(currentObservation.recordingParts);
+
+          currentObservation = updatedObs;
+
+          // Update in main observations list
+          const index = observations.findIndex(
+            (o) => o.id === currentObservation.id,
+          );
+          if (index !== -1) observations[index] = currentObservation;
+
+          // Update metadata
+          renderObservationDetail();
+
+          // Only reinitialize video if parts changed and video not playing
+          if (partsChanged && (!videoElement || videoElement.paused)) {
+            requestAnimationFrame(() => {
+              renderVideoPlayer();
+            });
+          }
+
+          // Update notes
+          const notesResponse = await authManager.makeAuthenticatedRequest(
+            `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
+            { method: "GET" },
+          );
+
+          if (notesResponse.ok) {
+            const newNotes = await notesResponse.json();
+
+            // Check for new notes
+            if (newNotes.length > lastNotesCount) {
+              const newCount = newNotes.length - lastNotesCount;
+              showToast(
+                `${newCount} new note${newCount !== 1 ? "s" : ""} added`,
+              );
+            }
+
+            lastNotesCount = newNotes.length;
+            notes = newNotes;
+            renderNotes();
+          }
+        } catch (error) {
+          console.error("Error updating detail view:", error);
+        }
+      }
+
+      // Show toast notification
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("active");
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove("active");
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

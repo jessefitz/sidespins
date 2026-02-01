@@ -5,6 +5,8 @@ docs/.jekyll-cache
 docs/.jekyll-metadata
 docs/vendor
 
+tools/poolingest/config.json
+
 # .NET / Azure Functions
 functions/bin/
 functions/obj/

@@ -12,6 +12,42 @@ class AuthManager {
         this.currentPhoneId = null; // Store phone ID for SMS verification
         this.userMemberships = null; // Cache for team memberships
         this.activeTeamId = null; // Currently selected team
+        this.authToken = null; // Store token in memory
+    }
+
+    /**
+     * Store auth token securely
+     */
+    setAuthToken(token) {
+        this.authToken = token;
+        // Store in localStorage for persistence across page reloads
+        localStorage.setItem('sidespins_auth_token', token);
+    }
+
+    /**
+     * Get current auth token
+     */
+    getAuthToken() {
+        if (this.authToken) {
+            return this.authToken;
+        }
+        // Fallback to localStorage
+        return localStorage.getItem('sidespins_auth_token');
+    }
+
+    /**
+     * Clear auth token
+     */
+    clearAuthToken() {
+        this.authToken = null;
+        localStorage.removeItem('sidespins_auth_token');
+        // Also clear any legacy cookies
+        try {
+            document.cookie = 'ssid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.sidespins.com';
+            document.cookie = 'ssid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+        } catch (e) {
+            // Ignore cookie clearing errors
+        }
     }
 
     /**
@@ -19,27 +55,38 @@ class AuthManager {
      * @returns {Promise<boolean>} True if authenticated
      */
     async checkAuth() {
-        const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-        
         try {
             console.log('Checking authentication status...');
-            console.log('Is iOS Safari:', isIOSSafari);
             
+            const token = this.getAuthToken();
+            if (!token) {
+                console.log('No auth token found');
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                return false;
+            }
+
             const response = await fetch(`${this.baseUrl}/auth/user`, {
-                credentials: 'include',
-                // For iOS Safari, ensure we don't cache the request
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
                 cache: 'no-cache'
             });
             
             console.log('Auth check response status:', response.status);
-            console.log('Auth check response ok:', response.ok);
             
             if (response.ok) {
                 this.currentUser = await response.json();
                 this.isAuthenticated = this.currentUser.authenticated || false;
                 console.log('Authentication status:', this.isAuthenticated);
-                console.log('Current user:', this.currentUser);
                 return this.isAuthenticated;
+            } else if (response.status === 401) {
+                // Token is invalid, clear it
+                this.clearAuthToken();
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                return false;
             } else {
                 console.log('Auth check failed - response not ok');
                 this.isAuthenticated = false;
@@ -65,8 +112,7 @@ class AuthManager {
             const response = await fetch(`${this.baseUrl}/auth/signup/init`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apaNumber, phoneNumber }),
-                credentials: 'include'
+                body: JSON.stringify({ apaNumber, phoneNumber })
             });
             
             const result = await response.json();
@@ -103,8 +149,7 @@ class AuthManager {
             const response = await fetch(`${this.baseUrl}/auth/sms/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phoneNumber }),
-                credentials: 'include'
+                body: JSON.stringify({ phoneNumber })
             });
             
             const result = await response.json();
@@ -136,13 +181,14 @@ class AuthManager {
             const response = await fetch(`${this.baseUrl}/auth/sms/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phoneId: this.currentPhoneId, code }),
-                credentials: 'include'
+                body: JSON.stringify({ phoneId: this.currentPhoneId, code })
             });
             
             const result = await response.json();
             
-            if (result.ok) {
+            if (result.ok && result.sessionToken) {
+                // Store the token instead of relying on cookies
+                this.setAuthToken(result.sessionToken);
                 await this.checkAuth(); // Refresh user state
                 await this.loadUserMemberships(); // Load team memberships
                 this.currentPhoneId = null; // Clear phone ID after successful verification
@@ -156,14 +202,59 @@ class AuthManager {
     }
 
     /**
+     * Make an authenticated API request
+     */
+    async makeAuthenticatedRequest(url, options = {}) {
+        const token = this.getAuthToken();
+        
+        if (!token) {
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.userMemberships = null;
+            this.activeTeamId = null;
+            window.location.href = '/login.html';
+            throw new Error('Authentication required');
+        }
+
+        const mergedHeaders = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
+        };
+
+        const mergedOptions = { 
+            ...options, 
+            headers: mergedHeaders 
+        };
+        
+        try {
+            const response = await fetch(url, mergedOptions);
+            
+            // If unauthorized, clear auth state and redirect to login
+            if (response.status === 401) {
+                this.clearAuthToken();
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                this.userMemberships = null;
+                this.activeTeamId = null;
+                window.location.href = '/login.html';
+                throw new Error('Authentication required');
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('Authenticated request failed:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Load user's team memberships
      * @returns {Promise<Array>} Array of team memberships
      */
     async loadUserMemberships() {
         try {
-            const response = await fetch(`${this.baseUrl}/me/memberships`, {
-                credentials: 'include'
-            });
+            const response = await this.makeAuthenticatedRequest(`${this.baseUrl}/me/memberships`);
             
             if (response.ok) {
                 const result = await response.json();
@@ -196,9 +287,7 @@ class AuthManager {
      */
     async getUserProfile() {
         try {
-            const response = await fetch(`${this.baseUrl}/me/profile`, {
-                credentials: 'include'
-            });
+            const response = await this.makeAuthenticatedRequest(`${this.baseUrl}/me/profile`);
             
             if (response.ok) {
                 return await response.json();
@@ -392,10 +481,17 @@ class AuthManager {
      * @returns {Promise<Response>} Response object
      */
     async apiRequest(url, options = {}) {
-        const response = await fetch(url, {
-            credentials: 'include',
-            ...options
-        });
+        const token = this.getAuthToken();
+        
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` }),
+                ...options.headers
+            }
+        };
+
+        const response = await fetch(url, { ...defaultOptions, ...options });
 
         if (!response.ok) {
             const handled = await this.handleApiError(response);
@@ -425,8 +521,7 @@ class AuthManager {
             const response = await fetch(`${this.baseUrl}/auth/email/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-                credentials: 'include'
+                body: JSON.stringify({ email })
             });
             return await response.json();
         } catch (error) {
@@ -445,13 +540,14 @@ class AuthManager {
             const response = await fetch(`${this.baseUrl}/auth/email/authenticate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token }),
-                credentials: 'include'
+                body: JSON.stringify({ token })
             });
             
             const result = await response.json();
             
-            if (result.ok) {
+            if (result.ok && result.sessionToken) {
+                // Store the token instead of relying on cookies
+                this.setAuthToken(result.sessionToken);
                 await this.checkAuth(); // Refresh user state
                 await this.loadUserMemberships(); // Load team memberships
             }
@@ -485,138 +581,62 @@ class AuthManager {
     }
 
     /**
-     * Logout current user
+     * Logout current user - simplified without cookie handling
      * @returns {Promise<Object>} API response
      */
     async logout() {
         console.log('Starting logout process...');
         
-        const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-        
-        if (isIOSSafari) {
-            return this.logoutIOSSafari();
-        }
-        
         try {
-            const headers = {
-                'Content-Type': 'application/json'
-            };
+            const token = this.getAuthToken();
             
-            console.log('Making logout request to:', `${this.baseUrl}/auth/logout`);
-            
-            const response = await fetch(`${this.baseUrl}/auth/logout`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: headers,
-                cache: 'no-cache'
-            });
-            
-            console.log('Logout response status:', response.status);
-            console.log('Logout response ok:', response.ok);
-            
-            let result;
-            try {
-                result = await response.json();
-                console.log('Logout response body:', result);
-            } catch (jsonError) {
-                console.warn('Failed to parse logout response as JSON:', jsonError);
-                result = { success: response.ok, message: 'Logout request completed' };
-            }
-            
-            // Clear local state
-            console.log('Clearing local authentication state...');
-            this.isAuthenticated = false;
-            this.currentUser = null;
-            this.userMemberships = null;
-            this.activeTeamId = null;
-            localStorage.removeItem('activeTeamId');
-            
-            return result;
-        } catch (error) {
-            console.error('Logout failed with error:', error);
-            // Even if logout fails, clear local state
-            this.isAuthenticated = false;
-            this.currentUser = null;
-            this.userMemberships = null;
-            this.activeTeamId = null;
-            localStorage.removeItem('activeTeamId');
-            
-            throw new Error('Failed to logout');
-        }
-    }
-
-    /**
-     * Special logout handling for iOS Safari
-     * @returns {Promise<Object>} API response
-     */
-    async logoutIOSSafari() {
-        console.log('Starting iOS Safari logout process...');
-        
-        // Method 1: Try the standard logout first
-        try {
-            console.log('Attempting standard logout for iOS Safari...');
-            
-            const response = await fetch(`${this.baseUrl}/auth/logout`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
-                },
-                cache: 'no-cache'
-            });
-            
-            console.log('iOS Safari logout response status:', response.status);
-            
-            let result = { success: true, message: 'Logout completed' };
-            if (response.ok) {
+            if (token) {
+                // Optional: Call logout endpoint to invalidate token server-side
                 try {
-                    result = await response.json();
-                } catch (jsonError) {
-                    console.warn('Could not parse JSON response, but logout appears successful');
+                    await fetch(`${this.baseUrl}/auth/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        cache: 'no-cache'
+                    });
+                } catch (logoutError) {
+                    console.warn('Server logout failed, continuing with local logout:', logoutError);
                 }
             }
             
-            // Always clear local state for iOS Safari
-            this.clearAllAuthData();
+            // Clear local state
+            this.clearAuthToken();
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.userMemberships = null;
+            this.activeTeamId = null;
+            localStorage.removeItem('activeTeamId');
             
-            return result;
-            
+            return { success: true, message: 'Logout successful' };
         } catch (error) {
-            console.warn('Standard logout failed on iOS Safari, trying alternative method:', error);
+            console.error('Logout failed:', error);
+            // Even if logout fails, clear local state
+            this.clearAuthToken();
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.userMemberships = null;
+            this.activeTeamId = null;
+            localStorage.removeItem('activeTeamId');
             
-            // Method 2: Try without waiting for response
-            try {
-                // Fire and forget request
-                fetch(`${this.baseUrl}/auth/logout`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    cache: 'no-cache'
-                }).catch(e => console.log('Fire-and-forget logout request completed'));
-                
-                // Clear local state immediately
-                this.clearAllAuthData();
-                
-                return { success: true, message: 'iOS Safari logout completed' };
-                
-            } catch (altError) {
-                console.error('All logout methods failed on iOS Safari:', altError);
-                
-                // Last resort: just clear local state
-                this.clearAllAuthData();
-                
-                return { success: false, message: 'Local logout completed' };
-            }
+            return { success: false, message: 'Local logout completed' };
         }
     }
 
     /**
-     * Clear all authentication-related data (iOS Safari compatible)
+     * Clear all authentication-related data
      */
     clearAllAuthData() {
         console.log('Clearing all authentication data...');
+        
+        // Clear tokens
+        this.clearAuthToken();
         
         // Clear instance variables
         this.isAuthenticated = false;
@@ -627,29 +647,24 @@ class AuthManager {
         // Clear localStorage
         try {
             localStorage.removeItem('activeTeamId');
-            localStorage.clear(); // Clear everything to be safe
+            localStorage.removeItem('sidespins_auth_token');
         } catch (e) {
             console.warn('Error clearing localStorage:', e);
         }
         
         // Clear sessionStorage
         try {
-            sessionStorage.removeItem('userProfile');
-            sessionStorage.removeItem('userMemberships');
-            sessionStorage.removeItem('activeTeamId');
-            sessionStorage.clear(); // Clear everything to be safe
+            sessionStorage.clear();
         } catch (e) {
             console.warn('Error clearing sessionStorage:', e);
         }
         
-        // Try to clear cookies (iOS Safari specific)
+        // Clear any legacy cookies
         try {
-            // Get all cookies and expire them
             document.cookie.split(";").forEach(function(c) { 
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
             });
             
-            // Also try with domain
             const domain = window.location.hostname;
             document.cookie.split(";").forEach(function(c) { 
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/;domain=" + domain); 
@@ -696,24 +711,7 @@ class AuthManager {
         
         const url = endpoint.includes('://') ? endpoint : `${this.baseUrl}${endpoint}`;
         
-        const defaultOptions = {
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        };
-        
-        const response = await fetch(url, { ...defaultOptions, ...options });
-        
-        // Handle 403 responses by clearing team context if needed
-        if (response.status === 403 && this.activeTeamId) {
-            console.warn('403 response received, user may have lost team access');
-            // Optionally refresh memberships and switch to a valid team
-            await this.loadUserMemberships();
-        }
-        
-        return response;
+        return this.makeAuthenticatedRequest(url, options);
     }
 
     /**
@@ -763,21 +761,34 @@ class AuthManager {
      * @returns {Promise<Response>} Fetch response
      */
     async makeAuthenticatedRequest(url, options = {}) {
-        const defaultOptions = {
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
+        const token = this.getAuthToken();
+        
+        if (!token) {
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.userMemberships = null;
+            this.activeTeamId = null;
+            window.location.href = '/login.html';
+            throw new Error('Authentication required');
+        }
+
+        const mergedHeaders = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
         };
 
-        const mergedOptions = { ...defaultOptions, ...options };
+        const mergedOptions = { 
+            ...options, 
+            headers: mergedHeaders 
+        };
         
         try {
             const response = await fetch(url, mergedOptions);
             
             // If unauthorized, clear auth state and redirect to login
             if (response.status === 401) {
+                this.clearAuthToken();
                 this.isAuthenticated = false;
                 this.currentUser = null;
                 this.userMemberships = null;
@@ -791,6 +802,69 @@ class AuthManager {
         } catch (error) {
             console.error('Authenticated request failed:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Create a new match for a team (captain operation)
+     * @param {string} teamId - Team ID
+     * @param {Object} matchData - Match data (divisionId, week, scheduledAt, status)
+     * @returns {Promise<Object>} Created match object
+     */
+    async createTeamMatch(teamId, matchData) {
+        const url = `${this.baseUrl}/teams/${teamId}/matches`;
+        const response = await this.makeAuthenticatedRequest(url, {
+            method: 'POST',
+            body: JSON.stringify(matchData)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to create match');
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Update a match lineup for a team (captain operation)
+     * @param {string} teamId - Team ID
+     * @param {string} matchId - Match ID
+     * @param {string} divisionId - Division ID (required for partition key)
+     * @param {Object} lineupPlan - Lineup plan data
+     * @returns {Promise<Object>} Updated match object
+     */
+    async updateTeamMatchLineup(teamId, matchId, divisionId, lineupPlan) {
+        const url = `${this.baseUrl}/teams/${teamId}/matches/${matchId}/lineup?divisionId=${divisionId}`;
+        const response = await this.makeAuthenticatedRequest(url, {
+            method: 'PATCH',
+            body: JSON.stringify(lineupPlan)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to update lineup');
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Delete a match for a team (captain operation)
+     * @param {string} teamId - Team ID
+     * @param {string} matchId - Match ID
+     * @param {string} divisionId - Division ID (required for partition key)
+     * @returns {Promise<void>}
+     */
+    async deleteTeamMatch(teamId, matchId, divisionId) {
+        const url = `${this.baseUrl}/teams/${teamId}/matches/${matchId}?divisionId=${divisionId}`;
+        const response = await this.makeAuthenticatedRequest(url, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to delete match');
         }
     }
 }
@@ -812,43 +886,6 @@ class UIPermissions {
      */
     static getCurrentTeamRole() {
         return this.authManager?.getCurrentTeamRole() || 'none';
-    }
-
-    /**
-     * Make an authenticated API request
-     * @param {string} url - API endpoint URL
-     * @param {Object} options - Fetch options
-     * @returns {Promise<Response>} Fetch response
-     */
-    async makeAuthenticatedRequest(url, options = {}) {
-        const defaultOptions = {
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        };
-
-        const mergedOptions = { ...defaultOptions, ...options };
-
-        try {
-            const response = await fetch(url, mergedOptions);
-            
-            // If unauthorized, clear auth state and redirect to login
-            if (response.status === 401) {
-                this.isAuthenticated = false;
-                this.currentUser = null;
-                this.userMemberships = null;
-                this.activeTeamId = null;
-                window.location.href = '/login.html';
-                throw new Error('Authentication required');
-            }
-            
-            return response;
-        } catch (error) {
-            console.error('Authenticated request failed:', error);
-            throw error;
-        }
     }
 
     /**

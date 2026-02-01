@@ -114,11 +114,35 @@ Visit: `http://localhost:4000/observations.html`
 4. Click "Start Observation"
 
 ### 2. Manually Upload Videos
-Using Azure Storage Explorer, Azure Portal, or azcopy:
+
+**Recommended: Use the video-processing.ps1 script** for automated processing, renaming, and upload:
+
+```powershell
+cd Tools\PoolIngest
+
+# Process videos from a dated folder (recommended)
+.\video-processing.ps1 -SourceDirectory "2026-01-28"
+
+# Or process directly from USB drive
+.\video-processing.ps1 -DriveLetter E
+```
+
+The script will:
+1. Extract video metadata (creation_time, duration) using ffprobe
+2. Rename files with UTC timestamps: `YYYYMMDD_HHmmss_D{duration}_{seq}_{name}.mp4`
+3. Upload to Azure Blob Storage via azcopy
+
+**Alternative: Manual upload** via Azure Storage Explorer, Azure Portal, or azcopy:
 - Upload MP4 files to the `observations-videos` container
-- For best results, use naming convention: `YYYY_MMDD_HHMMSS_SEQ.mp4`
-  - Example: `2026_0109_143000_001.mp4`
+- Use the new naming convention: `YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.mp4`
+  - Example: `20260129_004011_D211_001_MVI_0066.MP4`
+  - `20260129_004011` = UTC creation time (extracted via ffprobe)
+  - `D211` = Duration in seconds
+  - `001` = Sequence number for collision handling
+  - `MVI_0066` = Original camera filename
 - Run `ffmpeg -i input.mp4 -c copy -movflags faststart output.mp4` for web streaming optimization
+
+**Legacy format still supported**: `YYYY_MMDD_HHMMSS_SEQ.mp4` (e.g., `2026_0109_143000_001.mp4`)
 
 ### 3. Attach Videos to Observation (New Blob Picker Workflow)
 1. Open the observation
@@ -229,17 +253,37 @@ dotnet build
 ### Immediate Priority
 
 1. **Test Multi-Part Video Functionality**
-   - Test filename parsing with format `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT`
+   - Test filename parsing with new format `YYYYMMDD_HHmmss_D{duration}_{seq}_{name}.EXT`
+   - Legacy format `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT` also supported
    - Verify auto-calculation of part numbers, offsets, and durations
    - Test video auto-transition between parts
-   - Verify note timestamp navigation across multiple parts
+   - Verify note timestamp navigation across multiple parts (uses DateTime-based correlation)
    - Test edge cases (non-standard filenames, missing parts, etc.)
 
-2. **Video Processing with ffmpeg (CRITICAL)**
+2. **Video Processing with video-processing.ps1 (RECOMMENDED)**
    
    **Why This Is Required**: HTML5 video players need the moov atom (metadata) at the beginning of MP4 files to enable seeking/scrubbing. Files from cameras typically have the moov atom at the end, which breaks browser playback.
    
-   **Process all videos before uploading** using ffmpeg's faststart flag:
+   **Use the automated script** for processing and uploading:
+   
+   ```powershell
+   cd Tools\PoolIngest
+   
+   # Process an existing dated folder (most common)
+   .\video-processing.ps1 -SourceDirectory "2026-01-28"
+   
+   # Process from USB drive with ffmpeg conversion
+   .\video-processing.ps1 -DriveLetter E
+   
+   # Preview what would happen without making changes
+   .\video-processing.ps1 -SourceDirectory "2026-01-28" -WhatIf -SkipUpload
+   ```
+   
+   The script extracts metadata using ffprobe and renames files with embedded timestamps:
+   - `20260129_004011_D211_001_MVI_0066.MP4`
+   - UTC creation time + duration + sequence + original name
+   
+   **Manual processing** (if not using the script):
    
    ```bash
    # Basic command - remuxes file with moov atom at start
@@ -261,13 +305,14 @@ dotnet build
    - The `faststart` flag moves the moov atom to the beginning
    - Without this step, browser seeking will fail or be severely limited
    - Process files locally before uploading to Azure Blob Storage
+   - Consider using `video-processing.ps1` script which handles this automatically
 
-3. **Automate Multi-File Upload Process**
-   - Create upload utility/script to batch-process multiple video files for an observation
-   - Parse filenames to extract timestamps and sequence numbers
-   - Automatically calculate durations based on consecutive file timestamps
-   - Upload processed files to Azure Blob Storage
-   - Auto-create RecordingParts via API with calculated metadata
+3. **Video Upload and Metadata Workflow**
+   - The `video-processing.ps1` script automates the entire workflow
+   - Extracts `creation_time` (UTC) and duration from video metadata using ffprobe
+   - Renames files with embedded timestamps for timeline correlation
+   - Uploads to Azure Blob Storage with retry logic
+   - Frontend parses filenames to extract DateTime-based `startTime` and duration
 
 ### Future Enhancements
 

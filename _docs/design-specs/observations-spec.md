@@ -82,59 +82,94 @@ Derived:
 
 Notes may be timestamped or general.
 
-| Field          | Type      | Notes                                                  |
-| -------------- | --------- | ------------------------------------------------------ |
-| id             | UUID      | Primary identifier                                     |
-| observation_id | UUID      | Foreign key                                            |
-| offset_seconds | Integer   | Seconds from Observation start; null for general notes |
-| text           | Text      | Required                                               |
-| created_at     | Timestamp | Audit                                                  |
-| updated_at     | Timestamp | Audit                                                  |
+| Field          | Type      | Notes                                                     |
+| -------------- | --------- | --------------------------------------------------------- |
+| id             | UUID      | Primary identifier                                        |
+| observation_id | UUID      | Foreign key                                               |
+| timestamp      | DateTime  | **Preferred**: UTC timestamp when note was taken          |
+| offset_seconds | Integer   | *Legacy*: Seconds from Observation start; null for general |
+| text           | Text      | Required                                                  |
+| created_at     | Timestamp | Audit                                                     |
+| updated_at     | Timestamp | Audit                                                     |
+
+**Timestamp Handling:**
+
+* **New notes** use `timestamp` (DateTime) - represents the actual UTC time the note refers to
+* **Legacy notes** use `offset_seconds` - seconds from observation start time
+* Frontend supports both formats for backward compatibility
+* When `timestamp` is present, it takes precedence over `offset_seconds`
 
 Constraints:
 
-* If `offset_seconds` is not null, it must be ≥ 0.
-* For completed Observations, the UI should prevent offsets > duration, but the API may allow it if duration is unknown or recording alignment differs.
+* If `timestamp` is not null, it should be within the observation's time range
+* If `offset_seconds` is not null (legacy), it must be ≥ 0
+* For completed Observations, the UI should prevent timestamps outside the recording timeline
 
 ---
 
 ### RecordingPart (array on Observation)
 
-Supports **multiple sequential video recordings** for a single observation. Each part represents a continuous recording segment that begins where the previous part left off in the observation timeline.
+Supports **multiple sequential video recordings** for a single observation. Each part represents a continuous recording segment with embedded metadata from the video file.
 
-| Field                | Type    | Notes                                                   |
-| -------------------- | ------- | ------------------------------------------------------- |
-| part_number          | Integer | Sequential identifier (1, 2, 3...)                      |
-| provider             | Enum    | Always `azure_blob` in MVP                              |
-| storage_account      | String  | Optional if implied by environment                      |
-| container            | String  | Required                                                |
-| blob_name            | String  | Required (full path within container)                   |
-| content_type         | String  | Optional metadata; expected `video/mp4`                 |
-| start_offset_seconds | Integer | When this part begins in observation timeline (default 0) |
-| duration_seconds     | Integer | Optional duration of this part in seconds               |
+| Field                | Type     | Notes                                                   |
+| -------------------- | -------- | ------------------------------------------------------- |
+| part_number          | Integer  | Sequential identifier (1, 2, 3...)                      |
+| provider             | Enum     | Always `azure_blob` in MVP                              |
+| storage_account      | String   | Optional if implied by environment                      |
+| container            | String   | Required                                                |
+| blob_name            | String   | Required (full path within container)                   |
+| content_type         | String   | Optional metadata; expected `video/mp4`                 |
+| start_time           | DateTime | **UTC timestamp when recording started** (from video metadata) |
+| duration_seconds     | Integer  | Duration of this part in seconds (from video metadata)  |
+| start_offset_seconds | Integer  | *Legacy*: When this part begins in observation timeline |
 
-**Multi-Part Timeline Model:**
+**Filename Format:**
 
-* Parts are ordered by `start_offset_seconds`
-* Each part begins where the previous ended in the observation timeline
+Videos are renamed by the `video-processing.ps1` script with embedded metadata:
+
+```
+YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.mp4
+```
+
+Example: `20260129_004011_D211_001_MVI_0066.MP4`
+- `20260129_004011` = UTC creation time (Jan 29, 2026 at 00:40:11 UTC)
+- `D211` = Duration in seconds (211s = 3:31)
+- `001` = Sequence number (for same-second collision handling)
+- `MVI_0066` = Original camera filename
+
+**DateTime-Based Timeline Model:**
+
+* Parts are ordered by `start_time` (DateTime)
+* Each part has a precise UTC start time extracted from video metadata via ffprobe
+* Duration is also extracted from video metadata
 * Example: 
-  - Part 1: start_offset_seconds = 0, duration_seconds = 300 (covers 0-300s)
-  - Part 2: start_offset_seconds = 300, duration_seconds = 240 (covers 300-540s)
-  - Part 3: start_offset_seconds = 540 (covers 540s onward)
+  - Part 1: start_time = 2026-01-29T00:22:08Z, duration_seconds = 238
+  - Part 2: start_time = 2026-01-29T00:27:08Z, duration_seconds = 722
+  - Part 3: start_time = 2026-01-29T00:40:11Z, duration_seconds = 211
 
-**Note Timestamp Navigation:**
+**Note Timestamp Navigation (DateTime-based):**
 
-When seeking to a note timestamp:
+When seeking to a note with a `timestamp` (DateTime):
+
+1. Find which part contains the note's timestamp:
+   - Sort parts by `start_time`
+   - Find part where `timestamp >= part.start_time` and `timestamp < part.start_time + part.duration_seconds`
+   - Last part handles all timestamps from its start onward
+
+2. Calculate seek position within that part:
+   - `seek_time = (note.timestamp - part.start_time).TotalSeconds`
+
+3. Switch video source if needed and seek to calculated position
+
+**Legacy Support (offset-based):**
+
+For backward compatibility with existing data using `offset_seconds`:
 
 1. Find which part contains the note's `offset_seconds`:
    - Sort parts by `start_offset_seconds`
    - Find part where `offset_seconds >= part.start_offset_seconds` and `offset_seconds < next_part.start_offset_seconds`
-   - Last part handles all timestamps from its start onward
 
-2. Calculate seek position within that part:
-   - `seek_time = note.offset_seconds - part.start_offset_seconds`
-
-3. Switch video source if needed and seek to calculated position
+2. Calculate seek position: `seek_time = note.offset_seconds - part.start_offset_seconds`
 
 **Auto-Transition:**
 

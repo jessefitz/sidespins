@@ -477,22 +477,18 @@ def import_division(
     access_token = fetch_access_token(refresh_token)
     division_data = fetch_division_rosters(access_token, division_id)
     
-    # Connect to Cosmos DB
-    if not what_if:
-        print(f"\nConnecting to Cosmos DB: {cosmos_db}...")
-        client = CosmosClient(cosmos_uri, cosmos_key)
-        database = client.get_database_client(cosmos_db)
-        divisions_container = database.get_container_client("Divisions")
-        teams_container = database.get_container_client("Teams")
-        players_container = database.get_container_client("Players")
-        memberships_container = database.get_container_client("TeamMemberships")
-        print("✓ Connected to Cosmos DB")
-    else:
+    # Connect to Cosmos DB (always connect for existence checks, even in what-if mode)
+    print(f"\nConnecting to Cosmos DB: {cosmos_db}...")
+    client = CosmosClient(cosmos_uri, cosmos_key)
+    database = client.get_database_client(cosmos_db)
+    divisions_container = database.get_container_client("Divisions")
+    teams_container = database.get_container_client("Teams")
+    players_container = database.get_container_client("Players")
+    memberships_container = database.get_container_client("TeamMemberships")
+    print("✓ Connected to Cosmos DB")
+    
+    if what_if:
         print("\n[WHAT-IF MODE] - No changes will be made to the database")
-        divisions_container = None
-        teams_container = None
-        players_container = None
-        memberships_container = None
     
     # Transform and import division
     print(f"\n{'='*60}")
@@ -530,14 +526,11 @@ def import_division(
         
         # Skip teams that already exist in the database
         apa_team_id = str(team_data["id"])
-        existing_team = None
-        if not what_if:
-            existing_team = check_team_exists(teams_container, apa_team_id, division_doc["id"])
+        existing_team = check_team_exists(teams_container, apa_team_id, division_doc["id"])
         
         if existing_team:
             print(f"\nSkipping existing team (APA ID {apa_team_id}): {team_data.get('name', 'Unknown')}")
             stats["teams_skipped"] = stats.get("teams_skipped", 0) + 1
-            continue
             continue
         
         roster = team_data.get("roster", [])
@@ -584,9 +577,7 @@ def import_division(
             is_captain = (idx == 0)
             
             # Check if player exists
-            existing_player = None
-            if not what_if:
-                existing_player = check_player_exists(players_container, apa_number)
+            existing_player = check_player_exists(players_container, apa_number)
             
             if existing_player:
                 # Player exists - check for name mismatch
@@ -628,8 +619,8 @@ def import_division(
             )
             
             if what_if:
-                # Don't print full membership doc to reduce noise
-                pass
+                # Count memberships in what-if mode too
+                stats["memberships_created"] += 1
             else:
                 memberships_container.upsert_item(membership_doc)
                 stats["memberships_created"] += 1

@@ -147,15 +147,15 @@ Video observation tool for capturing and reviewing pool play sessions:
   
 - **Multi-Part Video Support**:
   - Attach multiple sequential video recordings to single observation
-  - Automatic filename parsing for timestamp-based sequencing
-  - Smart timeline alignment and duration calculation
+  - Automatic filename parsing extracts UTC timestamps and duration from metadata
+  - DateTime-based timeline alignment for precise note correlation
   - Seamless auto-transition between video parts during playback
   
 - **Timestamped Notes**:
   - Add notes during or after observation
   - Click note timestamps to jump to specific moments in video
+  - DateTime-based timestamps enable precise cross-video seeking
   - General notes (not tied to specific time) also supported
-  - "Use Current Video Time" button for quick timestamping
   
 - **Video Playback**:
   - HTML5 video player with full seeking/scrubbing controls
@@ -170,8 +170,11 @@ Video observation tool for capturing and reviewing pool play sessions:
   - Cosmos DB storage for observation metadata and notes
 
 **Technical Notes**:
-- Videos must be processed with ffmpeg's `faststart` flag before upload to enable browser seeking
-- Supports structured filename convention: `YYYY_MMDD_HHMMSS_SEQ[_custom].EXT`
+- Use `video-processing.ps1` script to process, rename, and upload videos automatically
+- New filename format: `YYYYMMDD_HHmmss_D{duration}_{seq}_{name}.mp4` (e.g., `20260129_004011_D211_001_MVI_0066.MP4`)
+- Metadata (creation_time, duration) extracted using ffprobe for precise timeline correlation
+- Videos processed with ffmpeg's `faststart` flag for browser seeking
+- See `Tools/PoolIngest/README.md` for video processing details
 - See `_docs/OBSERVATIONS_SETUP.md` for detailed setup and usage instructions
 
 ## Deployment

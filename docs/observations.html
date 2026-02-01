@@ -1127,10 +1127,18 @@ title: Observations - SideSpins
           return;
         }
 
-        // Sort parts by startOffsetSeconds
-        sortedParts = [...currentObservation.recordingParts].sort(
-          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds,
-        );
+        // Sort parts by startTime (if available) or fallback to startOffsetSeconds for legacy data
+        sortedParts = [...currentObservation.recordingParts].sort((a, b) => {
+          // Prefer startTime (new format) over startOffsetSeconds (legacy)
+          const aTime = a.startTime ? new Date(a.startTime).getTime() : null;
+          const bTime = b.startTime ? new Date(b.startTime).getTime() : null;
+
+          if (aTime && bTime) {
+            return aTime - bTime;
+          }
+          // Fallback to legacy offset-based sorting
+          return (a.startOffsetSeconds || 0) - (b.startOffsetSeconds || 0);
+        });
 
         // Build HTML with dropdown if multiple parts
         let html = "";
@@ -1140,8 +1148,9 @@ title: Observations - SideSpins
           "Recording parts:",
           sortedParts.map((p) => ({
             blobName: p.blobName,
-            startOffsetSeconds: p.startOffsetSeconds,
+            startTime: p.startTime,
             durationSeconds: p.durationSeconds,
+            startOffsetSeconds: p.startOffsetSeconds,
           })),
         );
 
@@ -1150,31 +1159,39 @@ title: Observations - SideSpins
           html += "<label>Select Part:</label>";
           html += '<select id="partSelector" onchange="handlePartSelection()">';
           sortedParts.forEach((part, index) => {
-            // Show observation timeline offsets (where this part starts and ends in the observation)
-            const startOffset = formatTime(part.startOffsetSeconds);
-            let endOffset;
+            // Format part label based on available data
+            let partLabel;
 
-            if (index < sortedParts.length - 1) {
-              // End offset is where the next part starts
-              endOffset = formatTime(sortedParts[index + 1].startOffsetSeconds);
+            if (part.startTime) {
+              // New format: show actual recording time
+              const startDate = new Date(part.startTime);
+              const timeStr = startDate.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+              const durationStr = part.durationSeconds
+                ? ` (${formatTime(part.durationSeconds)})`
+                : "";
+              partLabel = `Part ${index + 1} - ${timeStr}${durationStr}`;
             } else {
-              // Last part - show as "End"
-              endOffset = "End";
+              // Legacy format: show observation timeline offsets
+              const startOffset = formatTime(part.startOffsetSeconds || 0);
+              let endOffset;
+
+              if (index < sortedParts.length - 1) {
+                endOffset = formatTime(
+                  sortedParts[index + 1].startOffsetSeconds || 0,
+                );
+              } else {
+                endOffset = "End";
+              }
+              partLabel = `Part ${index + 1} (${startOffset} - ${endOffset})`;
             }
 
-            console.log(
-              `Part ${index + 1}: ${startOffset} - ${endOffset} (raw: ${
-                part.startOffsetSeconds
-              } - ${
-                index < sortedParts.length - 1
-                  ? sortedParts[index + 1].startOffsetSeconds
-                  : "end"
-              })`,
-            );
+            console.log(`Part ${index + 1}: ${partLabel}`);
 
-            html += `<option value="${index}">Part ${
-              index + 1
-            } (${startOffset} - ${endOffset})</option>`;
+            html += `<option value="${index}">${partLabel}</option>`;
           });
           html += "</select>";
           html += "</div>";
@@ -1314,8 +1331,28 @@ title: Observations - SideSpins
 
         listEl.innerHTML = notes
           .map((note) => {
+            // Support both new timestamp format and legacy offsetSeconds
             const hasTimestamp =
-              note.offsetSeconds !== null && note.offsetSeconds !== undefined;
+              note.timestamp ||
+              (note.offsetSeconds !== null && note.offsetSeconds !== undefined);
+
+            // Format the timestamp display
+            let timestampDisplay = "";
+            if (note.timestamp) {
+              // New format: show actual time
+              const noteTime = new Date(note.timestamp);
+              timestampDisplay = noteTime.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+            } else if (
+              note.offsetSeconds !== null &&
+              note.offsetSeconds !== undefined
+            ) {
+              // Legacy format: show offset
+              timestampDisplay = formatTime(note.offsetSeconds);
+            }
 
             // Build author display
             const authorInfo = note.createdByName
@@ -1332,9 +1369,7 @@ title: Observations - SideSpins
                 <div>
                   ${
                     hasTimestamp
-                      ? `<span class="note-timestamp">${formatTime(
-                          note.offsetSeconds,
-                        )}</span>`
+                      ? `<span class="note-timestamp">${timestampDisplay}</span>`
                       : "<span>General Note</span>"
                   }
                   ${authorInfo ? ` • ${authorInfo}` : ""}
@@ -1355,22 +1390,36 @@ title: Observations - SideSpins
       // Seek video to note timestamp
       function seekToNote(noteId) {
         const note = notes.find((n) => n.id === noteId);
-        if (!note || note.offsetSeconds === null) return;
+        if (!note) return;
+
+        // Support both new timestamp format and legacy offsetSeconds
+        const hasTimestamp =
+          note.timestamp ||
+          (note.offsetSeconds !== null && note.offsetSeconds !== undefined);
+        if (!hasTimestamp) return;
 
         // Find which part contains this timestamp
-        const result = findPartForTimestamp(note.offsetSeconds);
+        const result = findPartForTimestamp(note);
         if (!result) {
-          console.warn(
-            `No video part found for timestamp ${note.offsetSeconds}`,
-          );
+          console.warn(`No video part found for note`, note);
           return;
         }
 
         // Calculate seek time within the video part
-        const seekTime = note.offsetSeconds - result.part.startOffsetSeconds;
+        let seekTime;
+        if (note.timestamp && result.part.startTime) {
+          // New format: calculate from DateTime difference
+          const noteTime = new Date(note.timestamp).getTime();
+          const partStartTime = new Date(result.part.startTime).getTime();
+          seekTime = (noteTime - partStartTime) / 1000; // Convert ms to seconds
+        } else {
+          // Legacy format: use offsetSeconds
+          seekTime =
+            (note.offsetSeconds || 0) - (result.part.startOffsetSeconds || 0);
+        }
 
         console.log(
-          `Seeking to note: offset=${note.offsetSeconds}, part=${
+          `Seeking to note: timestamp=${note.timestamp || note.offsetSeconds}, part=${
             result.index + 1
           }, seekTime=${seekTime}`,
         );
@@ -1392,8 +1441,44 @@ title: Observations - SideSpins
         }
       }
 
-      function findPartForTimestamp(offsetSeconds) {
+      function findPartForTimestamp(note) {
         if (!sortedParts || sortedParts.length === 0) return null;
+
+        // Handle new timestamp format
+        if (note.timestamp && sortedParts[0].startTime) {
+          const noteTime = new Date(note.timestamp).getTime();
+
+          for (let i = 0; i < sortedParts.length; i++) {
+            const part = sortedParts[i];
+            const partStart = new Date(part.startTime).getTime();
+            const partEnd = part.durationSeconds
+              ? partStart + part.durationSeconds * 1000
+              : sortedParts[i + 1]
+                ? new Date(sortedParts[i + 1].startTime).getTime()
+                : Infinity;
+
+            if (noteTime >= partStart && noteTime < partEnd) {
+              return { part, index: i };
+            }
+          }
+
+          // If note is after all parts, return last part
+          if (
+            noteTime >=
+            new Date(sortedParts[sortedParts.length - 1].startTime).getTime()
+          ) {
+            return {
+              part: sortedParts[sortedParts.length - 1],
+              index: sortedParts.length - 1,
+            };
+          }
+
+          return null;
+        }
+
+        // Legacy offsetSeconds format
+        const offsetSeconds = note.offsetSeconds;
+        if (offsetSeconds === null || offsetSeconds === undefined) return null;
 
         for (let i = 0; i < sortedParts.length; i++) {
           const part = sortedParts[i];
@@ -1401,14 +1486,14 @@ title: Observations - SideSpins
 
           if (!nextPart) {
             // Last part handles everything from its start onward
-            if (offsetSeconds >= part.startOffsetSeconds) {
+            if (offsetSeconds >= (part.startOffsetSeconds || 0)) {
               return { part, index: i };
             }
           } else {
             // This part handles from its start to next part's start
             if (
-              offsetSeconds >= part.startOffsetSeconds &&
-              offsetSeconds < nextPart.startOffsetSeconds
+              offsetSeconds >= (part.startOffsetSeconds || 0) &&
+              offsetSeconds < (nextPart.startOffsetSeconds || 0)
             ) {
               return { part, index: i };
             }
@@ -1418,15 +1503,23 @@ title: Observations - SideSpins
         return null;
       }
 
-      // Use current video time for note
-      function useCurrentVideoTime() {
-        if (!videoElement || !currentVideoPart) return;
+      // Get current video time as a timestamp (utility function)
+      // Returns ISO timestamp string if using new format, or offsetSeconds for legacy
+      function getCurrentVideoTimestamp() {
+        if (!videoElement || !currentVideoPart) return null;
 
-        const offsetSeconds = Math.floor(
-          videoElement.currentTime + currentVideoPart.startOffsetSeconds,
-        );
-
-        document.getElementById("noteOffset").value = offsetSeconds;
+        if (currentVideoPart.startTime) {
+          // New format: calculate actual DateTime
+          const partStart = new Date(currentVideoPart.startTime).getTime();
+          const currentMs = partStart + videoElement.currentTime * 1000;
+          return new Date(currentMs).toISOString();
+        } else {
+          // Legacy format: return offsetSeconds
+          return Math.floor(
+            videoElement.currentTime +
+              (currentVideoPart.startOffsetSeconds || 0),
+          );
+        }
       }
 
       // Handle create observation
@@ -1473,36 +1566,78 @@ title: Observations - SideSpins
         }
       }
 
-      // Parse filename format: YYYY_MMDD_HHMMSS_SEQ[_custom].EXT
-      // Example: 2018_0102_025808_002_faststart.MP4
+      // Parse filename format: YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.mp4
+      // Example: 20260129_004011_D211_001_MVI_0066.MP4
+      // Returns: { startTime: Date (UTC), durationSeconds: number, sequenceNumber: number }
       function parseRecordingFilename(filename) {
         // Support virtual folders in blob names by stripping any prefix before the leaf name
         const leafName = filename.split("/").pop();
 
-        const pattern = /^(\d{4})_(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_(\d{3})/;
-        const match = leafName.match(pattern);
+        // New format: YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.ext
+        const newPattern =
+          /^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_D(\d+)_(\d{3})_/;
+        const newMatch = leafName.match(newPattern);
 
-        if (!match) return null;
+        if (newMatch) {
+          const [, year, month, day, hour, minute, second, duration, seq] =
+            newMatch;
 
-        const [, year, month, day, hour, minute, second, seq] = match;
+          // Parse as UTC timestamp
+          const startTime = new Date(
+            Date.UTC(
+              parseInt(year),
+              parseInt(month) - 1, // JS months are 0-indexed
+              parseInt(day),
+              parseInt(hour),
+              parseInt(minute),
+              parseInt(second),
+            ),
+          );
 
-        return {
-          timestamp: new Date(
-            parseInt(year),
-            parseInt(month) - 1, // JS months are 0-indexed
-            parseInt(day),
-            parseInt(hour),
-            parseInt(minute),
-            parseInt(second),
-          ),
-          sequenceNumber: parseInt(seq),
-          year: parseInt(year),
-          month: parseInt(month),
-          day: parseInt(day),
-          hour: parseInt(hour),
-          minute: parseInt(minute),
-          second: parseInt(second),
-        };
+          return {
+            startTime,
+            durationSeconds: parseInt(duration),
+            sequenceNumber: parseInt(seq),
+            year: parseInt(year),
+            month: parseInt(month),
+            day: parseInt(day),
+            hour: parseInt(hour),
+            minute: parseInt(minute),
+            second: parseInt(second),
+            isNewFormat: true,
+          };
+        }
+
+        // Legacy format: YYYY_MMDD_HHMMSS_SEQ[_custom].ext
+        const legacyPattern =
+          /^(\d{4})_(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_(\d{3})/;
+        const legacyMatch = leafName.match(legacyPattern);
+
+        if (legacyMatch) {
+          const [, year, month, day, hour, minute, second, seq] = legacyMatch;
+
+          return {
+            startTime: new Date(
+              parseInt(year),
+              parseInt(month) - 1,
+              parseInt(day),
+              parseInt(hour),
+              parseInt(minute),
+              parseInt(second),
+            ),
+            durationSeconds: null, // Legacy format doesn't include duration
+            sequenceNumber: parseInt(seq),
+            year: parseInt(year),
+            month: parseInt(month),
+            day: parseInt(day),
+            hour: parseInt(hour),
+            minute: parseInt(minute),
+            second: parseInt(second),
+            isNewFormat: false,
+          };
+        }
+
+        return null;
       }
 
       // Show recording modal
@@ -1537,8 +1672,14 @@ title: Observations - SideSpins
           return;
         }
 
+        // Sort by startTime (if available) or startOffsetSeconds
         const sortedParts = [...currentObservation.recordingParts].sort(
-          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds,
+          (a, b) => {
+            if (a.startTime && b.startTime) {
+              return new Date(a.startTime) - new Date(b.startTime);
+            }
+            return (a.startOffsetSeconds || 0) - (b.startOffsetSeconds || 0);
+          },
         );
 
         listEl.innerHTML = `
@@ -1546,9 +1687,17 @@ title: Observations - SideSpins
           <div class="parts-list">
             ${sortedParts
               .map((part, index) => {
-                const parsed = parseRecordingFilename(part.blobName);
-                const timestampInfo = parsed
-                  ? `<span style="color: #28a745;">📹 ${parsed.year}-${String(
+                // Build timestamp display
+                let timestampInfo = "";
+                if (part.startTime) {
+                  // New format: show actual recording time
+                  const startDate = new Date(part.startTime);
+                  timestampInfo = `<span style="color: #28a745;">📹 ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}</span>`;
+                } else {
+                  // Try to parse from filename for legacy display
+                  const parsed = parseRecordingFilename(part.blobName);
+                  if (parsed) {
+                    timestampInfo = `<span style="color: #28a745;">📹 ${parsed.year}-${String(
                       parsed.month,
                     ).padStart(2, "0")}-${String(parsed.day).padStart(
                       2,
@@ -1558,8 +1707,17 @@ title: Observations - SideSpins
                     ).padStart(2, "0")}:${String(parsed.second).padStart(
                       2,
                       "0",
-                    )}</span>`
-                  : "";
+                    )}</span>`;
+                  }
+                }
+
+                // Build duration/offset info
+                let timingInfo = "";
+                if (part.durationSeconds) {
+                  timingInfo = `Duration: ${formatTime(part.durationSeconds)}`;
+                } else if (part.startOffsetSeconds !== undefined) {
+                  timingInfo = `Start: ${formatTime(part.startOffsetSeconds)}`;
+                }
 
                 return `
               <div class="part-card" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
@@ -1568,12 +1726,7 @@ title: Observations - SideSpins
                     <strong>Part ${index + 1}</strong> ${timestampInfo}
                     <div style="font-size: 12px; color: #666;">
                       ${part.blobName}<br>
-                      Start: ${formatTime(part.startOffsetSeconds)}
-                      ${
-                        part.durationSeconds
-                          ? ` | Duration: ${formatTime(part.durationSeconds)}`
-                          : ""
-                      }
+                      ${timingInfo}
                     </div>
                   </div>
                   <button class="btn btn-danger btn-sm" onclick="handleDeleteRecordingPartModal(${index})">
@@ -1753,13 +1906,13 @@ title: Observations - SideSpins
             parsed: parseRecordingFilename(name),
           }));
 
-          // Sort by timestamp (earliest first)
+          // Sort by startTime (earliest first)
           parsedBlobs.sort((a, b) => {
             if (!a.parsed || !b.parsed) return 0;
-            return a.parsed.timestamp - b.parsed.timestamp;
+            return a.parsed.startTime - b.parsed.startTime;
           });
 
-          // Calculate part numbers and offsets
+          // Calculate part numbers
           const existingParts = currentObservation.recordingParts || [];
           let nextPartNumber = 1;
           if (existingParts.length > 0) {
@@ -1767,37 +1920,43 @@ title: Observations - SideSpins
               Math.max(...existingParts.map((p) => p.partNumber)) + 1;
           }
 
-          let cumulativeOffsetSeconds = 0;
-
           for (let i = 0; i < parsedBlobs.length; i++) {
             const { name, parsed } = parsedBlobs[i];
-            let startOffsetSeconds = cumulativeOffsetSeconds;
-            let durationSeconds = null;
 
-            if (parsed) {
-              // Calculate duration from timestamp difference to next video
-              if (i < parsedBlobs.length - 1 && parsedBlobs[i + 1].parsed) {
-                const currentTimestamp = parsed.timestamp;
-                const nextTimestamp = parsedBlobs[i + 1].parsed.timestamp;
-                durationSeconds = Math.floor(
-                  (nextTimestamp - currentTimestamp) / 1000,
-                );
-
-                // Update cumulative offset for next part
-                cumulativeOffsetSeconds += durationSeconds;
-              }
-            }
-
-            newParts.push({
-              partNumber: parsed ? parsed.sequenceNumber : nextPartNumber + i,
+            // Build recording part - always use sequential part numbers based on position
+            const part = {
+              partNumber: nextPartNumber + i,
               provider: "azure_blob",
               container,
               blobName: name,
               contentType: "video/mp4",
-              startOffsetSeconds,
-              durationSeconds,
-            });
+            };
+
+            if (parsed && parsed.isNewFormat) {
+              // New format: use startTime and durationSeconds directly from filename
+              part.startTime = parsed.startTime.toISOString();
+              part.durationSeconds = parsed.durationSeconds;
+            } else if (parsed) {
+              // Legacy format: still use startTime from filename but no duration
+              part.startTime = parsed.startTime.toISOString();
+              // Legacy: Calculate startOffsetSeconds for backward compatibility
+              const firstParsed = parsedBlobs[0].parsed;
+              if (firstParsed) {
+                part.startOffsetSeconds = Math.floor(
+                  (parsed.startTime - firstParsed.startTime) / 1000,
+                );
+              } else {
+                part.startOffsetSeconds = 0;
+              }
+            } else {
+              // No parsed data - use defaults
+              part.startOffsetSeconds = 0;
+            }
+
+            newParts.push(part);
           }
+
+          console.log("New parts to add:", JSON.stringify(newParts, null, 2));
 
           // Merge with existing parts
           const existingPartsCopy = currentObservation.recordingParts || [];
@@ -1822,6 +1981,11 @@ title: Observations - SideSpins
             recordingParts: updatedParts,
           };
 
+          console.log(
+            "Sending observation update:",
+            JSON.stringify(updatedObs, null, 2),
+          );
+
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${currentObservation.id}`,
             {
@@ -1831,7 +1995,13 @@ title: Observations - SideSpins
             },
           );
 
-          if (!response.ok) throw new Error("Failed to add recording parts");
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("API Error:", response.status, errorText);
+            throw new Error(
+              `Failed to add recording parts: ${response.status} ${errorText}`,
+            );
+          }
 
           currentObservation = await response.json();
 
@@ -1851,14 +2021,20 @@ title: Observations - SideSpins
           );
         } catch (error) {
           console.error("Error adding recording parts:", error);
-          alert("Failed to add recording parts");
+          alert("Failed to add recording parts: " + error.message);
         }
       }
 
       // Handle delete recording part from modal
       async function handleDeleteRecordingPartModal(partIndex) {
+        // Sort by startTime (if available) or startOffsetSeconds
         const sortedParts = [...currentObservation.recordingParts].sort(
-          (a, b) => a.startOffsetSeconds - b.startOffsetSeconds,
+          (a, b) => {
+            if (a.startTime && b.startTime) {
+              return new Date(a.startTime) - new Date(b.startTime);
+            }
+            return (a.startOffsetSeconds || 0) - (b.startOffsetSeconds || 0);
+          },
         );
         const partToDelete = sortedParts[partIndex];
 
@@ -2048,55 +2224,82 @@ title: Observations - SideSpins
 
         const text = document.getElementById("noteModalText").value;
         const noteType = document.getElementById("noteTypeSelect").value;
-        let offsetSeconds = null;
+        let timestamp = null;
+        let offsetSeconds = null; // Legacy fallback
 
         if (noteType === "moment") {
           const timestampValue =
             document.getElementById("timestampSelect").value;
 
+          // Calculate the timestamp based on video position
           if (timestampValue === "now") {
             // Use current video time if available
-            if (videoElement && currentVideoPart) {
+            if (
+              videoElement &&
+              currentVideoPart &&
+              currentVideoPart.startTime
+            ) {
+              // New format: calculate actual DateTime
+              const partStart = new Date(currentVideoPart.startTime).getTime();
+              const currentMs = partStart + videoElement.currentTime * 1000;
+              timestamp = new Date(currentMs).toISOString();
+            } else if (videoElement && currentVideoPart) {
+              // Legacy format: use offsetSeconds
               offsetSeconds = Math.floor(
-                videoElement.currentTime + currentVideoPart.startOffsetSeconds,
+                videoElement.currentTime +
+                  (currentVideoPart.startOffsetSeconds || 0),
               );
             } else {
-              // No video, use observation elapsed time
-              const obsStart = new Date(currentObservation.startTime);
-              const now = new Date();
-              offsetSeconds = Math.floor((now - obsStart) / 1000);
+              // No video, use current time as timestamp
+              timestamp = new Date().toISOString();
             }
           } else {
             // Calculate "now minus X seconds"
             const subtractSeconds = parseInt(timestampValue);
-            if (videoElement && currentVideoPart) {
+            if (
+              videoElement &&
+              currentVideoPart &&
+              currentVideoPart.startTime
+            ) {
+              // New format: calculate actual DateTime minus offset
+              const partStart = new Date(currentVideoPart.startTime).getTime();
+              const currentMs =
+                partStart +
+                videoElement.currentTime * 1000 -
+                subtractSeconds * 1000;
+              timestamp = new Date(currentMs).toISOString();
+            } else if (videoElement && currentVideoPart) {
+              // Legacy format: use offsetSeconds
               offsetSeconds = Math.floor(
                 videoElement.currentTime +
-                  currentVideoPart.startOffsetSeconds -
+                  (currentVideoPart.startOffsetSeconds || 0) -
                   subtractSeconds,
               );
+              offsetSeconds = Math.max(0, offsetSeconds);
             } else {
-              const obsStart = new Date(currentObservation.startTime);
-              const now = new Date();
-              offsetSeconds =
-                Math.floor((now - obsStart) / 1000) - subtractSeconds;
+              // No video, use current time minus offset
+              timestamp = new Date(
+                Date.now() - subtractSeconds * 1000,
+              ).toISOString();
             }
           }
-
-          // Ensure offset is not negative
-          offsetSeconds = Math.max(0, offsetSeconds);
         }
 
         try {
+          // Build request body - prefer timestamp over offsetSeconds
+          const requestBody = { text };
+          if (timestamp) {
+            requestBody.timestamp = timestamp;
+          } else if (offsetSeconds !== null) {
+            requestBody.offsetSeconds = offsetSeconds;
+          }
+
           const response = await authManager.makeAuthenticatedRequest(
             `${authManager.baseUrl}/observations/${currentObservation.id}/notes`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                text,
-                offsetSeconds,
-              }),
+              body: JSON.stringify(requestBody),
             },
           );
 
@@ -2104,9 +2307,21 @@ title: Observations - SideSpins
 
           const newNote = await response.json();
           notes.push(newNote);
-          notes.sort(
-            (a, b) => (a.offsetSeconds || 999999) - (b.offsetSeconds || 999999),
-          );
+
+          // Sort notes: prefer timestamp, fallback to offsetSeconds
+          notes.sort((a, b) => {
+            const aTime = a.timestamp
+              ? new Date(a.timestamp).getTime()
+              : a.offsetSeconds !== null
+                ? a.offsetSeconds * 1000
+                : 999999999;
+            const bTime = b.timestamp
+              ? new Date(b.timestamp).getTime()
+              : b.offsetSeconds !== null
+                ? b.offsetSeconds * 1000
+                : 999999999;
+            return aTime - bTime;
+          });
 
           // Close modal and refresh
           hideNoteModal();

@@ -55,11 +55,22 @@ public class RecordingPart
     [JsonProperty("contentType")]
     public string ContentType { get; set; } = "video/mp4";
 
-    [JsonProperty("startOffsetSeconds")]
-    public int StartOffsetSeconds { get; set; } = 0;
+    /// <summary>
+    /// UTC DateTime when this video recording started (extracted from video metadata via ffprobe).
+    /// Used to correlate notes with specific moments in the video.
+    /// </summary>
+    [JsonProperty("startTime")]
+    public DateTime? StartTime { get; set; }
 
+    /// <summary>
+    /// Duration of this video part in seconds (extracted from video metadata via ffprobe).
+    /// </summary>
     [JsonProperty("durationSeconds")]
     public int? DurationSeconds { get; set; }
+
+    // Legacy field for backward compatibility - will be removed in future version
+    [JsonProperty("startOffsetSeconds")]
+    public int StartOffsetSeconds { get; set; } = 0;
 }
 
 public class Note
@@ -73,6 +84,15 @@ public class Note
     [JsonProperty("observationId")]
     public string ObservationId { get; set; } = string.Empty;
 
+    /// <summary>
+    /// UTC DateTime when this note was recorded (the moment in time the note refers to).
+    /// For moment notes, this is used to seek to the correct position in the video.
+    /// For general notes, this is null.
+    /// </summary>
+    [JsonProperty("timestamp")]
+    public DateTime? Timestamp { get; set; }
+
+    // Legacy field for backward compatibility - will be removed in future version
     [JsonProperty("offsetSeconds")]
     public int? OffsetSeconds { get; set; }
 

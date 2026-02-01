@@ -1,10 +1,19 @@
 <#
 .SYNOPSIS
-    USB Video Ingest - Phase 1: Local conversion with ffmpeg faststart
+    USB Video Ingest - Local conversion, metadata extraction, and Azure upload
 
 .DESCRIPTION
     Scans a specified drive for MP4 files, processes them with ffmpeg to relocate
-    the moov atom for streaming optimization, and organizes outputs into dated folders.
+    the moov atom for streaming optimization, extracts video metadata (creation time
+    and duration) using ffprobe, renames files with timestamp prefixes for comment
+    correlation, and uploads to Azure Blob Storage.
+
+    Output filename format: YYYYMMDD_HHmmss_D{duration}_{seq}_{originalname}.mp4
+    Example: 20260129_004011_D120_001_mvi_0066.mp4
+    - 20260129_004011 = UTC creation time from video metadata
+    - D120 = Duration in seconds (120s)
+    - 001 = Sequence number (for same-second collisions)
+    - mvi_0066 = Original filename
 
 .PARAMETER DriveLetter
     Drive letter to scan (e.g., 'D' or 'E'). Not required when using -UploadOnly or -SourceDirectory.
@@ -29,7 +38,7 @@
 
 .EXAMPLE
     .\video-processing.ps1 -DriveLetter D
-    Scans D:\ for MP4 files, processes them, and uploads to Azure.
+    Scans D:\ for MP4 files, converts with faststart, extracts metadata, renames, and uploads.
 
 .EXAMPLE
     .\video-processing.ps1 -DriveLetter E -WhatIf
@@ -37,19 +46,23 @@
 
 .EXAMPLE
     .\video-processing.ps1 -UploadOnly
-    Upload today's processed videos to Azure without scanning drives.
+    Extract metadata, rename, and upload today's processed videos to Azure.
 
 .EXAMPLE
     .\video-processing.ps1 -DriveLetter D -SkipUpload
-    Process files from D:\ but don't upload to Azure.
+    Process files from D:\, extract metadata, and rename (no upload).
 
 .EXAMPLE
     .\video-processing.ps1 -SourceDirectory "2026-01-28"
-    Upload files from the 2026-01-28 folder without ffmpeg conversion.
+    Extract metadata, rename, and upload files from the 2026-01-28 folder.
 
 .EXAMPLE
     .\video-processing.ps1 -SourceDirectory "2026-01-28" -MovFlags
-    Process files from the 2026-01-28 folder with ffmpeg faststart conversion, then upload.
+    Process with ffmpeg faststart, extract metadata, rename, then upload.
+
+.NOTES
+    Requires: ffmpeg, ffprobe, azcopy (all must be in PATH or configured in config.json)
+    Videos must have creation_time metadata embedded (most cameras do this automatically).
 #>
 
 [CmdletBinding(SupportsShouldProcess)]
@@ -72,7 +85,7 @@ param(
 )
 
 # Script version
-$ScriptVersion = "1.2.0-phase3"
+$ScriptVersion = "1.3.0-metadata"
 
 # Validate parameter combinations
 $paramCount = 0
@@ -372,6 +385,194 @@ function Convert-VideoFile {
         $Script:Stats.Errors += "Exception processing $($SourceFile.Name): $_"
         return $false
     }
+}
+#endregion
+
+#region FFprobe Metadata Extraction
+function Test-FfprobeAvailable {
+    param([string]$FfprobePath)
+    
+    try {
+        $result = & $FfprobePath -version 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $versionLine = ($result | Select-Object -First 1) -replace 'ffprobe version ', ''
+            Write-Log "FFprobe found: $versionLine" -Level SUCCESS
+            return $true
+        }
+    }
+    catch {
+        Write-Log "FFprobe not found at: $FfprobePath" -Level ERROR
+        Write-Log "Error: $_" -Level ERROR
+        return $false
+    }
+    
+    return $false
+}
+
+function Get-VideoMetadata {
+    param(
+        [System.IO.FileInfo]$VideoFile,
+        [string]$FfprobePath
+    )
+    
+    $metadata = @{
+        CreationTime = $null
+        DurationSeconds = $null
+        Success = $false
+    }
+    
+    try {
+        # Get creation_time from format tags
+        $creationOutput = & $FfprobePath -v error -show_entries format_tags=creation_time -of default=nw=1:nk=1 $VideoFile.FullName 2>&1
+        
+        if ($LASTEXITCODE -eq 0 -and $creationOutput) {
+            $creationTimeStr = ($creationOutput | Out-String).Trim()
+            if ($creationTimeStr -match '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}') {
+                # Parse ISO 8601 UTC timestamp (e.g., 2026-01-29T00:40:11.000000Z)
+                $metadata.CreationTime = [DateTime]::Parse($creationTimeStr).ToUniversalTime()
+                Write-Log "  Creation time: $($metadata.CreationTime.ToString('yyyy-MM-dd HH:mm:ss')) UTC" -Level INFO
+            }
+        }
+        
+        # Get duration from format
+        $durationOutput = & $FfprobePath -v error -show_entries format=duration -of default=nw=1:nk=1 $VideoFile.FullName 2>&1
+        
+        if ($LASTEXITCODE -eq 0 -and $durationOutput) {
+            $durationStr = ($durationOutput | Out-String).Trim()
+            if ($durationStr -match '^[\d.]+$') {
+                $metadata.DurationSeconds = [Math]::Round([double]$durationStr)
+                Write-Log "  Duration: $($metadata.DurationSeconds) seconds" -Level INFO
+            }
+        }
+        
+        if ($metadata.CreationTime -and $metadata.DurationSeconds) {
+            $metadata.Success = $true
+        }
+        else {
+            Write-Log "  Warning: Could not extract complete metadata" -Level WARN
+            if (-not $metadata.CreationTime) {
+                Write-Log "    - Missing creation_time" -Level WARN
+            }
+            if (-not $metadata.DurationSeconds) {
+                Write-Log "    - Missing duration" -Level WARN
+            }
+        }
+    }
+    catch {
+        Write-Log "  Error extracting metadata: $_" -Level ERROR
+    }
+    
+    return $metadata
+}
+
+function Rename-VideosWithMetadata {
+    param(
+        [string]$DirectoryPath,
+        [string]$FfprobePath
+    )
+    
+    Write-Log "=== Phase 2: Metadata Extraction & Rename ===" -Level INFO
+    
+    # Check ffprobe availability (fail if not found)
+    if (-not (Test-FfprobeAvailable -FfprobePath $FfprobePath)) {
+        throw "FFprobe is not available. Please install ffprobe and ensure it's in PATH or configure FfprobePath in config.json"
+    }
+    
+    # Find video files that haven't been renamed yet (don't have timestamp prefix)
+    # Also skip zero-length files (corrupted/incomplete recordings)
+    $videoFiles = Get-ChildItem -Path $DirectoryPath -File | 
+        Where-Object { $_.Extension -match '\.mp4$' } |
+        Where-Object { $_.Length -gt 0 } |
+        Where-Object { $_.Name -notmatch '^\d{8}_\d{6}_D\d+_' }  # Skip already renamed files
+    
+    if ($videoFiles.Count -eq 0) {
+        Write-Log "No files need metadata extraction (all files already renamed or no MP4 files found)" -Level INFO
+        return $true
+    }
+    
+    Write-Log "Extracting metadata from $($videoFiles.Count) file(s)..." -Level INFO
+    
+    # Collect metadata for all files first (for collision detection)
+    $fileMetadata = @()
+    foreach ($file in $videoFiles) {
+        Write-Log "Processing: $($file.Name)" -Level INFO
+        $metadata = Get-VideoMetadata -VideoFile $file -FfprobePath $FfprobePath
+        
+        if (-not $metadata.Success) {
+            Write-Log "Failed to extract metadata from $($file.Name) - cannot proceed" -Level ERROR
+            $Script:Stats.Failed++
+            $Script:Stats.Errors += "Metadata extraction failed for $($file.Name)"
+            throw "Metadata extraction failed for $($file.Name). All videos must have valid creation_time and duration."
+        }
+        
+        $fileMetadata += @{
+            File = $file
+            CreationTime = $metadata.CreationTime
+            DurationSeconds = $metadata.DurationSeconds
+        }
+    }
+    
+    # Sort by creation time for sequence numbering
+    $fileMetadata = $fileMetadata | Sort-Object { $_.CreationTime }
+    
+    # Track timestamps for collision detection (same second)
+    $timestampCounts = @{}
+    
+    Write-Log "" -Level INFO
+    Write-Log "Renaming files with metadata..." -Level INFO
+    
+    foreach ($item in $fileMetadata) {
+        $file = $item.File
+        $creationTime = $item.CreationTime
+        $duration = $item.DurationSeconds
+        
+        # Format: YYYYMMDD_HHmmss
+        $timestampKey = $creationTime.ToString('yyyyMMdd_HHmmss')
+        
+        # Handle collisions (multiple videos in same second)
+        if ($timestampCounts.ContainsKey($timestampKey)) {
+            $timestampCounts[$timestampKey]++
+        }
+        else {
+            $timestampCounts[$timestampKey] = 1
+        }
+        $sequence = $timestampCounts[$timestampKey]
+        
+        # Get original filename without extension
+        $originalBaseName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
+        $extension = $file.Extension
+        
+        # Build new filename: YYYYMMDD_HHmmss_D{duration}_{sequence}_{originalName}.mp4
+        $newFileName = "{0}_D{1}_{2:D3}_{3}{4}" -f $timestampKey, $duration, $sequence, $originalBaseName, $extension
+        $newFilePath = Join-Path $DirectoryPath $newFileName
+        
+        # Check if target already exists
+        if (Test-Path $newFilePath) {
+            Write-Log "  Skipped (target exists): $newFileName" -Level WARN
+            $Script:Stats.Skipped++
+            continue
+        }
+        
+        if ($WhatIfPreference) {
+            Write-Log "  [WhatIf] Would rename: $($file.Name) -> $newFileName" -Level INFO
+        }
+        else {
+            try {
+                Rename-Item -Path $file.FullName -NewName $newFileName -ErrorAction Stop
+                Write-Log "  Renamed: $($file.Name) -> $newFileName" -Level SUCCESS
+            }
+            catch {
+                Write-Log "  Failed to rename $($file.Name): $_" -Level ERROR
+                $Script:Stats.Failed++
+                $Script:Stats.Errors += "Failed to rename $($file.Name): $_"
+                throw "Failed to rename $($file.Name): $_"
+            }
+        }
+    }
+    
+    Write-Log "" -Level INFO
+    Write-Log "=== Metadata Extraction Complete ===" -Level SUCCESS
+    return $true
 }
 #endregion
 
@@ -768,6 +969,14 @@ function Start-Ingest {
         $existingFiles = Get-ChildItem -Path $outputDir -File | 
             Where-Object { $_.Extension -match '\.mp4$' }
         Write-Log "Found $($existingFiles.Count) file(s) ready for upload" -Level INFO
+    }
+    
+    # Phase 2: Extract metadata and rename files
+    Write-Log "" -Level INFO
+    $renameSuccess = Rename-VideosWithMetadata -DirectoryPath $outputDir -FfprobePath $Config.FfprobePath
+    
+    if (-not $renameSuccess) {
+        throw "Metadata extraction/rename phase failed"
     }
     
     # Phase 3: Upload to Azure (unless SkipUpload)

@@ -15,8 +15,12 @@
     - 001 = Sequence number (for same-second collisions)
     - mvi_0066 = Original filename
 
+.PARAMETER Auto
+    Automatically detect Canon video source. Checks for SD card reader first (fast),
+    then falls back to MTP USB connection. Mutually exclusive with other source parameters.
+
 .PARAMETER DriveLetter
-    Drive letter to scan (e.g., 'D' or 'E'). Not required when using -UploadOnly or -SourceDirectory.
+    Drive letter to scan (e.g., 'D' or 'E'). Not required when using -UploadOnly, -SourceDirectory, or -Auto.
 
 .PARAMETER SourceDirectory
     Name of a subdirectory under OutputRoot to use as the source. When specified, skips
@@ -60,6 +64,14 @@
     .\video-processing.ps1 -SourceDirectory "2026-01-28" -MovFlags
     Process with ffmpeg faststart, extract metadata, rename, then upload.
 
+.EXAMPLE
+    .\video-processing.ps1 -Auto
+    Auto-detect Canon camera (SD card or USB), process, rename, and upload.
+
+.EXAMPLE
+    .\video-processing.ps1 -Auto -SkipUpload
+    Auto-detect Canon camera, process and rename locally (no upload).
+
 .NOTES
     Requires: ffmpeg, ffprobe, azcopy (all must be in PATH or configured in config.json)
     Videos must have creation_time metadata embedded (most cameras do this automatically).
@@ -81,25 +93,29 @@ param(
     [switch]$UploadOnly,
 
     [Parameter(Mandatory=$false)]
-    [switch]$SkipUpload
+    [switch]$SkipUpload,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$Auto
 )
 
 # Script version
-$ScriptVersion = "1.3.0-metadata"
+$ScriptVersion = "1.4.0"
 
 # Validate parameter combinations
 $paramCount = 0
 if ($DriveLetter) { $paramCount++ }
 if ($SourceDirectory) { $paramCount++ }
 if ($UploadOnly) { $paramCount++ }
+if ($Auto) { $paramCount++ }
 
 if ($paramCount -gt 1) {
-    Write-Error "Cannot specify more than one of: -DriveLetter, -SourceDirectory, or -UploadOnly"
+    Write-Error "Cannot specify more than one of: -DriveLetter, -SourceDirectory, -UploadOnly, or -Auto"
     exit 1
 }
 
 if ($paramCount -eq 0) {
-    Write-Error "Must specify one of: -DriveLetter, -SourceDirectory, or -UploadOnly"
+    Write-Error "Must specify one of: -DriveLetter, -SourceDirectory, -UploadOnly, or -Auto"
     exit 1
 }
 
@@ -180,6 +196,239 @@ function Write-Log {
     # Write to log file
     if ($Script:LogFilePath) {
         Add-Content -Path $Script:LogFilePath -Value $logEntry
+    }
+}
+#endregion
+
+#region Camera Auto-Detection
+function Find-CanonSDCard {
+    param(
+        [string]$FolderPattern = '^\d{3}CANON$'
+    )
+
+    Write-Log "Scanning for Canon SD card on removable drives..." -Level INFO
+
+    try {
+        $removableDrives = Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=2" -ErrorAction SilentlyContinue
+
+        if (-not $removableDrives) {
+            Write-Log "No removable drives found" -Level INFO
+            return $null
+        }
+
+        foreach ($drive in $removableDrives) {
+            $driveLetter = $drive.DeviceID.TrimEnd(':')
+            $dcimPath = Join-Path "$($drive.DeviceID)\" "DCIM"
+
+            if (Test-Path $dcimPath) {
+                $canonFolders = Get-ChildItem -Path $dcimPath -Directory -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Name -match $FolderPattern }
+
+                if ($canonFolders -and $canonFolders.Count -gt 0) {
+                    Write-Log "Found Canon SD card on drive $($drive.DeviceID) (Label: $($drive.VolumeName))" -Level SUCCESS
+                    Write-Log "  DCIM folders: $($canonFolders.Name -join ', ')" -Level INFO
+                    return $driveLetter
+                }
+            }
+        }
+
+        Write-Log "No Canon SD card found on removable drives" -Level INFO
+        return $null
+    }
+    catch {
+        Write-Log "Error scanning for SD card: $_" -Level ERROR
+        return $null
+    }
+}
+
+function Copy-FromMTPDevice {
+    param(
+        [string]$DeviceNamePattern = 'Canon',
+        [string]$DestinationPath,
+        [string[]]$FileExtensions = @('.mp4')
+    )
+
+    Write-Log "Scanning for MTP device matching '$DeviceNamePattern'..." -Level INFO
+
+    try {
+        $shell = New-Object -ComObject Shell.Application
+        $thisPC = $shell.Namespace(0x11)  # "This PC"
+
+        if (-not $thisPC) {
+            Write-Log "Could not access 'This PC' namespace" -Level ERROR
+            return $null
+        }
+
+        # Find the device matching the pattern
+        $device = $null
+        foreach ($item in $thisPC.Items()) {
+            if ($item.Name -match $DeviceNamePattern) {
+                $device = $item
+                Write-Log "Found MTP device: $($item.Name)" -Level SUCCESS
+                break
+            }
+        }
+
+        if (-not $device) {
+            Write-Log "No MTP device found matching '$DeviceNamePattern'" -Level INFO
+            return $null
+        }
+
+        # Recursively find video files on the MTP device
+        $mtpFiles = @()
+        Find-MTPFiles -Folder $device.GetFolder -Files ([ref]$mtpFiles) -Extensions $FileExtensions
+
+        if ($mtpFiles.Count -eq 0) {
+            Write-Log "No video files found on MTP device" -Level WARN
+            return $null
+        }
+
+        Write-Log "Found $($mtpFiles.Count) video file(s) on MTP device" -Level SUCCESS
+
+        # Ensure destination directory exists
+        if (-not (Test-Path $DestinationPath)) {
+            New-Item -Path $DestinationPath -ItemType Directory -Force | Out-Null
+            Write-Log "Created output directory: $DestinationPath" -Level INFO
+        }
+
+        $destShell = $shell.Namespace($DestinationPath)
+        if (-not $destShell) {
+            Write-Log "Could not access destination folder: $DestinationPath" -Level ERROR
+            return $null
+        }
+
+        $copiedFiles = @()
+        $fileIndex = 0
+        foreach ($mtpFile in $mtpFiles) {
+            $fileIndex++
+            $fileName = $mtpFile.Name
+            $destFilePath = Join-Path $DestinationPath $fileName
+            $progress = "[$fileIndex/$($mtpFiles.Count)]"
+
+            # Skip if already exists and non-empty
+            if (Test-Path $destFilePath) {
+                $existingFile = Get-Item $destFilePath
+                if ($existingFile.Length -gt 0) {
+                    Write-Log "  $progress Skipped (already exists): $fileName ($([Math]::Round($existingFile.Length / 1MB, 1)) MB)" -Level WARN
+                    $copiedFiles += $existingFile
+                    continue
+                }
+                else {
+                    Write-Log "  $progress Removing empty file, will re-copy: $fileName" -Level WARN
+                    Remove-Item $destFilePath -Force
+                }
+            }
+
+            Write-Log "  $progress Copying: $fileName ..." -Level INFO
+
+            if ($WhatIfPreference) {
+                Write-Log "  $progress [WhatIf] Would copy: $fileName" -Level INFO
+                continue
+            }
+
+            # CopyHere: 0x10 = overwrite, 0x4 = no progress dialog
+            $destShell.CopyHere($mtpFile, 0x14)
+
+            # Poll for completion (MTP copies are async)
+            $timeoutSeconds = 600  # 10 minutes per file
+            $zeroLengthTimeout = 30  # bail out after 30s if file stays at 0 bytes
+            $elapsed = 0
+            $pollInterval = 2
+
+            # Wait for file to appear
+            while (-not (Test-Path $destFilePath) -and $elapsed -lt $timeoutSeconds) {
+                Start-Sleep -Seconds $pollInterval
+                $elapsed += $pollInterval
+                if ($elapsed % 10 -eq 0) {
+                    Write-Log "  $progress Waiting for file to appear... (${elapsed}s)" -Level INFO
+                }
+            }
+
+            if (Test-Path $destFilePath) {
+                # Wait for file to finish writing (size stabilizes)
+                $lastSize = 0
+                $stableCount = 0
+                $zeroElapsed = 0
+                while ($stableCount -lt 3 -and $elapsed -lt $timeoutSeconds) {
+                    Start-Sleep -Seconds $pollInterval
+                    $elapsed += $pollInterval
+                    $currentSize = (Get-Item $destFilePath).Length
+                    if ($currentSize -eq 0) {
+                        $zeroElapsed += $pollInterval
+                        if ($zeroElapsed -ge $zeroLengthTimeout) {
+                            Write-Log "  $progress File stuck at 0 bytes after ${zeroElapsed}s, skipping: $fileName" -Level WARN
+                            break
+                        }
+                    }
+                    elseif ($currentSize -eq $lastSize) {
+                        $stableCount++
+                    }
+                    else {
+                        $stableCount = 0
+                        if ($elapsed % 10 -eq 0) {
+                            Write-Log "  $progress Copying... $([Math]::Round($currentSize / 1MB, 1)) MB (${elapsed}s)" -Level INFO
+                        }
+                    }
+                    $lastSize = $currentSize
+                }
+
+                if ($stableCount -ge 3 -and $lastSize -gt 0) {
+                    Write-Log "  $progress Copied: $fileName ($([Math]::Round($lastSize / 1MB, 1)) MB, ${elapsed}s)" -Level SUCCESS
+                    $copiedFiles += Get-Item $destFilePath
+                }
+                elseif ($lastSize -eq 0) {
+                    Write-Log "  $progress Skipped (copy produced empty file): $fileName" -Level WARN
+                    Remove-Item $destFilePath -Force -ErrorAction SilentlyContinue
+                    $Script:Stats.Skipped++
+                }
+                else {
+                    Write-Log "  $progress Copy timed out after ${elapsed}s: $fileName ($([Math]::Round($lastSize / 1MB, 1)) MB)" -Level ERROR
+                    $Script:Stats.Failed++
+                    $Script:Stats.Errors += "MTP copy timed out for $fileName after ${elapsed}s"
+                }
+            }
+            else {
+                Write-Log "  $progress Copy failed - file not created after ${elapsed}s: $fileName" -Level ERROR
+                $Script:Stats.Failed++
+                $Script:Stats.Errors += "MTP copy failed for $fileName"
+            }
+        }
+
+        Write-Log "MTP copy complete: $($copiedFiles.Count) of $($mtpFiles.Count) file(s) copied" -Level SUCCESS
+        return $copiedFiles
+    }
+    catch {
+        Write-Log "Error during MTP copy: $_" -Level ERROR
+        return $null
+    }
+}
+
+function Find-MTPFiles {
+    param(
+        [object]$Folder,
+        [ref]$Files,
+        [string[]]$Extensions
+    )
+
+    if (-not $Folder) { return }
+
+    try {
+        foreach ($item in $Folder.Items()) {
+            if ($item.IsFolder) {
+                Find-MTPFiles -Folder $item.GetFolder -Files $Files -Extensions $Extensions
+            }
+            else {
+                foreach ($ext in $Extensions) {
+                    if ($item.Name -like "*$ext") {
+                        $Files.Value += $item
+                        break
+                    }
+                }
+            }
+        }
+    }
+    catch {
+        Write-Log "  Warning: Could not enumerate MTP folder: $_" -Level WARN
     }
 }
 #endregion
@@ -299,6 +548,41 @@ function New-OutputDirectory {
 #endregion
 
 #region FFmpeg Processing
+function Test-NeedsFaststart {
+    param(
+        [string]$FilePath,
+        [string]$FfprobePath
+    )
+
+    # Use ffprobe trace output to check if moov atom appears before mdat.
+    # If moov is already first, no ffmpeg processing needed.
+    # Conservative: if we can't determine atom order, return $true (needs processing).
+    try {
+        $traceOutput = & $FfprobePath -v trace -i $FilePath 2>&1 | Out-String
+
+        $moovPos = $traceOutput.IndexOf("type:'moov'")
+        $mdatPos = $traceOutput.IndexOf("type:'mdat'")
+
+        if ($moovPos -lt 0 -or $mdatPos -lt 0) {
+            Write-Log "  Could not determine atom order for $(Split-Path $FilePath -Leaf) - will process with ffmpeg" -Level WARN
+            return $true
+        }
+
+        if ($moovPos -lt $mdatPos) {
+            Write-Log "  moov atom already before mdat - faststart not needed" -Level INFO
+            return $false
+        }
+        else {
+            Write-Log "  moov atom after mdat - faststart processing needed" -Level INFO
+            return $true
+        }
+    }
+    catch {
+        Write-Log "  Error checking atom order: $_ - will process with ffmpeg" -Level WARN
+        return $true
+    }
+}
+
 function Test-FfmpegAvailable {
     param([string]$FfmpegPath)
     
@@ -325,24 +609,54 @@ function Convert-VideoFile {
         [string]$DestinationPath,
         [string]$Suffix,
         [string]$FfmpegPath,
+        [string]$FfprobePath,
         [bool]$SkipIfExists
     )
-    
+
     # Build destination filename
     $baseName = [System.IO.Path]::GetFileNameWithoutExtension($SourceFile.Name)
     $extension = $SourceFile.Extension
     $destFileName = "${baseName}${Suffix}${extension}"
     $destFilePath = Join-Path $DestinationPath $destFileName
-    
+
     # Check if already exists
     if ((Test-Path $destFilePath) -and $SkipIfExists) {
         Write-Log "Skipped (already exists): $destFileName" -Level WARN
         $Script:Stats.Skipped++
         return $true
     }
-    
+
+    # Check if faststart processing is actually needed
+    $needsFaststart = $true
+    if ($FfprobePath) {
+        $needsFaststart = Test-NeedsFaststart -FilePath $SourceFile.FullName -FfprobePath $FfprobePath
+    }
+
+    if (-not $needsFaststart) {
+        # moov atom already before mdat - just copy the file
+        Write-Log "Copying (faststart not needed): $($SourceFile.Name) -> $destFileName" -Level INFO
+
+        if ($WhatIfPreference) {
+            Write-Log "[WhatIf] Would copy: $($SourceFile.FullName) -> $destFilePath" -Level INFO
+            return $true
+        }
+
+        try {
+            Copy-Item -Path $SourceFile.FullName -Destination $destFilePath -Force
+            Write-Log "Successfully copied: $destFileName" -Level SUCCESS
+            $Script:Stats.Processed++
+            return $true
+        }
+        catch {
+            Write-Log "Copy failed: $_" -Level ERROR
+            $Script:Stats.Failed++
+            $Script:Stats.Errors += "Failed to copy $($SourceFile.Name): $_"
+            return $false
+        }
+    }
+
     Write-Log "Processing: $($SourceFile.Name) -> $destFileName" -Level INFO
-    
+
     # Run ffmpeg
     try {
         $ffmpegArgs = @(
@@ -352,19 +666,19 @@ function Convert-VideoFile {
             '-y'  # Overwrite if exists
             "`"$destFilePath`""
         )
-        
+
         if ($WhatIfPreference) {
             Write-Log "[WhatIf] Would run: $FfmpegPath $($ffmpegArgs -join ' ')" -Level INFO
             return $true
         }
-        
+
         $process = Start-Process -FilePath $FfmpegPath `
                                   -ArgumentList $ffmpegArgs `
                                   -NoNewWindow `
                                   -Wait `
                                   -PassThru `
                                   -RedirectStandardError (Join-Path $env:TEMP "ffmpeg_error.txt")
-        
+
         if ($process.ExitCode -eq 0) {
             Write-Log "Successfully processed: $destFileName" -Level SUCCESS
             $Script:Stats.Processed++
@@ -602,230 +916,214 @@ function Start-AzureUpload {
         [string]$LocalPath,
         [PSCustomObject]$AzCopyConfig
     )
-    
-    Write-Log "=== Starting Azure Upload ==="  -Level INFO
-    
+
+    Write-Log "=== Starting Azure Upload ===" -Level INFO
+
     # Create marker file
     $markerInProgress = Join-Path $LocalPath "_upload_in_progress.txt"
     $markerComplete = Join-Path $LocalPath "_upload_complete.txt"
     $markerFailed = Join-Path $LocalPath "_upload_failed.txt"
-    
+
     # Clean up old markers
     Remove-Item $markerComplete -ErrorAction SilentlyContinue
     Remove-Item $markerFailed -ErrorAction SilentlyContinue
-    
+
     if (-not $WhatIfPreference) {
         Set-Content -Path $markerInProgress -Value "Upload started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Log "Created upload marker: $markerInProgress" -Level INFO
     }
-    
+
     # Build destination URL from config parts
-    # Get the date folder name from the local path
     $folderName = Split-Path $LocalPath -Leaf
-    
-    # Build remote path components. AzCopy preserves the source folder name, so we only append the configured prefix.
+
     $remotePathParts = @()
     if ($AzCopyConfig.RemotePrefix) {
         $remotePathParts += $AzCopyConfig.RemotePrefix.Trim('/')
     }
     $remotePath = ($remotePathParts -join '/')
 
-    Write-Log "Debug - Folder name: $folderName" -Level INFO
-    Write-Log "Debug - Remote path: $remotePath" -Level INFO
-
-    # Construct full destination URL: baseUrl/container[/remotePath]?SAS
     $baseUrl = $AzCopyConfig.BaseUrl.TrimEnd('/')
     $containerName = $AzCopyConfig.ContainerName.Trim('/')
-    
-    # Normalize SAS token - trim whitespace and remove leading ? if present
-    # Do NOT decode or modify the signature - pass it verbatim
+
+    # Normalize SAS token
     $sasToken = $AzCopyConfig.SasToken.Trim()
     $sasToken = $sasToken.TrimStart('?')
-    
+
+    # Build the destination URL for recursive copy (azcopy will create the folder structure)
     if ($remotePath) {
-        $destinationUrl = "$baseUrl/$containerName/$remotePath`?$sasToken"
+        $destinationUrl = "$baseUrl/$containerName/$remotePath/$folderName`?$sasToken"
+        $remoteFolder = "$baseUrl/$containerName/$remotePath/$folderName"
+        $remoteFolderForList = "$remotePath/$folderName"
     }
     else {
-        $destinationUrl = "$baseUrl/$containerName`?$sasToken"
+        $destinationUrl = "$baseUrl/$containerName/$folderName`?$sasToken"
+        $remoteFolder = "$baseUrl/$containerName/$folderName"
+        $remoteFolderForList = $folderName
     }
-    
+
     Write-Log "Uploading from: $LocalPath" -Level INFO
-    if ($remotePath) {
-        Write-Log "Destination: $baseUrl/$containerName/$remotePath/$folderName" -Level INFO
-    }
-    else {
-        Write-Log "Destination: $baseUrl/$containerName/$folderName" -Level INFO
-    }
-    
-    # Get list of files matching the include pattern
+    Write-Log "Destination: $remoteFolder" -Level INFO
+
+    # Count local files to upload
     $includePatterns = if ($AzCopyConfig.IncludePattern) {
         $AzCopyConfig.IncludePattern -split ';'
     } else {
         @('*')
     }
-    
+
     $filesToUpload = @()
     foreach ($pattern in $includePatterns) {
         $filesToUpload += Get-ChildItem -Path $LocalPath -Filter $pattern -File
     }
-    
-    # Deduplicate files (Windows is case-insensitive, so *.mp4 and *.MP4 match the same files)
     $filesToUpload = $filesToUpload | Sort-Object -Property FullName -Unique
-    
+
     if ($filesToUpload.Count -eq 0) {
         Write-Log "No files found to upload in $LocalPath" -Level WARN
         return $false
     }
-    
+
     Write-Log "Found $($filesToUpload.Count) file(s) to upload" -Level INFO
-    
-    # Build remote folder URL including the date folder
-    if ($remotePath) {
-        $remoteFolder = "$baseUrl/$containerName/$remotePath/$folderName"
-        $remoteFolderForList = "$remotePath/$folderName"
-    }
-    else {
-        $remoteFolder = "$baseUrl/$containerName/$folderName"
-        $remoteFolderForList = $folderName
-    }
-    
-    # Retry logic: up to 3 attempts
-    $maxAttempts = 3
-    $attempt = 1
-    $allFilesUploaded = $false
-    
-    while ($attempt -le $maxAttempts -and -not $allFilesUploaded) {
-        if ($attempt -gt 1) {
-            Write-Log "" -Level INFO
-            Write-Log "=== Upload Attempt $attempt of $maxAttempts ===" -Level WARN
-        }
-        
-        # Check which files already exist remotely
-        Write-Log "Checking remote files..." -Level INFO
-        $remoteFiles = @{}
-        
-        try {
-            $listUrl = "$baseUrl/$containerName/$remoteFolderForList`?$sasToken"
-            $listOutput = & $AzCopyConfig.AzCopyPath list $listUrl 2>&1
-            
-            if ($LASTEXITCODE -eq 0) {
-                # Parse azcopy list output to find file names
-                $listOutput | ForEach-Object {
-                    if ($_ -match '; Content Length: ') {
-                        # Extract filename from the line (format varies, but filename is typically at the start)
-                        $line = $_.ToString()
-                        $parts = $line -split ';'
-                        if ($parts.Count -gt 0) {
-                            $filename = ($parts[0].Trim() -split '/')[-1]
-                            if ($filename) {
-                                $remoteFiles[$filename] = $true
-                            }
-                        }
-                    }
+
+    # Check which files already exist remotely (informational)
+    try {
+        $listUrl = "$baseUrl/$containerName/$remoteFolderForList`?$sasToken"
+        $listOutput = & $AzCopyConfig.AzCopyPath list $listUrl 2>&1
+        $remoteCount = 0
+
+        if ($LASTEXITCODE -eq 0) {
+            $listOutput | ForEach-Object {
+                if ($_ -match '; Content Length: ') {
+                    $remoteCount++
                 }
-                Write-Log "Found $($remoteFiles.Count) file(s) already in remote location" -Level INFO
             }
+            Write-Log "Found $remoteCount file(s) already in remote location" -Level INFO
         }
-        catch {
-            Write-Log "Could not list remote files (will attempt all uploads): $_" -Level WARN
-        }
-        
-        # Determine which files need uploading
-        $filesToAttempt = @()
-        foreach ($file in $filesToUpload) {
-            if ($file.Name -and -not $remoteFiles.ContainsKey($file.Name)) {
-                $filesToAttempt += $file
+    }
+    catch {
+        Write-Log "Could not list remote files: $_" -Level WARN
+    }
+
+    # Build azcopy args for recursive upload
+    $includePatternArg = $AzCopyConfig.IncludePattern
+    $sourcePath = "$LocalPath/*"
+
+    $azcopyArgs = @(
+        'copy',
+        $sourcePath,
+        $destinationUrl,
+        '--recursive',
+        '--log-level=WARNING'
+    )
+
+    if ($includePatternArg) {
+        $azcopyArgs += "--include-pattern=$includePatternArg"
+    }
+
+    if ($AzCopyConfig.OverwritePolicy) {
+        $azcopyArgs += "--overwrite=$($AzCopyConfig.OverwritePolicy)"
+    }
+
+    if ($WhatIfPreference) {
+        Write-Log "[WhatIf] Would run: $($AzCopyConfig.AzCopyPath) $($azcopyArgs -join ' ')" -Level INFO
+        Remove-Item $markerInProgress -ErrorAction SilentlyContinue
+        Set-Content -Path $markerComplete -Value "Upload completed (dry-run): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        return $true
+    }
+
+    # Calculate total size for progress reporting
+    $totalSizeBytes = ($filesToUpload | Measure-Object -Property Length -Sum).Sum
+    $totalSizeGB = [Math]::Round($totalSizeBytes / 1GB, 1)
+    $avgSizeMB = [Math]::Round($totalSizeBytes / $filesToUpload.Count / 1MB, 0)
+    Write-Log "Starting recursive azcopy upload ($($filesToUpload.Count) files, $totalSizeGB GB, avg $avgSizeMB MB/file)..." -Level INFO
+    Write-Log "Note: Progress updates every 30s. Each file must fully upload before showing as 'Done'." -Level INFO
+
+    try {
+        # Stream azcopy output line by line for real-time status
+        $jobId = $null
+        $uploadedCount = 0
+        $failedCount = 0
+        $startTime = Get-Date
+        $Script:LastProgressTime = $startTime
+
+        & $AzCopyConfig.AzCopyPath @azcopyArgs 2>&1 | ForEach-Object {
+            $line = $_.ToString()
+
+            # Extract job ID
+            if ($line -match 'Job ([0-9a-f-]+) has started') {
+                $jobId = $Matches[1]
+                Write-Log "  azcopy job: $($Matches[1])" -Level INFO
             }
-            elseif (-not $file.Name) {
-                Write-Log "Skipping file with null/empty name" -Level WARN
-            }
-        }
-        
-        if ($filesToAttempt.Count -eq 0) {
-            Write-Log "All files already exist remotely!" -Level SUCCESS
-            $allFilesUploaded = $true
-            break
-        }
-        
-        Write-Log "Need to upload $($filesToAttempt.Count) file(s)" -Level INFO
-        
-        $successCount = 0
-        $failCount = 0
-        
-        foreach ($file in $filesToAttempt) {
-            Write-Log "Uploading file: $($file.Name)..." -Level INFO
-            
-            # Build destination URL for this specific file
-            $fileDestUrl = "$remoteFolder/$($file.Name)?$sasToken"
-            
-            $azcopyArgs = @(
-                'copy',
-                $file.FullName,
-                $fileDestUrl
-            )
-            
-            if ($AzCopyConfig.OverwritePolicy) {
-                $azcopyArgs += "--overwrite=$($AzCopyConfig.OverwritePolicy)"
-            }
-            
-            if ($WhatIfPreference) {
-                Write-Log "[WhatIf] Would run: $($AzCopyConfig.AzCopyPath) $($azcopyArgs -join ' ')" -Level INFO
-                $successCount++
-                continue
-            }
-            
-            try {
-                # Run azcopy for this file
-                & $AzCopyConfig.AzCopyPath @azcopyArgs 2>&1 | Out-Null
-                $exitCode = $LASTEXITCODE
-                
-                if ($exitCode -eq 0) {
-                    Write-Log "  ✓ Success: $($file.Name)" -Level SUCCESS
-                    $successCount++
+            # Track individual file completions
+            elseif ($line -match 'UPLOADSUCCESSFUL') {
+                $uploadedCount++
+                if ($line -match '/([^/;]+\.MP4)') {
+                    Write-Log "  [$uploadedCount/$($filesToUpload.Count)] Uploaded: $($Matches[1])" -Level SUCCESS
                 }
                 else {
-                    Write-Log "  ✗ Failed: $($file.Name) (exit code $exitCode)" -Level ERROR
-                    $failCount++
-                    $Script:Stats.Errors += "Failed to upload $($file.Name): exit code $exitCode"
+                    Write-Log "  [$uploadedCount/$($filesToUpload.Count)] Uploaded" -Level SUCCESS
                 }
             }
-            catch {
-                Write-Log "  ✗ Exception uploading $($file.Name): $_" -Level ERROR
-                $failCount++
-                $Script:Stats.Errors += "Exception uploading $($file.Name): $_"
+            elseif ($line -match 'UPLOADFAILED') {
+                $failedCount++
+                Write-Log "  azcopy FAILED: $line" -Level ERROR
+            }
+            # Progress lines (e.g., "0.0 %, 0 Done, 0 Failed, 135 Pending, ...")
+            # azcopy uses \r to overwrite lines — split on \r and take the last non-empty segment
+            elseif ($line -match '%.*Done.*Pending') {
+                $now = Get-Date
+                $elapsed = [Math]::Round(($now - $startTime).TotalSeconds)
+                $sinceLast = ($now - $Script:LastProgressTime).TotalSeconds
+                # Log every 30 seconds
+                if ($sinceLast -ge 30) {
+                    $Script:LastProgressTime = $now
+                    # Extract the latest progress update (azcopy uses \r to overwrite)
+                    $segments = $line -split "`r"
+                    $latest = ($segments | Where-Object { $_.Trim() -ne '' } | Select-Object -Last 1).Trim()
+                    # Extract done count for file-level progress
+                    $doneMatch = [regex]::Match($latest, '(\d+)\s+Done')
+                    if ($doneMatch.Success) { $uploadedCount = [int]$doneMatch.Groups[1].Value }
+                    Write-Log "  azcopy: $latest (${elapsed}s elapsed)" -Level INFO
+                }
+            }
+            # Show final job summary
+            elseif ($line -match 'Final Job Status:|Elapsed Time|Total Number Of Transfers|Number of File Transfers|TotalBytesTransferred') {
+                Write-Log "  azcopy: $line" -Level INFO
+            }
+            # Show real errors (not progress lines that happen to contain "Failed")
+            elseif ($line -match 'AuthenticationFailed|AuthorizationFailure|ServerBusy|FATAL|cannot|unable' -and $line -notmatch 'log-level|AZCOPY_LOG_LOCATION') {
+                Write-Log "  azcopy: $line" -Level ERROR
             }
         }
-        
-        Write-Log "" -Level INFO
-        Write-Log "Attempt $attempt summary: $successCount succeeded, $failCount failed" -Level INFO
-        
-        # Check if all files are now uploaded
-        if ($failCount -eq 0) {
-            $allFilesUploaded = $true
+
+        $exitCode = $LASTEXITCODE
+        $elapsed = [Math]::Round(((Get-Date) - $startTime).TotalSeconds)
+
+        if ($exitCode -eq 0) {
+            Write-Log "" -Level SUCCESS
+            Write-Log "All files uploaded successfully ($uploadedCount files, ${elapsed}s)" -Level SUCCESS
+            Remove-Item $markerInProgress -ErrorAction SilentlyContinue
+            Set-Content -Path $markerComplete -Value "Upload completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n$uploadedCount files uploaded in ${elapsed}s"
+            return $true
         }
         else {
-            $attempt++
-            if ($attempt -le $maxAttempts) {
-                Write-Log "Waiting 5 seconds before retry..." -Level INFO
-                Start-Sleep -Seconds 5
+            Write-Log "" -Level ERROR
+            Write-Log "AzCopy upload failed with exit code $exitCode ($uploadedCount uploaded, $failedCount failed, ${elapsed}s)" -Level ERROR
+            if ($jobId) {
+                Write-Log "To resume this upload, run:" -Level WARN
+                Write-Log "  azcopy jobs resume $jobId" -Level WARN
             }
+            $Script:Stats.Errors += "AzCopy upload failed with exit code $exitCode"
+            Remove-Item $markerInProgress -ErrorAction SilentlyContinue
+            Set-Content -Path $markerFailed -Value "Upload failed (exit code $exitCode): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+            return $false
         }
     }
-    
-    # Final verification
-    if (-not $allFilesUploaded) {
-        Write-Log "" -Level ERROR
-        Write-Log "Upload incomplete after $maxAttempts attempts" -Level ERROR
+    catch {
+        Write-Log "Exception during azcopy upload: $_" -Level ERROR
+        $Script:Stats.Errors += "Exception during upload: $_"
         Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-        Set-Content -Path $markerFailed -Value "Upload incomplete after $maxAttempts attempts: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Set-Content -Path $markerFailed -Value "Upload exception: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n$_"
         return $false
-    }
-    else {
-        Write-Log "" -Level SUCCESS
-        Write-Log "All files uploaded successfully" -Level SUCCESS
-        Remove-Item $markerInProgress -ErrorAction SilentlyContinue
-        Set-Content -Path $markerComplete -Value "Upload completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`nAll files uploaded successfully"
-        return $true
     }
 }
 #endregion
@@ -838,13 +1136,89 @@ function Start-Ingest {
         [bool]$MovFlags,
         [PSCustomObject]$Config,
         [bool]$UploadOnly,
-        [bool]$SkipUpload
+        [bool]$SkipUpload,
+        [bool]$Auto
     )
-    
-    Write-Log "=== Starting Video Ingest (Phase 3) ===" -Level INFO
-    
+
+    Write-Log "=== Starting Video Ingest ===" -Level INFO
+
     $outputDir = $null
-    
+
+    # Handle Auto mode - detect source automatically
+    if ($Auto) {
+        Write-Log "=== Auto-Detection Mode ===" -Level INFO
+
+        # Get camera config patterns
+        $sdCardPattern = '^\d{3}CANON$'
+        $deviceNamePattern = 'Canon'
+        if ($Config.Camera) {
+            if ($Config.Camera.SDCardFolderPattern) {
+                $sdCardPattern = $Config.Camera.SDCardFolderPattern
+            }
+            if ($Config.Camera.DeviceNamePattern) {
+                $deviceNamePattern = $Config.Camera.DeviceNamePattern
+            }
+        }
+
+        # Try 1: SD card reader (fast filesystem access)
+        $sdDriveLetter = Find-CanonSDCard -FolderPattern $sdCardPattern
+
+        if ($sdDriveLetter) {
+            Write-Log "Using SD card on drive ${sdDriveLetter}:" -Level SUCCESS
+            $DriveLetter = $sdDriveLetter
+            # Fall through to DriveLetter code path below
+        }
+        else {
+            # Try 2: MTP USB connection (slower but works without card reader)
+            Write-Log "No SD card found, trying MTP USB connection..." -Level INFO
+
+            # Create output directory for MTP files
+            $outputDir = New-OutputDirectory -OutputRoot $Config.OutputRoot `
+                                             -IncludeTimestamp $Config.IncludeTimestampInFolder
+
+            $copiedFiles = Copy-FromMTPDevice -DeviceNamePattern $deviceNamePattern `
+                                               -DestinationPath $outputDir `
+                                               -FileExtensions $Config.FileExtensions
+
+            if (-not $copiedFiles -or $copiedFiles.Count -eq 0) {
+                throw "No Canon video source found. Insert SD card into reader or connect camera via USB."
+            }
+
+            $Script:Stats.Found = $copiedFiles.Count
+
+            # Check ffmpeg availability
+            if (-not (Test-FfmpegAvailable -FfmpegPath $Config.FfmpegPath)) {
+                throw "FFmpeg is not available. Please install ffmpeg and ensure it's in PATH or configure FfmpegPath in config.json"
+            }
+
+            # Process each copied file with Convert-VideoFile (which will smart-skip if not needed)
+            # Since MTP copies land in the same output dir, remove the original after
+            # successful conversion to avoid duplicates (original + _faststart copy)
+            Write-Log "Processing $($copiedFiles.Count) file(s) from MTP device..." -Level INFO
+            foreach ($file in $copiedFiles) {
+                $result = Convert-VideoFile -SourceFile $file `
+                                            -DestinationPath $outputDir `
+                                            -Suffix $Config.AppendSuffix `
+                                            -FfmpegPath $Config.FfmpegPath `
+                                            -FfprobePath $Config.FfprobePath `
+                                            -SkipIfExists $Config.SkipIfExists
+                if ($result) {
+                    $suffixedName = "$([System.IO.Path]::GetFileNameWithoutExtension($file.Name))$($Config.AppendSuffix)$($file.Extension)"
+                    $suffixedPath = Join-Path $outputDir $suffixedName
+                    # Only delete original if a separate suffixed file was created
+                    if ((Test-Path $suffixedPath) -and $suffixedPath -ne $file.FullName) {
+                        Remove-Item $file.FullName -Force
+                        Write-Log "  Removed original (keeping processed copy): $($file.Name)" -Level INFO
+                    }
+                }
+            }
+
+            Write-Log "" -Level INFO
+            Write-Log "=== MTP Ingest Complete ===" -Level SUCCESS
+            # Skip to Phase 2 (rename) below
+        }
+    }
+
     # Handle SourceDirectory mode
     if ($SourceDirectory) {
         $sourcePath = Join-Path $Config.OutputRoot $SourceDirectory
@@ -883,6 +1257,7 @@ function Start-Ingest {
                                             -DestinationPath $sourcePath `
                                             -Suffix $Config.AppendSuffix `
                                             -FfmpegPath $Config.FfmpegPath `
+                                            -FfprobePath $Config.FfprobePath `
                                             -SkipIfExists $Config.SkipIfExists
             }
             
@@ -900,8 +1275,8 @@ function Start-Ingest {
         
         $outputDir = $sourcePath
     }
-    # Phase 1: Process files from drive (unless UploadOnly)
-    elseif (-not $UploadOnly) {
+    # Phase 1: Process files from drive (unless UploadOnly or already handled by Auto/MTP)
+    elseif (-not $UploadOnly -and -not $outputDir) {
         Write-Log "=== Phase 1: Local Conversion ===" -Level INFO
         
         # Validate drive
@@ -937,6 +1312,7 @@ function Start-Ingest {
                                         -DestinationPath $outputDir `
                                         -Suffix $Config.AppendSuffix `
                                         -FfmpegPath $Config.FfmpegPath `
+                                        -FfprobePath $Config.FfprobePath `
                                         -SkipIfExists $Config.SkipIfExists
         }
         
@@ -1045,7 +1421,8 @@ try {
                  -MovFlags $MovFlags.IsPresent `
                  -Config $config `
                  -UploadOnly $UploadOnly.IsPresent `
-                 -SkipUpload $SkipUpload.IsPresent
+                 -SkipUpload $SkipUpload.IsPresent `
+                 -Auto $Auto.IsPresent
     
     exit 0
 }

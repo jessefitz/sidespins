@@ -2,12 +2,35 @@
 
 A PowerShell-based utility for ingesting raw video files from removable media, optimizing them for streaming with ffmpeg faststart, extracting video metadata using ffprobe, renaming files with UTC timestamps for timeline correlation, and uploading to Azure Blob Storage.
 
-## Current Status: Version 1.3.0
+## Current Status: Version 1.4.0
 
-**v1.3.0-metadata** implements:
+**v1.4.0** implements:
+- **Auto-detection**: `-Auto` parameter auto-detects Canon camera via SD card reader or MTP USB
+- **Smart FFmpeg skip**: Checks moov atom position with ffprobe; skips ffmpeg when faststart is already applied
+- **Reliable uploads**: Single recursive azcopy command with native retry, parallelism, and resume support
 - Phase 1: FFmpeg conversion with faststart for browser streaming
 - Phase 2: FFprobe metadata extraction (creation time, duration) and smart file renaming
 - Phase 3: Azure Blob Storage upload via azcopy
+
+## Quickstart
+
+```powershell
+# 1. Connect your Canon camera via SD card reader (preferred) or USB cable
+# 2. Run:
+.\video-processing.ps1 -Auto
+
+# That's it. The script will:
+#   - Find the camera automatically (SD card reader > MTP USB)
+#   - Copy videos to %USERPROFILE%\Videos\pool\YYYY-MM-DD\
+#   - Skip ffmpeg if files already have faststart
+#   - Rename files with UTC timestamps and duration
+#   - Upload to Azure Blob Storage
+
+# To process without uploading:
+.\video-processing.ps1 -Auto -SkipUpload
+```
+
+Requires `ffmpeg`, `ffprobe`, and `azcopy` in PATH. See [Prerequisites](#prerequisites) for install instructions.
 
 ## Output Filename Format
 
@@ -56,6 +79,12 @@ This format enables:
 ### Basic Usage
 
 ```powershell
+# Auto-detect Canon camera (SD card or USB) - recommended
+.\video-processing.ps1 -Auto
+
+# Auto-detect, process locally only (no upload)
+.\video-processing.ps1 -Auto -SkipUpload
+
 # Process all MP4 files on drive D: (full pipeline: convert, rename, upload)
 .\video-processing.ps1 -DriveLetter D
 
@@ -77,11 +106,17 @@ This format enables:
 
 ### What It Does
 
+0. **Auto-Detection** (with `-Auto`):
+   - Scans removable drives for Canon SD card (DCIM/###CANON folders) — fast filesystem copy
+   - Falls back to MTP USB copy via Windows Shell COM API if no SD card found
+   - SD card reader recommended for best performance (~10x faster than MTP)
+
 1. **Phase 1 - Local Conversion** (optional with `-MovFlags`):
    - Validates the specified drive exists
    - Scans recursively for `*.mp4` files
    - Creates output folder: `%USERPROFILE%\Videos\pool\YYYY-MM-DD\`
-   - Processes each video with ffmpeg (copies streams, relocates moov atom)
+   - **Smart skip**: Checks moov atom position via ffprobe; skips ffmpeg if faststart already applied
+   - Processes each video with ffmpeg when needed (copies streams, relocates moov atom)
 
 2. **Phase 2 - Metadata Extraction & Rename** (always runs):
    - Extracts `creation_time` UTC timestamp using ffprobe
@@ -90,9 +125,9 @@ This format enables:
    - Handles same-second collisions with sequence numbers
 
 3. **Phase 3 - Azure Upload** (unless `-SkipUpload`):
-   - Uploads renamed files to Azure Blob Storage
-   - Retry logic with up to 3 attempts
-   - Skips files already present in destination
+   - Single recursive azcopy command with native parallel transfers and exponential backoff retry
+   - Provides `azcopy jobs resume` guidance on failure for manual recovery
+   - Reports count of files already present in destination
 
 ### Output Structure
 
@@ -135,6 +170,10 @@ Edit `config.json` to customize behavior:
     "RECYCLER"
   ],
   "LogDirectory": "%LOCALAPPDATA%\\PoolIngest\\logs",
+  "Camera": {
+    "DeviceNamePattern": "Canon",
+    "SDCardFolderPattern": "^\\d{3}CANON$"
+  },
   "AzCopy": {
     "Enabled": true,
     "AzCopyPath": "azcopy",
@@ -161,6 +200,8 @@ Edit `config.json` to customize behavior:
 | `SkipIfExists` | Skip if output file exists | `true` |
 | `ExcludePaths` | Folder names to skip | System folders |
 | `LogDirectory` | Where to store logs | `%LOCALAPPDATA%\PoolIngest\logs` |
+| `Camera.DeviceNamePattern` | Pattern to match MTP device name | `Canon` |
+| `Camera.SDCardFolderPattern` | Regex for DCIM subfolder names | `^\d{3}CANON$` |
 | `AzCopy.Enabled` | Enable Azure upload | `true` |
 | `AzCopy.SasToken` | SAS token for blob access | Required for upload |
 
@@ -176,6 +217,12 @@ The script handles:
 - **Upload retries**: Up to 3 attempts with progressive delay
 
 ## Examples
+
+### Auto-detect camera (recommended)
+```powershell
+# Auto-detect Canon camera (SD card reader or MTP USB), process, and upload
+.\video-processing.ps1 -Auto
+```
 
 ### Full workflow from USB drive
 ```powershell
@@ -222,6 +269,13 @@ Edit `config.json` to set `"IncludeTimestampInFolder": true`, then:
 - Check manually: `ffprobe -v error -show_entries format_tags=creation_time <file>`
 - If missing, video was likely recorded with non-standard software
 
+### "No Canon video source found"
+- Ensure the camera is connected via USB or the SD card is in a reader
+- Check that the SD card has a `DCIM/` folder with `###CANON` subfolders
+- For MTP, ensure the camera appears in "This PC" in File Explorer
+- SD card reader is recommended (~10x faster than MTP USB)
+- Customize detection patterns in `config.json` under `Camera`
+
 ### "Drive does not exist"
 - Ensure the drive letter is correct and the device is mounted
 - Check in File Explorer that the drive is accessible
@@ -241,8 +295,16 @@ Edit `config.json` to set `"IncludeTimestampInFolder": true`, then:
 - Verify SAS token is valid and not expired
 - Check `AzCopy.Enabled` is `true` in config
 - Try running with `-SkipUpload` first to verify local processing works
+- If upload was interrupted, use the `azcopy jobs resume <job-id>` command shown in the error output
 
 ## Version History
+
+- **1.4.0** (2026-02-22): Auto-detect source, smart skip, reliable uploads
+  - `-Auto` parameter: auto-detects Canon SD card reader or MTP USB connection
+  - Smart FFmpeg skip: checks moov atom position, skips ffmpeg when faststart already applied
+  - Recursive azcopy upload with native retry, parallelism, and resume support
+  - `azcopy jobs resume` guidance on upload failure
+  - New `Camera` config section for device/SD card patterns
 
 - **1.3.0-metadata** (2026-02-01): FFprobe metadata extraction
   - Extract creation_time UTC timestamp from video metadata

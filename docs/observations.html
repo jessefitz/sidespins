@@ -363,7 +363,7 @@ title: Observations - SideSpins
       .blob-picker {
         border: 1px solid #e1e5e9;
         border-radius: 6px;
-        max-height: 300px;
+        max-height: 400px;
         overflow-y: auto;
         background: white;
       }
@@ -423,6 +423,68 @@ title: Observations - SideSpins
         color: #007cba;
         font-weight: 600;
         padding: 0.5rem;
+      }
+
+      .date-group-header {
+        padding: 0.75rem 1rem;
+        background: #f0f2f5;
+        border-bottom: 1px solid #e1e5e9;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+      }
+
+      .date-group-header:hover {
+        background: #e4e7eb;
+      }
+
+      .date-group-header .date-label {
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .date-group-header .date-label .arrow {
+        font-size: 0.75rem;
+        transition: transform 0.2s;
+      }
+
+      .date-group-header .date-label .arrow.expanded {
+        transform: rotate(90deg);
+      }
+
+      .date-group-header .date-summary {
+        font-size: 0.875rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .date-group-header .btn-select-day {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        background: #007cba;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .date-group-header .btn-select-day:hover {
+        background: #005f8a;
+      }
+
+      .date-group-items {
+        display: none;
+      }
+
+      .date-group-items.expanded {
+        display: block;
       }
 
       .search-box {
@@ -838,6 +900,7 @@ title: Observations - SideSpins
       let activeTimer = null;
       let availableBlobs = [];
       let selectedBlobs = new Set();
+      let expandedDates = new Set();
 
       // Role state
       let isCaptainOrManager = false;
@@ -1645,6 +1708,7 @@ title: Observations - SideSpins
         document.getElementById("recordingModal").classList.add("active");
         document.getElementById("modalContainerName").value = "videos";
         selectedBlobs.clear();
+        expandedDates.clear();
         availableBlobs = [];
         renderModalRecordingPartsList();
       }
@@ -1773,42 +1837,145 @@ title: Observations - SideSpins
         }
       }
 
-      // Render blob picker in modal
+      // Group blobs by date parsed from filename
+      function groupBlobsByDate(blobs) {
+        const groups = new Map();
+        for (const blob of blobs) {
+          const parsed = parseRecordingFilename(blob.name);
+          let dateKey;
+          if (parsed) {
+            dateKey = `${parsed.year}-${String(parsed.month).padStart(2, "0")}-${String(parsed.day).padStart(2, "0")}`;
+          } else {
+            dateKey = new Date(blob.lastModified).toISOString().slice(0, 10);
+          }
+          if (!groups.has(dateKey)) {
+            groups.set(dateKey, []);
+          }
+          groups.get(dateKey).push(blob);
+        }
+        // Sort dates newest first
+        return new Map([...groups.entries()].sort((a, b) => b[0].localeCompare(a[0])));
+      }
+
+      // Filter out already-attached blobs
+      function getUnattachedBlobs(blobs) {
+        const attachedNames = new Set(
+          (currentObservation?.recordingParts || []).map((p) => p.blobName),
+        );
+        return blobs.filter((b) => !attachedNames.has(b.name));
+      }
+
+      // Toggle date group expanded/collapsed
+      function toggleDateGroup(dateKey) {
+        if (expandedDates.has(dateKey)) {
+          expandedDates.delete(dateKey);
+        } else {
+          expandedDates.add(dateKey);
+        }
+        renderBlobPickerModal();
+      }
+
+      // Select all blobs for a given date
+      function selectDateGroup(dateKey, event) {
+        event.stopPropagation();
+        const unattached = getUnattachedBlobs(availableBlobs);
+        const groups = groupBlobsByDate(unattached);
+        const dateBlobs = groups.get(dateKey) || [];
+        const allSelected = dateBlobs.every((b) => selectedBlobs.has(b.name));
+        if (allSelected) {
+          dateBlobs.forEach((b) => selectedBlobs.delete(b.name));
+        } else {
+          dateBlobs.forEach((b) => selectedBlobs.add(b.name));
+        }
+        if (!expandedDates.has(dateKey)) {
+          expandedDates.add(dateKey);
+        }
+        renderBlobPickerModal();
+        updateAddButtonModal();
+      }
+
+      // Render blob picker in modal - grouped by date
       function renderBlobPickerModal(filteredBlobs = null) {
         const pickerEl = document.getElementById("modalBlobPicker");
-        const blobs = filteredBlobs || availableBlobs;
+        const unattached = filteredBlobs || getUnattachedBlobs(availableBlobs);
 
-        if (blobs.length === 0) {
+        if (unattached.length === 0) {
           pickerEl.innerHTML =
             '<div class="loading">No video files found in this container.</div>';
+          updateSelectedCountModal();
           return;
         }
 
-        pickerEl.innerHTML = blobs
-          .map((blob) => {
-            const isSelected = selectedBlobs.has(blob.name);
-            const sizeMB = (blob.sizeBytes / 1024 / 1024).toFixed(2);
-            const date = new Date(blob.lastModified).toLocaleString();
+        const groups = groupBlobsByDate(unattached);
+        let html = "";
 
-            return `
-              <div class="blob-item ${
-                isSelected ? "selected" : ""
-              }" data-blob-name="${blob.name}">
-                <input 
-                  type="checkbox" 
-                  class="blob-checkbox" 
-                  ${isSelected ? "checked" : ""} 
-                  onchange="toggleBlobSelectionModal('${blob.name}')"
-                />
-                <div class="blob-info">
-                  <div class="blob-name">${blob.name}</div>
-                  <div class="blob-meta">${sizeMB} MB • ${date}</div>
-                </div>
+        for (const [dateKey, blobs] of groups) {
+          const isExpanded = expandedDates.has(dateKey);
+          const totalSizeMB = (
+            blobs.reduce((sum, b) => sum + b.sizeBytes, 0) /
+            1024 /
+            1024
+          ).toFixed(1);
+          const selectedInGroup = blobs.filter((b) =>
+            selectedBlobs.has(b.name),
+          ).length;
+          const allSelected =
+            blobs.length > 0 && selectedInGroup === blobs.length;
+          const displayDate = new Date(dateKey + "T12:00:00").toLocaleDateString(
+            undefined,
+            { weekday: "short", year: "numeric", month: "short", day: "numeric" },
+          );
+
+          html += `
+            <div class="date-group-header" onclick="toggleDateGroup('${dateKey}')">
+              <div class="date-label">
+                <span class="arrow ${isExpanded ? "expanded" : ""}">&#9654;</span>
+                ${displayDate}
               </div>
-            `;
-          })
-          .join("");
+              <div class="date-summary">
+                ${selectedInGroup > 0 ? `<span style="color: #007cba; font-weight: 600;">${selectedInGroup} selected</span>` : ""}
+                <span>${blobs.length} video${blobs.length !== 1 ? "s" : ""} &bull; ${totalSizeMB} MB</span>
+                <button class="btn-select-day" onclick="selectDateGroup('${dateKey}', event)">
+                  ${allSelected ? "Deselect Day" : "Select Day"}
+                </button>
+              </div>
+            </div>
+            <div class="date-group-items ${isExpanded ? "expanded" : ""}">
+              ${blobs
+                .map((blob) => {
+                  const isSelected = selectedBlobs.has(blob.name);
+                  const sizeMB = (blob.sizeBytes / 1024 / 1024).toFixed(2);
+                  const parsed = parseRecordingFilename(blob.name);
+                  let timeStr = "";
+                  if (parsed) {
+                    timeStr = `${String(parsed.hour).padStart(2, "0")}:${String(parsed.minute).padStart(2, "0")}:${String(parsed.second).padStart(2, "0")}`;
+                    if (parsed.durationSeconds) {
+                      const mins = Math.floor(parsed.durationSeconds / 60);
+                      const secs = parsed.durationSeconds % 60;
+                      timeStr += ` (${mins}:${String(secs).padStart(2, "0")})`;
+                    }
+                  }
+                  return `
+                    <div class="blob-item ${isSelected ? "selected" : ""}" data-blob-name="${blob.name}">
+                      <input
+                        type="checkbox"
+                        class="blob-checkbox"
+                        ${isSelected ? "checked" : ""}
+                        onchange="toggleBlobSelectionModal('${blob.name}')"
+                      />
+                      <div class="blob-info">
+                        <div class="blob-name">${blob.name}</div>
+                        <div class="blob-meta">${sizeMB} MB${timeStr ? " &bull; " + timeStr : ""}</div>
+                      </div>
+                    </div>
+                  `;
+                })
+                .join("")}
+            </div>
+          `;
+        }
 
+        pickerEl.innerHTML = html;
         updateSelectedCountModal();
       }
 
@@ -1820,16 +1987,11 @@ title: Observations - SideSpins
           selectedBlobs.add(blobName);
         }
 
-        updateSelectedCountModal();
+        const pickerEl = document.getElementById("modalBlobPicker");
+        const scrollPos = pickerEl.scrollTop;
+        renderBlobPickerModal();
+        pickerEl.scrollTop = scrollPos;
         updateAddButtonModal();
-
-        // Update UI
-        const blobItem = document.querySelector(
-          `[data-blob-name="${blobName}"]`,
-        );
-        if (blobItem) {
-          blobItem.classList.toggle("selected");
-        }
       }
 
       // Select all visible blobs in modal
@@ -1837,20 +1999,23 @@ title: Observations - SideSpins
         const searchTerm = document
           .getElementById("modalBlobSearch")
           .value.toLowerCase();
+        const unattached = getUnattachedBlobs(availableBlobs);
         const visibleBlobs = searchTerm
-          ? availableBlobs.filter((b) =>
+          ? unattached.filter((b) =>
               b.name.toLowerCase().includes(searchTerm),
             )
-          : availableBlobs;
+          : unattached;
 
         visibleBlobs.forEach((blob) => selectedBlobs.add(blob.name));
         renderBlobPickerModal(searchTerm ? visibleBlobs : null);
+        updateAddButtonModal();
       }
 
       // Clear all selections in modal
       function clearSelectionModal() {
         selectedBlobs.clear();
         renderBlobPickerModal();
+        updateAddButtonModal();
       }
 
       // Filter blobs by search term in modal
@@ -1863,7 +2028,8 @@ title: Observations - SideSpins
           return;
         }
 
-        const filtered = availableBlobs.filter((blob) =>
+        const unattached = getUnattachedBlobs(availableBlobs);
+        const filtered = unattached.filter((blob) =>
           blob.name.toLowerCase().includes(searchTerm),
         );
         renderBlobPickerModal(filtered);

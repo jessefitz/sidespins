@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,8 +6,8 @@
     <title>SideSpins App</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -581,8 +581,8 @@
         <!-- Desktop Navigation -->
         <div class="nav-links">
           <a href="/app.html" class="active">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -636,8 +636,8 @@
 
         <div class="mobile-nav-links">
           <a href="/app.html" class="active">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -678,7 +678,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916002"></script>
+    <script src="/assets/auth.js?v=202601251504"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         const authManager = new AuthManager();
@@ -696,7 +696,7 @@
         const errorContainer = document.getElementById("error-container");
         const errorMessage = document.getElementById("error-message");
         const dashboardContainer = document.getElementById(
-          "dashboard-container"
+          "dashboard-container",
         );
         const roleActions = document.getElementById("role-actions");
         const logoutBtn = document.getElementById("logout-btn");
@@ -845,15 +845,22 @@
           const commonActions = [
             {
               text: "Schedule",
-              href: "/schedule-new.html",
+              href: "/schedule-new.html?v=2",
               description: "View team schedule and match results",
               icon: "📅",
             },
             {
               text: "Lineup Explorer",
-              href: "/lineup-explorer-new.html",
+              href: "/lineup-explorer-new.html?v=2",
               description: "Explore different player combinations",
               icon: "🎯",
+            },
+            {
+              text: "Observations",
+              href: "/observations.html",
+              description:
+                "Record and review pool practice sessions with video",
+              icon: "🎥",
             },
           ];
 
@@ -862,14 +869,32 @@
             admin: [
               ...commonActions,
               {
-                text: "Admin Panel",
-                href: "/admin/",
-                description: "Manage users, teams, and system settings",
+                text: "Match Management",
+                href: "/captain-matches.html",
+                description: "Create and manage team matches",
+                icon: "📅",
+              },
+              {
+                text: "Team Management",
+                href: "/team-admin.html",
+                description: "Manage team roster and settings",
+                icon: "👥",
+              },
+              {
+                text: "Admin Dashboard",
+                href: "/admin.html",
+                description: "Manage sessions and system settings",
                 icon: "⚙️",
               },
             ],
             manager: [
               ...commonActions,
+              {
+                text: "Match Management",
+                href: "/captain-matches.html",
+                description: "Create and manage team matches",
+                icon: "📅",
+              },
               {
                 text: "Team Management",
                 href: "/team-admin.html",
@@ -879,6 +904,12 @@
             ],
             captain: [
               ...commonActions,
+              {
+                text: "Match Management",
+                href: "/captain-matches.html",
+                description: "Create and manage team matches",
+                icon: "📅",
+              },
               {
                 text: "Team Management",
                 href: "/team-admin.html",
@@ -951,7 +982,7 @@
 
         function showComingSoon(feature) {
           alert(
-            `${feature} feature is coming soon! This will be available in a future update.`
+            `${feature} feature is coming soon! This will be available in a future update.`,
           );
         }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,8 +6,8 @@
     <title>Lineup Explorer - SideSpins</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -654,10 +654,13 @@
 
       .player-actions {
         margin-left: 1rem;
+        display: flex;
+        gap: 0.5rem;
       }
 
       .player-actions .add-btn,
-      .player-actions .remove-btn {
+      .player-actions .remove-btn,
+      .player-actions .volunteer-alt-btn {
         background: #007cba;
         color: white;
         border: none;
@@ -679,6 +682,44 @@
 
       .player-actions .remove-btn:hover {
         background: #c82333;
+      }
+
+      .player-actions .volunteer-alt-btn {
+        background: #28a745;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+
+      .player-actions .volunteer-alt-btn:hover {
+        background: #218838;
+      }
+
+      .player-actions .remove-alt-btn {
+        background: #ffc107;
+        color: #212529;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+
+      .player-actions .remove-alt-btn:hover {
+        background: #e0a800;
+      }
+
+      .alternate-badge {
+        background: #17a2b8;
+        color: white;
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 3px;
+        font-weight: bold;
+        margin-left: 0.5rem;
+      }
+
+      .alternate-status {
+        color: #17a2b8;
+        font-size: 0.75rem;
+        font-weight: 500;
+        font-style: italic;
       }
 
       .skill-summary {
@@ -1027,8 +1068,10 @@
         <!-- Desktop Navigation -->
         <div class="nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html" class="active">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2" class="active"
+            >Lineup Explorer</a
+          >
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -1082,8 +1125,10 @@
 
         <div class="mobile-nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html" class="active">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2" class="active"
+            >Lineup Explorer</a
+          >
           <a href="/team-admin.html" class="nav-team-admin">Team Admin</a>
         </div>
 
@@ -1227,7 +1272,7 @@
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916002"></script>
+    <script src="/assets/auth.js?v=202601251504"></script>
     <script>
       class LineupExplorerApp {
         constructor() {
@@ -1238,6 +1283,12 @@
               ? "http://localhost:7071/api"
               : "https://api.sidespins.com/api";
           this.authManager = new AuthManager(baseUrl);
+          this.apiUrl =
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+              ? "http://localhost:7071"
+              : "https://api.sidespins.com";
+          this.apiSecret = this.authManager.apiSecret;
           this.teamId = null;
           this.divisionId = null;
           this.teamName = null;
@@ -1345,8 +1396,15 @@
             // Update captain badge based on role
             this.updateCaptainBadge(activeMembership.role);
 
-            // TODO: Get division ID from team data or user preferences
-            this.divisionId = "div_nottingham_wed_9b_311";
+            // Get division ID from team membership
+            this.divisionId = activeMembership.divisionId;
+
+            if (!this.divisionId) {
+              this.showError(
+                "Team division information is missing. Please contact support.",
+              );
+              return;
+            }
 
             // Update team display
             document.getElementById("team-name").textContent = this.teamName;
@@ -1355,18 +1413,20 @@
 
             // Load data and setup UI
             await this.loadData();
-            this.setupUI();
+            await this.setupUI();
 
             // Setup event handlers
             this.setupLogoutHandler();
             this.setupTeamChangeListener();
 
             // Apply conditional UI based on permissions
+            UIPermissions.applyConditionalUI();
+
             this.showMainContent();
           } catch (error) {
             console.error("Lineup explorer initialization failed:", error);
             this.showError(
-              "Failed to initialize lineup explorer. Please try again."
+              "Failed to initialize lineup explorer. Please try again.",
             );
           }
         }
@@ -1518,13 +1578,13 @@
             const [playersResponse, matchesResponse, membershipsResponse] =
               await Promise.all([
                 this.authManager.makeAuthenticatedRequest(
-                  `${this.authManager.baseUrl}/GetPlayers`
+                  `${this.authManager.baseUrl}/GetPlayers`,
                 ),
                 this.authManager.makeAuthenticatedRequest(
-                  `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`
+                  `${this.authManager.baseUrl}/GetMatches?divisionId=${this.divisionId}`,
                 ),
                 this.authManager.makeAuthenticatedRequest(
-                  `${this.authManager.baseUrl}/GetMemberships?teamId=${this.teamId}`
+                  `${this.authManager.baseUrl}/GetMemberships?teamId=${this.teamId}`,
                 ),
               ]);
 
@@ -1545,9 +1605,13 @@
             });
 
             // Filter players for this team and add skill levels
+            // Exclude observing-players from lineup planning
             this.players = allPlayers
               .filter((player) =>
-                teamMemberships.some((m) => m.playerId === player.id)
+                teamMemberships.some(
+                  (m) =>
+                    m.playerId === player.id && m.role !== "observing-player",
+                ),
               )
               .map((player) => ({
                 ...player,
@@ -1559,7 +1623,7 @@
             this.matches = allMatches.filter(
               (match) =>
                 match.homeTeamId === this.teamId ||
-                match.awayTeamId === this.teamId
+                match.awayTeamId === this.teamId,
             );
           } catch (error) {
             console.error("Error loading data:", error);
@@ -1567,7 +1631,7 @@
           }
         }
 
-        setupUI() {
+        async setupUI() {
           this.renderSlots();
           this.renderPlayerList();
           this.populateMatches();
@@ -1577,24 +1641,60 @@
           this.setupSaveButton();
           this.updateSkillSummary();
 
-          // Check for matchId in URL parameters
+          // Check for matchId and teamId in URL parameters
           const urlParams = new URLSearchParams(window.location.search);
           const matchId = urlParams.get("matchId");
+          const teamIdParam = urlParams.get("teamId");
+
+          // If teamId is provided in URL, switch to that team (captain mode)
+          if (teamIdParam && teamIdParam !== this.teamId) {
+            // Check if user has access to this team
+            const membership = this.authManager.userMemberships.find(
+              (m) => m.teamId === teamIdParam,
+            );
+            if (membership) {
+              this.teamId = teamIdParam;
+              this.teamName = membership.teamName || teamIdParam;
+              this.authManager.activeTeamId = teamIdParam;
+              localStorage.setItem("activeTeamId", teamIdParam);
+
+              // Update UI elements
+              document.getElementById("team-name").textContent = this.teamName;
+              const teamSelect = document.getElementById("team-select");
+              if (teamSelect) {
+                teamSelect.value = teamIdParam;
+              }
+
+              // Reload data for new team
+              await this.loadData();
+              this.renderPlayerList();
+            }
+          }
+
           if (matchId) {
             const matchSelect = document.getElementById("match-select");
             matchSelect.value = matchId;
 
-            // Set default to captain's lineup when coming from schedule
-            const captainRadio = document.querySelector(
-              'input[name="start-state"][value="captain"]'
-            );
-            if (captainRadio) {
-              captainRadio.checked = true;
+            // Set default to captain's lineup when coming from schedule with teamId
+            if (teamIdParam) {
+              const captainRadio = document.querySelector(
+                'input[name="start-state"][value="captain"]',
+              );
+              if (captainRadio) {
+                captainRadio.checked = true;
+              }
             }
 
-            // Trigger change event to load the match
-            const event = new Event("change");
-            matchSelect.dispatchEvent(event);
+            // Load the match directly instead of using change event
+            await this.loadMatchLineup(matchId);
+
+            // Show start state container since match is selected
+            const startStateContainer = document.getElementById(
+              "start-state-container",
+            );
+            if (startStateContainer) {
+              startStateContainer.style.display = "block";
+            }
           }
         }
 
@@ -1648,7 +1748,34 @@
             return;
           }
 
+          // Debug logging for alternate detection
+          console.log("renderPlayerList - Current match:", this.currentMatch);
+          if (this.currentMatch?.lineupPlan) {
+            console.log("Lineup plan exists:", this.currentMatch.lineupPlan);
+            const isHomeTeam = this.currentMatch.homeTeamId === this.teamId;
+            const lineup = isHomeTeam
+              ? this.currentMatch.lineupPlan.home
+              : this.currentMatch.lineupPlan.away;
+            console.log(
+              `Team is ${isHomeTeam ? "home" : "away"}, lineup:`,
+              lineup,
+            );
+            const alternates = lineup?.filter((p) => p.isAlternate) || [];
+            console.log("Found alternates:", alternates);
+          } else {
+            console.log(
+              "No match selected or no lineup plan - alternate detection disabled",
+            );
+          }
+
           playerList.innerHTML = "";
+
+          // Show message if no match is selected
+          if (!this.currentMatch) {
+            playerList.innerHTML =
+              '<li style="text-align: center; color: #666; padding: 1rem; font-style: italic;">Select a match above to see alternate status and manage alternates</li>';
+            return;
+          }
 
           if (!this.players || this.players.length === 0) {
             playerList.innerHTML =
@@ -1663,12 +1790,37 @@
             li.dataset.playerId = player.id;
 
             const isInLineup = Object.values(this.currentLineup).some(
-              (p) => p && p.id === player.id
+              (p) => p && p.id === player.id,
             );
+
+            // Check if player is an alternate in the current match
+            let isAlternate = false;
+            if (this.currentMatch?.lineupPlan) {
+              const isHomeTeam = this.currentMatch.homeTeamId === this.teamId;
+              const lineup = isHomeTeam
+                ? this.currentMatch.lineupPlan.home
+                : this.currentMatch.lineupPlan.away;
+              isAlternate =
+                lineup?.some(
+                  (p) => p.playerId === player.id && p.isAlternate,
+                ) || false;
+
+              // Debug logging
+              if (isAlternate) {
+                console.log(`Player ${player.name} is marked as alternate`);
+              }
+            }
+
+            const isCaptain =
+              this.authManager && this.authManager.hasTeamRole("captain");
 
             li.innerHTML = `
                         <div class="player-info">
-                            <div class="player-name">${player.name}</div>
+                            <div class="player-name">${player.name}${
+                              isAlternate
+                                ? ' <span class="alternate-badge">ALT</span>'
+                                : ""
+                            }</div>
                             <span class="player-skill">Skill: ${
                               player.skill
                             }</span>
@@ -1677,7 +1829,18 @@
                             ${
                               isInLineup
                                 ? `<button class="remove-btn" data-player-id="${player.id}">Remove</button>`
-                                : `<button class="add-btn" data-player-id="${player.id}">Add</button>`
+                                : isAlternate
+                                  ? isCaptain
+                                    ? `<button class="remove-alt-btn" data-player-id="${player.id}">Remove Alternate</button>`
+                                    : '<span class="alternate-status">Set as Alternate</span>'
+                                  : `<button class="add-btn" data-player-id="${
+                                      player.id
+                                    }">Add</button>
+                                     ${
+                                       isCaptain
+                                         ? `<button class="volunteer-alt-btn" data-player-id="${player.id}">Set as Alternate</button>`
+                                         : ""
+                                     }`
                             }
                         </div>
                     `;
@@ -1689,7 +1852,7 @@
           if (this.playerListEventHandler) {
             playerList.removeEventListener(
               "click",
-              this.playerListEventHandler
+              this.playerListEventHandler,
             );
           }
 
@@ -1700,6 +1863,12 @@
             } else if (e.target.classList.contains("remove-btn")) {
               const playerId = e.target.dataset.playerId;
               this.removePlayerFromLineup(playerId);
+            } else if (e.target.classList.contains("volunteer-alt-btn")) {
+              const playerId = e.target.dataset.playerId;
+              this.volunteerPlayerAsAlternate(playerId);
+            } else if (e.target.classList.contains("remove-alt-btn")) {
+              const playerId = e.target.dataset.playerId;
+              this.removePlayerAsAlternate(playerId);
             }
           };
 
@@ -1712,7 +1881,7 @@
 
           // Sort matches by date
           const sortedMatches = this.matches.sort(
-            (a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt)
+            (a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt),
           );
 
           sortedMatches.forEach((match) => {
@@ -1737,7 +1906,7 @@
         setupMatchSelector() {
           const matchSelect = document.getElementById("match-select");
           const startStateContainer = document.getElementById(
-            "start-state-container"
+            "start-state-container",
           );
 
           matchSelect.addEventListener("change", (e) => {
@@ -1752,7 +1921,7 @@
 
           // Handle start state toggle changes
           const startStateRadios = document.querySelectorAll(
-            'input[name="start-state"]'
+            'input[name="start-state"]',
           );
           startStateRadios.forEach((radio) => {
             radio.addEventListener("change", (e) => {
@@ -1815,11 +1984,11 @@
               const player = this.players.find((p) => p.id === playerId);
               if (player) {
                 const currentPlayerCount = Object.values(
-                  this.currentLineup
+                  this.currentLineup,
                 ).filter((p) => p !== null).length;
                 const isEmptySlot = !this.currentLineup[slotNumber];
                 const playerAlreadyInLineup = Object.values(
-                  this.currentLineup
+                  this.currentLineup,
                 ).some((p) => p && p.id === playerId);
 
                 if (
@@ -1844,7 +2013,7 @@
           // Check if player is already in lineup
           if (
             Object.values(this.currentLineup).some(
-              (p) => p && p.id === playerId
+              (p) => p && p.id === playerId,
             )
           ) {
             alert("Player is already in the lineup");
@@ -1853,7 +2022,7 @@
 
           // Check if we're trying to add to an empty slot and already have 5 players
           const currentPlayerCount = Object.values(this.currentLineup).filter(
-            (p) => p !== null
+            (p) => p !== null,
           ).length;
           const isEmptySlot = !this.currentLineup[slotNumber];
 
@@ -1884,6 +2053,150 @@
               this.updateSkillSummary();
               break;
             }
+          }
+        }
+
+        async volunteerPlayerAsAlternate(playerId) {
+          if (!this.currentMatch) {
+            this.showError("Please select a match first.");
+            return;
+          }
+
+          if (!this.authManager || !this.authManager.hasTeamRole("captain")) {
+            this.showError(
+              "Only team captains can volunteer players as alternates.",
+            );
+            return;
+          }
+
+          const player = this.players.find((p) => p.id === playerId);
+          if (!player) {
+            this.showError("Player not found.");
+            return;
+          }
+
+          try {
+            const url = `${this.authManager.baseUrl}/matches/${this.currentMatch.id}/volunteer-player-alternate?divisionId=${this.currentMatch.divisionId}&teamId=${this.teamId}&playerId=${playerId}`;
+
+            const response = await this.authManager.makeAuthenticatedRequest(
+              url,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              },
+            );
+
+            if (response.ok) {
+              try {
+                const result = await response.json();
+                this.showSuccess(
+                  `Successfully volunteered ${player.name} as an alternate.`,
+                );
+
+                // Refresh the match data to show the updated lineup
+                if (result.match) {
+                  this.currentMatch = result.match;
+                  this.renderPlayerList();
+                }
+              } catch (jsonError) {
+                console.warn(
+                  "Response was successful but not valid JSON:",
+                  jsonError,
+                );
+                this.showSuccess(
+                  `Successfully volunteered ${player.name} as an alternate.`,
+                );
+                // Still refresh the player list
+                this.renderPlayerList();
+              }
+            } else {
+              let errorText;
+              try {
+                errorText = await response.text();
+              } catch (textError) {
+                errorText = "Failed to set player as alternate.";
+              }
+              this.showError(errorText || "Failed to set player as alternate.");
+            }
+          } catch (error) {
+            console.error("Error setting player as alternate:", error);
+            this.showError(
+              "An error occurred while setting the player as alternate.",
+            );
+          }
+        }
+
+        async removePlayerAsAlternate(playerId) {
+          if (!this.currentMatch) {
+            this.showError("Please select a match first.");
+            return;
+          }
+
+          if (!this.authManager || !this.authManager.hasTeamRole("captain")) {
+            this.showError("Only team captains can remove alternates.");
+            return;
+          }
+
+          const player = this.players.find((p) => p.id === playerId);
+          if (!player) {
+            this.showError("Player not found.");
+            return;
+          }
+
+          try {
+            const url = `${this.authManager.baseUrl}/matches/${this.currentMatch.id}/remove-alternate?divisionId=${this.currentMatch.divisionId}&teamId=${this.teamId}&playerId=${playerId}`;
+
+            const response = await this.authManager.makeAuthenticatedRequest(
+              url,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              },
+            );
+
+            if (response.ok) {
+              try {
+                const result = await response.json();
+                this.showSuccess(
+                  `Successfully removed ${player.name} as an alternate.`,
+                );
+
+                // Refresh the match data to show the updated lineup
+                if (result.match) {
+                  this.currentMatch = result.match;
+                  this.renderPlayerList();
+                }
+              } catch (jsonError) {
+                console.warn(
+                  "Response was successful but not valid JSON:",
+                  jsonError,
+                );
+                this.showSuccess(
+                  `Successfully removed ${player.name} as an alternate.`,
+                );
+                // Still refresh the player list
+                this.renderPlayerList();
+              }
+            } else {
+              let errorText;
+              try {
+                errorText = await response.text();
+              } catch (textError) {
+                errorText = "Failed to remove player as alternate.";
+              }
+              this.showError(
+                errorText || "Failed to remove player as alternate.",
+              );
+            }
+          } catch (error) {
+            console.error("Error removing player as alternate:", error);
+            this.showError(
+              "An error occurred while removing the player as alternate.",
+            );
           }
         }
 
@@ -1922,7 +2235,7 @@
         updatePlayerListDisplay() {
           const playerItems = document.querySelectorAll(".player-item");
           const lineupPlayerIds = Object.values(this.currentLineup).map(
-            (p) => p.id
+            (p) => p.id,
           );
 
           playerItems.forEach((item) => {
@@ -1940,7 +2253,7 @@
         updateSkillSummary() {
           const totalSkill = Object.values(this.currentLineup).reduce(
             (total, player) => total + (player ? player.skill : 0),
-            0
+            0,
           );
 
           // Update cap meter elements
@@ -1963,7 +2276,7 @@
           if (meterFillElement) {
             const percentage = Math.min(
               (totalSkill / this.skillLimit) * 100,
-              100
+              100,
             );
             meterFillElement.style.width = `${percentage}%`;
 
@@ -2012,8 +2325,8 @@
           const availablePlayers = this.players.filter(
             (player) =>
               !Object.values(this.currentLineup).some(
-                (p) => p && p.id === player.id
-              )
+                (p) => p && p.id === player.id,
+              ),
           );
 
           if (availablePlayers.length === 0) {
@@ -2022,17 +2335,17 @@
           }
 
           const playerNames = availablePlayers.map(
-            (p) => `${p.name} (Skill: ${p.skill})`
+            (p) => `${p.name} (Skill: ${p.skill})`,
           );
           const selection = prompt(
             `Select a player for slot ${slotNumber}:\n\n${playerNames.join(
-              "\n"
-            )}\n\nEnter player name:`
+              "\n",
+            )}\n\nEnter player name:`,
           );
 
           if (selection) {
             const selectedPlayer = availablePlayers.find((p) =>
-              p.name.toLowerCase().includes(selection.toLowerCase())
+              p.name.toLowerCase().includes(selection.toLowerCase()),
             );
 
             if (selectedPlayer) {
@@ -2050,7 +2363,7 @@
           // Check if player is already in lineup
           if (
             Object.values(this.currentLineup).some(
-              (p) => p && p.id === playerId
+              (p) => p && p.id === playerId,
             )
           ) {
             alert("Player is already in the lineup");
@@ -2083,9 +2396,12 @@
 
             this.currentMatch = match;
 
+            // Refresh player list to show alternate status
+            this.renderPlayerList();
+
             // Check if start state is set to captain lineup
             const startStateRadio = document.querySelector(
-              'input[name="start-state"]:checked'
+              'input[name="start-state"]:checked',
             );
             if (startStateRadio && startStateRadio.value === "captain") {
               this.loadCaptainLineup(matchId);
@@ -2124,7 +2440,7 @@
           activeLineup.forEach((lineupPlayer, index) => {
             // Find the player in our roster
             const player = this.players.find(
-              (p) => p.id === lineupPlayer.playerId
+              (p) => p.id === lineupPlayer.playerId,
             );
             if (player) {
               const slotNumber = (index + 1).toString();
@@ -2134,7 +2450,7 @@
               };
               this.updateSlotDisplay(
                 slotNumber,
-                this.currentLineup[slotNumber]
+                this.currentLineup[slotNumber],
               );
             }
           });
@@ -2168,16 +2484,15 @@
             const lineupData = this.buildLineupData();
 
             // Make API call to save lineup
-            const response = await fetch(
+            const response = await this.authManager.makeAuthenticatedRequest(
               `${this.authManager.baseUrl}/teams/${this.teamId}/matches/${this.currentMatch.id}/lineup?divisionId=${this.divisionId}`,
               {
                 method: "PATCH",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                credentials: "include",
                 body: JSON.stringify(lineupData),
-              }
+              },
             );
 
             if (response.ok) {
@@ -2189,7 +2504,7 @@
 
               // Update match in our local matches array
               const matchIndex = this.matches.findIndex(
-                (m) => m.id === this.currentMatch.id
+                (m) => m.id === this.currentMatch.id,
               );
               if (matchIndex !== -1) {
                 this.matches[matchIndex] = updatedMatch;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,8 +6,8 @@
     <title>Team Administration - SideSpins</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f5f5f5;
@@ -366,6 +366,12 @@
         background-color: #d4edda;
         color: #155724;
         border: 1px solid #c3e6cb;
+      }
+
+      .role-observing-player {
+        background-color: #e7f3ff;
+        color: #004085;
+        border: 1px solid #b8daff;
       }
 
       .skill-level {
@@ -793,6 +799,109 @@
           flex-direction: column;
         }
       }
+
+      /* Session Management Styles */
+      .session-card {
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: box-shadow 0.2s;
+      }
+
+      .session-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .session-card.active {
+        border-color: #28a745;
+        border-width: 2px;
+        background-color: #f0fff4;
+      }
+
+      .session-info {
+        flex: 1;
+      }
+
+      .session-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .session-dates {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .session-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .session-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      .session-badge.active {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .session-badge.inactive {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      .session-match-count {
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .session-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-content h3 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
     </style>
   </head>
   <body>
@@ -803,8 +912,8 @@
         <!-- Desktop Navigation -->
         <div class="nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="active nav-team-admin"
             >Team Admin</a
           >
@@ -860,8 +969,8 @@
 
         <div class="mobile-nav-links">
           <a href="/app.html">Dashboard</a>
-          <a href="/schedule-new.html">Schedule</a>
-          <a href="/lineup-explorer-new.html">Lineup Explorer</a>
+          <a href="/schedule-new.html?v=2">Schedule</a>
+          <a href="/lineup-explorer-new.html?v=2">Lineup Explorer</a>
           <a href="/team-admin.html" class="active nav-team-admin"
             >Team Admin</a
           >
@@ -951,6 +1060,7 @@
                   <label for="member-role">Role</label>
                   <select id="member-role" class="form-control">
                     <option value="player">Player</option>
+                    <option value="observing-player">Observing Player</option>
                     <option value="captain">Captain</option>
                     <option value="manager">Manager</option>
                   </select>
@@ -975,11 +1085,52 @@
               </form>
             </div>
           </div>
+
+          <!-- Team Active Session Section -->
+          <div class="admin-section">
+            <div class="section-header">
+              <h2 class="section-title">Team Active Session</h2>
+            </div>
+
+            <p
+              class="section-description"
+              style="color: #666; margin-bottom: 1rem"
+            >
+              Select which session your team is currently participating in. Only
+              active sessions are available for selection.
+            </p>
+
+            <div id="active-session-selector">
+              <div class="form-group">
+                <label for="team-active-session"
+                  >Active Session for Your Team</label
+                >
+                <select
+                  id="team-active-session"
+                  class="form-control"
+                  style="max-width: 400px"
+                >
+                  <option value="">Loading sessions...</option>
+                </select>
+              </div>
+              <button
+                id="save-active-session-btn"
+                class="btn btn-primary"
+                style="margin-top: 0.5rem"
+              >
+                Save Active Session
+              </button>
+              <span
+                id="active-session-status"
+                style="margin-left: 1rem; color: #666"
+              ></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <script src="/assets/auth.js?v=20250916002"></script>
+    <script src="/assets/auth.js?v=202601251504"></script>
     <script>
       class TeamAdminApp {
         constructor() {
@@ -989,6 +1140,8 @@
           this.teamMembers = [];
           this.allPlayers = [];
           this.selectedPlayer = null;
+          this.sessions = [];
+          this.editingSessionId = null;
 
           // Bind methods
           this.handleTeamChange = this.handleTeamChange.bind(this);
@@ -1028,7 +1181,7 @@
           } catch (error) {
             console.error("Failed to initialize team admin app:", error);
             this.showError(
-              "Failed to load team administration. Please try refreshing the page."
+              "Failed to load team administration. Please try refreshing the page.",
             );
             this.hideLoading();
           }
@@ -1065,6 +1218,11 @@
           document
             .getElementById("player-search")
             .addEventListener("input", this.handlePlayerSearch);
+
+          // Active session selector
+          document
+            .getElementById("save-active-session-btn")
+            .addEventListener("click", () => this.handleSaveActiveSession());
 
           // Avatar dropdown
           const userAvatar = document.getElementById("user-avatar");
@@ -1126,7 +1284,7 @@
               console.log("Loaded players:", this.allPlayers.length);
             } else {
               console.warn(
-                "No player endpoint available, search will be limited"
+                "No player endpoint available, search will be limited",
               );
             }
           } catch (error) {
@@ -1183,7 +1341,7 @@
           if (this.mobileNav && memberships.length > 0) {
             this.mobileNav.updateTeamOptions(
               memberships,
-              this.authManager.activeTeamId
+              this.authManager.activeTeamId,
             );
           }
         }
@@ -1204,7 +1362,7 @@
           if (
             currentMembership &&
             ["captain", "manager"].includes(
-              currentMembership.role.toLowerCase()
+              currentMembership.role.toLowerCase(),
             )
           ) {
             captainBadge.style.display = "block";
@@ -1227,23 +1385,30 @@
 
         async loadTeamData() {
           try {
-            // Check permissions
-            if (!this.authManager.hasTeamRole("captain")) {
+            // Check permissions - allow captains and global admins
+            if (
+              !this.authManager.hasTeamRole("captain") &&
+              !this.authManager.isGlobalAdmin()
+            ) {
               this.showPermissionDenied();
               return;
             }
+
+            // Set currentTeamId from authManager (for initial load when no teamChanged event fires)
+            this.currentTeamId = this.authManager.activeTeamId;
+            this.currentMembership = this.authManager.getActiveMembership();
 
             this.showMainContent();
 
             // Update team info
             this.updateTeamHeader();
 
-            // Load team members
-            await this.loadTeamMembers();
+            // Load team members and sessions
+            await Promise.all([this.loadTeamMembers(), this.loadSessions()]);
           } catch (error) {
             console.error("Failed to load team data:", error);
             this.showError(
-              "Failed to load team data. Please try refreshing the page."
+              "Failed to load team data. Please try refreshing the page.",
             );
           }
         }
@@ -1257,7 +1422,7 @@
             teamNameElement.textContent =
               currentMembership.teamName || `Team ${currentMembership.teamId}`;
             teamRoleElement.textContent = `Role: ${this.formatRole(
-              currentMembership.role
+              currentMembership.role,
             )}`;
           }
         }
@@ -1265,7 +1430,7 @@
         async loadTeamMembers() {
           try {
             const response = await this.authManager.apiRequest(
-              `/teams/${this.authManager.activeTeamId}/memberships`
+              `/teams/${this.authManager.activeTeamId}/memberships`,
             );
 
             if (response.ok) {
@@ -1273,9 +1438,8 @@
               console.log("Raw memberships:", memberships);
 
               // Enrich memberships with player details
-              this.teamMembers = await this.enrichMembershipsWithPlayerDetails(
-                memberships
-              );
+              this.teamMembers =
+                await this.enrichMembershipsWithPlayerDetails(memberships);
               console.log("Enriched memberships:", this.teamMembers);
 
               this.renderMembersList();
@@ -1295,13 +1459,13 @@
             try {
               // Try to get player details from our cached players first
               let playerDetails = this.allPlayers.find(
-                (p) => p.id === membership.playerId
+                (p) => p.id === membership.playerId,
               );
 
               // If not found in cache, try to fetch individual player details
               if (!playerDetails) {
                 console.log(
-                  `Player ${membership.playerId} not found in cache, attempting individual fetch`
+                  `Player ${membership.playerId} not found in cache, attempting individual fetch`,
                 );
                 playerDetails = {
                   id: membership.playerId,
@@ -1333,7 +1497,7 @@
             } catch (error) {
               console.error(
                 `Failed to enrich membership ${membership.id}:`,
-                error
+                error,
               );
               // Add with minimal data
               enrichedMembers.push({
@@ -1388,7 +1552,9 @@
         }
 
         renderMemberRow(member) {
-          const canEdit = this.authManager.hasTeamRole("captain");
+          const canEdit =
+            this.authManager.hasTeamRole("captain") ||
+            this.authManager.isGlobalAdmin();
           const isCurrentUser =
             member.playerId === this.authManager.currentUser?.playerId;
 
@@ -1396,8 +1562,8 @@
                     <tr data-member-id="${member.id}">
                         <td>
                             <div class="member-name">${member.firstName} ${
-            member.lastName
-          }</div>
+                              member.lastName
+                            }</div>
                         </td>
                         <td>
                             <div class="member-apa">${
@@ -1414,6 +1580,11 @@
                                     <option value="player" ${
                                       member.role === "player" ? "selected" : ""
                                     }>Player</option>
+                                    <option value="observing-player" ${
+                                      member.role === "observing-player"
+                                        ? "selected"
+                                        : ""
+                                    }>Observing Player</option>
                                     <option value="captain" ${
                                       member.role === "captain"
                                         ? "selected"
@@ -1428,8 +1599,8 @@
                             `
                                 : `
                                 <span class="role-badge role-${member.role.toLowerCase()}">${this.formatRole(
-                                    member.role
-                                  )}</span>
+                                  member.role,
+                                )}</span>
                             `
                             }
                         </td>
@@ -1441,8 +1612,8 @@
                                     <select class="skill-select" data-member-id="${
                                       member.id
                                     }" data-current-skill="${
-                                    member.skillLevel
-                                  }">
+                                      member.skillLevel
+                                    }">
                                         <option value="">N/A</option>
                                         <option value="2" ${
                                           member.skillLevel == 2
@@ -1565,7 +1736,7 @@
               {
                 method: "PUT",
                 body: JSON.stringify(updateData),
-              }
+              },
             );
 
             if (response.ok) {
@@ -1573,7 +1744,7 @@
                 ? `skill level ${newSkillLevel}`
                 : "no skill level";
               this.showSuccess(
-                `Updated ${member.firstName} ${member.lastName}'s ${skillDisplay}`
+                `Updated ${member.firstName} ${member.lastName}'s ${skillDisplay}`,
               );
               select.dataset.currentSkill = newSkillLevel; // Update the current value
 
@@ -1619,14 +1790,14 @@
               {
                 method: "PUT",
                 body: JSON.stringify(updateData),
-              }
+              },
             );
 
             if (response.ok) {
               this.showSuccess(
                 `Updated ${member.firstName} ${
                   member.lastName
-                }'s role to ${this.formatRole(newRole)}`
+                }'s role to ${this.formatRole(newRole)}`,
               );
               await this.loadTeamMembers(); // Refresh the list
             } else {
@@ -1646,7 +1817,7 @@
 
           if (
             !confirm(
-              `Are you sure you want to remove ${memberName} from the team?`
+              `Are you sure you want to remove ${memberName} from the team?`,
             )
           ) {
             return;
@@ -1655,7 +1826,7 @@
           try {
             const response = await this.authManager.apiRequest(
               `/teams/${this.authManager.activeTeamId}/memberships/${memberId}`,
-              { method: "DELETE" }
+              { method: "DELETE" },
             );
 
             if (response.ok) {
@@ -1674,7 +1845,7 @@
           // Check if we have players to search
           if (!this.allPlayers || this.allPlayers.length === 0) {
             this.showError(
-              "Player search is not available. Please contact an administrator to add players to your team."
+              "Player search is not available. Please contact an administrator to add players to your team.",
             );
             return;
           }
@@ -1713,7 +1884,7 @@
 
             // Exclude players already on the team
             const isAlreadyMember = this.teamMembers.some(
-              (member) => member.playerId === player.id
+              (member) => member.playerId === player.id,
             );
 
             return (
@@ -1746,7 +1917,7 @@
                                 Skill: ${player.skillLevel || "N/A"}
                             </div>
                         </div>
-                    `
+                    `,
               )
               .join("");
 
@@ -1791,14 +1962,14 @@
               {
                 method: "POST",
                 body: JSON.stringify(membershipData),
-              }
+              },
             );
 
             if (response.ok) {
               this.showSuccess(
                 `Added ${this.selectedPlayer.firstName} ${
                   this.selectedPlayer.lastName
-                } to the team as ${this.formatRole(role)}`
+                } to the team as ${this.formatRole(role)}`,
               );
               this.hideAddMemberForm();
               await this.loadTeamMembers(); // Refresh the list
@@ -1814,6 +1985,7 @@
         formatRole(role) {
           const roleMap = {
             player: "Player",
+            "observing-player": "Observing Player",
             captain: "Captain",
             manager: "Manager",
           };
@@ -1858,6 +2030,132 @@
           document.getElementById("main-content").style.display = "none";
           document.getElementById("no-team").style.display = "none";
           document.getElementById("permission-denied").style.display = "block";
+        }
+
+        // Session Management Methods
+        async loadSessions() {
+          try {
+            const currentMembership = this.authManager.getActiveMembership();
+            if (!currentMembership?.divisionId) {
+              document.getElementById("team-active-session").innerHTML =
+                "<option value=''>No division selected</option>";
+              return;
+            }
+
+            // Load active sessions only
+            const response = await this.authManager.apiRequest(
+              `/divisions/${currentMembership.divisionId}/sessions/active`,
+            );
+
+            if (response.ok) {
+              this.sessions = await response.json();
+              await this.renderActiveSessionSelector();
+            } else {
+              throw new Error("Failed to load sessions");
+            }
+          } catch (error) {
+            console.error("Failed to load sessions:", error);
+            document.getElementById("team-active-session").innerHTML =
+              "<option value=''>Failed to load sessions</option>";
+          }
+        }
+
+        async renderActiveSessionSelector() {
+          const selectElement = document.getElementById("team-active-session");
+
+          // Sort sessions by start date (newest first)
+          const sortedSessions = [...this.sessions].sort(
+            (a, b) => new Date(b.startDate) - new Date(a.startDate),
+          );
+
+          // Get the team's current active session
+          const currentMembership = this.authManager.getActiveMembership();
+          let teamActiveSessionId = null;
+
+          try {
+            const teamResponse = await this.authManager.apiRequest(
+              `/teams/${this.currentTeamId}/details?divisionId=${currentMembership.divisionId}`,
+            );
+            if (teamResponse.ok) {
+              const teamData = await teamResponse.json();
+              teamActiveSessionId = teamData.team?.activeSessionId;
+            }
+          } catch (error) {
+            console.error("Failed to get team details:", error);
+          }
+
+          // Build options
+          let optionsHtml =
+            '<option value="">-- No session selected --</option>';
+
+          sortedSessions.forEach((session) => {
+            const startDate = new Date(session.startDate).toLocaleDateString();
+            const endDate = new Date(session.endDate).toLocaleDateString();
+            const selected =
+              session.id === teamActiveSessionId ? "selected" : "";
+            optionsHtml += `<option value="${session.id}" ${selected}>${this.escapeHtml(session.name)} (${startDate} - ${endDate})</option>`;
+          });
+
+          if (sortedSessions.length === 0) {
+            optionsHtml =
+              '<option value="">No active sessions available</option>';
+          }
+
+          selectElement.innerHTML = optionsHtml;
+        }
+
+        async handleSaveActiveSession() {
+          const selectElement = document.getElementById("team-active-session");
+          const statusElement = document.getElementById(
+            "active-session-status",
+          );
+          const sessionId = selectElement.value || null;
+
+          const currentMembership = this.authManager.getActiveMembership();
+          if (!currentMembership?.divisionId || !this.currentTeamId) {
+            alert("No team selected.");
+            return;
+          }
+
+          statusElement.textContent = "Saving...";
+          statusElement.style.color = "#666";
+
+          try {
+            const response = await this.authManager.apiRequest(
+              `/teams/${this.currentTeamId}/active-session?divisionId=${currentMembership.divisionId}`,
+              {
+                method: "PATCH",
+                body: JSON.stringify({ sessionId: sessionId }),
+              },
+            );
+
+            if (response.ok) {
+              statusElement.textContent = "✓ Saved";
+              statusElement.style.color = "#28a745";
+              setTimeout(() => {
+                statusElement.textContent = "";
+              }, 3000);
+            } else {
+              const errorText = await response.text();
+              throw new Error(errorText || "Failed to save");
+            }
+          } catch (error) {
+            console.error("Failed to save active session:", error);
+            statusElement.textContent = "✗ Failed to save";
+            statusElement.style.color = "#dc3545";
+            alert(`Failed to save active session: ${error.message}`);
+          }
+        }
+
+        escapeHtml(text) {
+          const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;",
+          };
+          return text.replace(/[&<>"']/g, (m) => map[m]);
         }
       }
 

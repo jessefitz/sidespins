@@ -1,0 +1,19 @@
+{
+  "OutputRoot": "%USERPROFILE%\\Videos\\pool",
+  "AppendSuffix": "_faststart",
+  "FfmpegPath": "ffmpeg",
+  "IncludeTimestampInFolder": false,
+  "FileExtensions": [".mp4"],
+  "SkipIfExists": true,
+  "ExcludePaths": ["System Volume Information", "$RECYCLE.BIN", "RECYCLER"],
+  "LogDirectory": "%LOCALAPPDATA%\\PoolIngest\\logs",
+  "AzCopy": {
+    "Enabled": true,
+    "AzCopyPath": "azcopy",
+    "ContainerSasUrl": "https://jessefitzblob.blob.core.windows.net/videos?<SAS-TOKEN-VALUE>",
+    "RemotePrefix": "pool",
+    "IncludePattern": "*.mp4",
+    "OverwritePolicy": "true",
+    "Recursive": true
+  }
+}

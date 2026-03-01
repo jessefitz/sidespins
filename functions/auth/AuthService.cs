@@ -651,12 +651,45 @@ public class AuthService
                 return null;
             }
 
+            // Fetch user from Stytch to get trusted_metadata for role
+            string sidespinsRole = "player"; // Default role
+            try
+            {
+                var userResponse = await _httpClient.GetAsync($"users/{authUserId}");
+                if (userResponse.IsSuccessStatusCode)
+                {
+                    var userContent = await userResponse.Content.ReadAsStringAsync();
+                    var user = JsonConvert.DeserializeObject<StytchUserResponse>(userContent);
+                    var trustedMetadata = ParseTrustedMetadata(user?.TrustedMetadata);
+                    sidespinsRole = trustedMetadata?.SidespinsRole ?? "player";
+                    _logger.LogInformation(
+                        "Fetched sidespins_role from Stytch: {Role} for authUserId: {AuthUserId}",
+                        sidespinsRole,
+                        authUserId
+                    );
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "Failed to fetch user from Stytch for role lookup (status: {StatusCode}), using default 'player' role",
+                        userResponse.StatusCode
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Error fetching user from Stytch for role lookup, using default 'player' role"
+                );
+            }
+
             // Create new AppClaims with player information
             var claims = new AppClaims
             {
                 Sub = authUserId,
                 PlayerId = player.Id,
-                SidespinsRole = "player", // Default role
+                SidespinsRole = sidespinsRole,
                 Iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Exp = DateTimeOffset.UtcNow.AddHours(24).ToUnixTimeSeconds(),
                 Ver = 1,
@@ -667,8 +700,9 @@ public class AuthService
             var newJwt = GenerateAppJwt(claims);
 
             _logger.LogInformation(
-                "Successfully regenerated JWT with player_id: {PlayerId} for authUserId: {AuthUserId}",
+                "Successfully regenerated JWT with player_id: {PlayerId}, role: {Role} for authUserId: {AuthUserId}",
                 player.Id,
+                sidespinsRole,
                 authUserId
             );
 

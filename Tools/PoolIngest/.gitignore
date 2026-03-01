@@ -1,0 +1,11 @@
+# Logs
+logs/
+*.log
+
+# Local settings (if we add sensitive config later)
+local.settings.json
+*.local.json
+
+# Temporary files
+*.tmp
+ffmpeg_error.txt
